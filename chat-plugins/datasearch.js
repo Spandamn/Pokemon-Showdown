@@ -1026,7 +1026,7 @@ function runMovesearch(target, cmd, canAll, message) {
 			}
 			break;
 
-		case 'zboost':
+		case 'zboosts':
 			for (let boost in searches[search]) {
 				for (let move in dex) {
 					if (dex[move].zMoveBoost) {

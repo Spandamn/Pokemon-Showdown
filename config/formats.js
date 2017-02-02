@@ -315,13 +315,13 @@ exports.Formats = [
 
 			set.species = template.species;
 			if (!validSources.length && pokemonWithAbility.length > 1) {
-				return [`${template.species}'s set is illegal.`];
+				return [`${set.name}'s set is illegal.`];
 			}
 			if (!validSources.length) {
 				problems.unshift(`${template.species} has an illegal set with an ability from ${this.tools.getTemplate(pokemonWithAbility[0]).name}.`);
 				return problems;
 			}
-			set.name = (name ? (name+" ("+donorSpecies+")") : (set.species+" ("+donorSpecies+")"));
+			set.name = name ? `${name} (${donorSpecies})` : `${set.species} (${donorSpecies})`;
 		},
 		onValidateTeam: function (team, format) {
 			// Donor Clause

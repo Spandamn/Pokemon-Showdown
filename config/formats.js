@@ -254,12 +254,12 @@ exports.Formats = [
 			}
 			return template.speciesid;
 		},
-		validateSet: function(set, teamHas) {
+		validateSet: function (set, teamHas) {
 			if (!this.format.abilityMap) {
 				let abilityMap = Object.create(null);
 				for (let speciesid in this.tools.data.Pokedex) {
-					let pokemon = this.tools.data.Pokedex[speciesid];
-					if (pokemon.num < 1 || pokemon.num > 802) continue;
+					let pokemon = this.tools.data.Pokedex[speciesid];if (pokemon.num < 1 || pokemon.species in this.format.banlistTable || this.format.bannedDonors.includes(pokemon.species)) continue;
+					if (this.tools.data.FormatsData[speciesid].requiredItem || this.tools.data.FormatsData[speciesid].requiredMove) continue;
 					for (let key in pokemon.abilities) {
 						let abilityId = toId(pokemon.abilities[key]);
 						if (abilityMap[abilityId]) {
@@ -280,22 +280,16 @@ exports.Formats = [
 
 			let species = toId(set.species);
 			let template = this.tools.getTemplate(species);
-			if (!template.exists) return ["" + set.species + " is not a real Pok\u00E9mon."];
-			if (template.isUnreleased) return ["" + set.species + " is unreleased."];
-			if (template.speciesid in this.format.customBans.receiver) {
-				return ["" + set.species + " is banned."];
-			} else if (!this.tools.data.FormatsData[species] || !this.tools.data.FormatsData[species].tier) {
-				if (toId(template.baseSpecies) in this.format.customBans.receiver) {
-					return ["" + template.baseSpecies + " is banned."];
-				}
-			}
+			if (!template.exists) return [`The Pokemon "${set.species}" does not exist.`];
+			if (template.isUnreleased) return [`${template.species} is unreleased.`];
+			if (template.tier === 'Uber' || template.tier === 'Bank-Uber' || template.species in this.format.banlistTable) return [`${template.species} is banned.`];
 
 			let name = set.name;
 
 			let abilityId = toId(set.ability);
-			if (!abilityId) return ["" + (set.name || set.species) + " must have an ability."];
+			if (!abilityId || !(abilityId in this.tools.data.Abilities)) return [`${name} needs to have a valid ability.`];
 			let pokemonWithAbility = this.format.abilityMap[abilityId];
-			if (!pokemonWithAbility) return ["" + set.ability + " is an invalid ability."];
+			if (!pokemonWithAbility) return [`"${set.ability}" is not available on a legal Pokemon.`];
 			let isBaseAbility = Object.values(template.abilities).map(toId).indexOf(abilityId) >= 0;
 
 			// Items must be fully validated here since we may pass a different item to the base set validator.
@@ -310,12 +304,7 @@ exports.Formats = [
 				let donorTemplate = this.tools.getTemplate(pokemonWithAbility[i]);
 				let evoFamily = this.format.getEvoFamily(donorTemplate);
 
-				if (validSources.indexOf(evoFamily) >= 0) {
-					// The existence of a legal set has already been established.
-					// We only keep iterating to find all legal donor families (Donor Clause).
-					// Skip this redundant iteration.
-					continue;
-				}
+				if (validSources.indexOf(evoFamily) >= 0) continue;
 
 				if (set.name === set.species) delete set.name;
 				else if (toId(donorTemplate.species) !== toId(set.species) && donorTemplate.isMega) {
@@ -330,10 +319,6 @@ exports.Formats = [
 					continue;
 				}
 				set.species = donorTemplate.species;
-				if (donorTemplate.species !== template.species && donorTemplate.requiredItem) {
-					// Bypass forme validation. Relevant to inherit from Giratina-O, and Mega/Primal formes.
-					set.item = donorTemplate.requiredItem;
-				}
 				problems = this.validateSet(set, teamHas) || [];
 				if (!problems.length) {
 					validSources.push(evoFamily);
@@ -341,20 +326,19 @@ exports.Formats = [
 				}
 				if (validSources.length > 1) {
 					// This is an optimization only valid for the current basic implementation of Donor Clause.
-					// Remove if the FIXME? above actually gets fixed.
 					break;
 				}
 			}
 
 			// Restore the intended species, name and item.
 			set.species = template.species;
-			set.name = set.name || set.species;//(name ? (name+" ("+donorSpecies+")") : (set.species+" ("+donorSpecies+")"));
+			set.name = set.name || set.species;
 			set.item = item.name;
 			if (!validSources.length && pokemonWithAbility.length > 1) {
 				return ["" + (set.name || set.species) + "'s set is illegal."];
 			}
 			if (!validSources.length) {
-				problems.unshift("" + (set.name || set.species) + " has an illegal set with an ability from " + this.tools.getTemplate(pokemonWithAbility[0]).name+'.');
+				problems.unshift(`${set.name} has an illegal set with an ability from ${this.tools.getTemplate(pokemonWithAbility[0]).name}.`);
 				return problems;
 			}
 			set.name = (name ? (name+" ("+donorSpecies+")") : (set.species+" ("+donorSpecies+")"));

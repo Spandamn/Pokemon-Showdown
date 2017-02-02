@@ -281,7 +281,7 @@ exports.Formats = [
 
 			let species = toId(set.species);
 			let template = this.tools.getTemplate(species);
-			if (!template.exists) return [`The Pokemon '${set.species}' does not exist.`];
+			if (!template.exists) return [`The Pokemon "${set.species}" does not exist.`];
 			if (template.isUnreleased) return [`${template.species} is unreleased.`];
 			if (template.tier === 'Uber' || template.tier === 'Bank-Uber' || template.species in this.format.banlistTable) return [`${template.species} is banned.`];
 
@@ -290,7 +290,7 @@ exports.Formats = [
 			let abilityId = toId(set.ability);
 			if (!abilityId || !(abilityId in this.tools.data.Abilities)) return [`${name} needs to have a valid ability.`];
 			let pokemonWithAbility = this.format.abilityMap[abilityId];
-			if (!pokemonWithAbility) return [`'${set.ability}' is not available on a legal Pokemon.`];
+			if (!pokemonWithAbility) return [`"${set.ability}" is not available on a legal Pokemon.`];
 
 			// Items must be fully validated here since we may pass a different item to the base set validator.
 			let item = this.tools.getItem(set.item);

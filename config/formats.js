@@ -291,13 +291,12 @@ exports.Formats = [
 			if (!abilityId || !(abilityId in this.tools.data.Abilities)) return [`${name} needs to have a valid ability.`];
 			let pokemonWithAbility = this.format.abilityMap[abilityId];
 			if (!pokemonWithAbility) return [`"${set.ability}" is not available on a legal Pokemon.`];
-			let isBaseAbility = Object.values(template.abilities).map(toId).indexOf(abilityId) >= 0;
 
 			// Items must be fully validated here since we may pass a different item to the base set validator.
 			let item = this.tools.getItem(set.item);
 			if (item.id) {
-				if (!item.exists) return ["" + set.item + " is an invalid item."];
-				if (item.isUnreleased) return ["" + (set.name || set.species) + "'s item " + item.name + " is unreleased."];
+				if (!item.exists) return [`"${set.item}" is an invalid item.`];
+				if (item.isUnreleased) return [`"${(set.name || set.species)}" + 's item "${item.name}" is unreleased.`];
 			}
 			let donorSpecies = "";
 			let validSources = set.abilitySources = []; // evolutionary families
@@ -309,14 +308,14 @@ exports.Formats = [
 
 				if (set.name === set.species) delete set.name;
 				else if (toId(donorTemplate.species) !== toId(set.species) && donorTemplate.isMega) {
-					problems = [template.species+" is inheriting from a Mega Pokemon, which is banned."];
+					problems = [`"${template.species}" is inheriting from a Mega Pokemon, which is banned.`];
 					continue;
 				} else if (donorTemplate.tier === "Uber" || donorTemplate.tier === "Bank-Uber") {
-					problems = [template.species+" is inheriting from an Uber, which is banned."];
+					problems = [`"${template.species}" is inheriting from an Uber, which is banned.`];
 					continue;
 				}
 				else if (toId(donorTemplate.species) !== (set.species) && toId(donorTemplate.speciesid ) in this.format.bannedDonors) {
-					problems = [template.species+" is inheriting from an Uber, which is banned."];
+					problems = [`"${template.species}" is inheriting from an Uber, which is banned.`];
 					continue;
 				}
 				set.species = donorTemplate.species;
@@ -336,7 +335,7 @@ exports.Formats = [
 			set.name = set.name || set.species;
 			set.item = item.name;
 			if (!validSources.length && pokemonWithAbility.length > 1) {
-				return ["" + (set.name || set.species) + "'s set is illegal."];
+				return [`"${set.name}"'s set is illegal.`];
 			}
 			if (!validSources.length) {
 				problems.unshift(`${set.name} has an illegal set with an ability from ${this.tools.getTemplate(pokemonWithAbility[0]).name}.`);
@@ -362,6 +361,9 @@ exports.Formats = [
 				if (requiredFamilies[evoFamilies[0]]) return ["You are limited to one inheritance from each family by the Donor Clause.", "(You inherit more than once from " + this.getTemplate(evoFamilies[0]).species + ".)"];
 				requiredFamilies[evoFamilies[0]] = 1;
 			}
+		},
+		onSwitchIn: function(pokemon) {
+			this.add('-start', pokemon, pokemon.donorSpecies || pokemon.species, '[silent]');
 		},
 	},
 	{

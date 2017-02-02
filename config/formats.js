@@ -315,7 +315,7 @@ exports.Formats = [
 
 			set.species = template.species;
 			if (!validSources.length && pokemonWithAbility.length > 1) {
-				return [`${set.name}'s set is illegal.`];
+				return [`${template.species}'s set is illegal.`];
 			}
 			if (!validSources.length) {
 				problems.unshift(`${template.species} has an illegal set with an ability from ${this.tools.getTemplate(pokemonWithAbility[0]).name}.`);

@@ -258,7 +258,8 @@ exports.Formats = [
 			if (!this.format.abilityMap) {
 				let abilityMap = Object.create(null);
 				for (let speciesid in this.tools.data.Pokedex) {
-					let pokemon = this.tools.data.Pokedex[speciesid];if (pokemon.num < 1 || pokemon.species in this.format.banlistTable || this.format.bannedDonors.includes(pokemon.species)) continue;
+					let pokemon = this.tools.data.Pokedex[speciesid];
+					if (pokemon.num < 1 || pokemon.species in this.format.banlistTable || this.format.bannedDonors.includes(pokemon.species)) continue;
 					if (this.tools.data.FormatsData[speciesid].requiredItem || this.tools.data.FormatsData[speciesid].requiredMove) continue;
 					for (let key in pokemon.abilities) {
 						let abilityId = toId(pokemon.abilities[key]);

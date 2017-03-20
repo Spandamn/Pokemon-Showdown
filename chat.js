@@ -1334,3 +1334,14 @@ Chat.getDataAbilityHTML = function (ability) {
 	buf += `</a></li><li style="clear:both"></li></ul>`;
 	return buf;
 };
+
+Chat.getDataItemHTML = function (item) {
+	if (typeof item === 'string') item = Object.assign({}, Tools.getItem(item));
+	let top = Math.floor(item.spritenum / 16) * 24;
+	let left = (item.spritenum % 16) * 24;
+	let buf = `<ul class="utilichart"><li class="result">`;
+	buf += `<a data-entry="item|${item.name}"><span class="col itemiconcol"><span style="background:transparent url(//play.pokemonshowdown.com/sprites/itemicons-sheet.png) no-repeat scroll -${top}px -${left}px"></span></span> <span class="col namecol">${item.name}</span> `;
+	buf += `<span class="col itemdesccol">${item.desc}</span> `;
+	buf += `</a></li><li style="clear:both"></li></ul>`;
+	return buf;
+};

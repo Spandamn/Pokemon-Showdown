@@ -1170,7 +1170,7 @@ Chat.getPokemonIcon = function (pokemon, facingLeft) {
 		snugglow: 1164 + 11,
 		floatoy: 1164 + 12,
 		caimanoe: 1164 + 13,
-		pluffle: 1164 + 14
+		pluffle: 1164 + 14,
 	};
 
 	if (altNums[id]) {

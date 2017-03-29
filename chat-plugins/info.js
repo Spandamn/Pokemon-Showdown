@@ -343,7 +343,7 @@ exports.commands = {
 		if (newTargets && newTargets.length) {
 			for (let i = 0; i < newTargets.length; ++i) {
 				if (!newTargets[i].exactMatch && !i) {
-					buffer = "No Pok\u00e9mon, item, move, ability or nature named '" + sep[0] + "' was found. Showing the data of '" + newTargets[0].name + "' instead.\n";
+					buffer = `No Pok\u00e9mon, item, move, ability or nature named '${sep[0]}' was found${Tools.gen > mod.gen ? ` in Gen ${mod.gen}` : ""}. Showing the data of '${newTargets[0].name}' instead.\n`;
 				}
 				if (newTargets[i].searchType === 'nature') {
 					let nature = Tools.getNature(newTargets[i].name);
@@ -359,7 +359,6 @@ exports.commands = {
 					let sType = newTargets[i].searchType.charAt(0).toUpperCase() + newTargets[i].searchType.substring(1, newTargets[i].searchType.length);
 					if (Chat[`getData${sType}HTML`]) {
 						let template = mod["get" + (sType === "Pokemon" ? "Template" : sType)](newTargets[i].name);
-						if (template.gen > mod.gen) return this.errorReply(`No Pok\u00e9mon, item, move, ability or nature named '${sep[0]}' was found in Gen ${mod.gen}.`);
 						buffer += `|raw|${Chat[`getData${sType}HTML`](template)}\n`;
 					} else {
 						buffer += '|c|~|/data-' + newTargets[i].searchType + ' ' + newTargets[i].name + '\n';
@@ -506,6 +505,7 @@ exports.commands = {
 		this.sendReply(buffer);
 	},
 	datahelp: ["/data [pokemon/item/move/ability] - Get details on this pokemon/item/move/ability/nature.",
+		"/data [pokemon/item/move/ability], Gen [generation number] - Get details on this pokemon/item/move/ability/nature for that generation.",
 		"!data [pokemon/item/move/ability] - Show everyone these details. Requires: + % @ * # & ~"],
 
 	'!details': true,
@@ -514,8 +514,9 @@ exports.commands = {
 		if (!target) return this.parse('/help details');
 		this.run('data');
 	},
-	detailshelp: ["/details [pokemon] - Get additional details on this pokemon/item/move/ability/nature.",
-		"!details [pokemon] - Show everyone these details. Requires: + % @ * # & ~"],
+	detailshelp: ["/details [pokemon/item/move/ability] - Get additional details on this pokemon/item/move/ability/nature.",
+		"/details [pokemon/item/move/ability], Gen [generation number] - Get details on this pokemon/item/move/ability/nature for that generation.",
+		"!details [pokemon/item/move/ability] - Show everyone these details. Requires: + % @ * # & ~"],
 
 	'!weakness': true,
 	weaknesses: 'weakness',

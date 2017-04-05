@@ -13061,7 +13061,6 @@ exports.BattlePokedex = {
 		weightkg: 80.5,
 		color: "Red",
 		eggGroups: ["Undiscovered"],
-		spritenum: 804 + 152,
 	},
 	marshadow: {
 		num: 802,

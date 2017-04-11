@@ -578,6 +578,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 957,
 	},
 	pikachuhoenn: {
 		num: 25,
@@ -593,6 +594,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 958,
 	},
 	pikachusinnoh: {
 		num: 25,
@@ -608,6 +610,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 959,
 	},
 	pikachuunova: {
 		num: 25,
@@ -623,6 +626,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 960,
 	},
 	pikachukalos: {
 		num: 25,
@@ -638,6 +642,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 961,
 	},
 	pikachualola: {
 		num: 25,
@@ -653,6 +658,7 @@ exports.BattlePokedex = {
 		weightkg: 6,
 		color: "Yellow",
 		eggGroups: ["Undiscovered"],
+		spritenum: 962,
 	},
 	raichu: {
 		num: 26,
@@ -13055,6 +13061,7 @@ exports.BattlePokedex = {
 		weightkg: 80.5,
 		color: "Red",
 		eggGroups: ["Undiscovered"],
+		spritenum: 956,
 	},
 	marshadow: {
 		num: 802,
@@ -13398,6 +13405,7 @@ exports.BattlePokedex = {
 		color: "Blue",
 		evos: ["syclant"],
 		eggGroups: ["Bug"],
+		spritenum: 1164,
 	},
 	embirch: {
 		num: -102,
@@ -13410,6 +13418,7 @@ exports.BattlePokedex = {
 		color: "Brown",
 		evos: ["flarelm"],
 		eggGroups: ["Monster", "Dragon"],
+		spritenum: 1165,
 	},
 	flarelm: {
 		num: -103,
@@ -13424,6 +13433,7 @@ exports.BattlePokedex = {
 		evos: ["pyroak"],
 		evoLevel: 24,
 		eggGroups: ["Monster", "Dragon"],
+		spritenum: 1166,
 	},
 	breezi: {
 		num: -104,
@@ -13436,6 +13446,7 @@ exports.BattlePokedex = {
 		color: "Purple",
 		evos: ["fidgit"],
 		eggGroups: ["Field"],
+		spritenum: 1167,
 	},
 	scratchet: {
 		num: -105,
@@ -13448,6 +13459,7 @@ exports.BattlePokedex = {
 		color: "Brown",
 		evos: ["tomohawk"],
 		eggGroups: ["Field", "Flying"],
+		spritenum: 1168,
 	},
 	necturine: {
 		num: -106,
@@ -13461,6 +13473,7 @@ exports.BattlePokedex = {
 		color: "White",
 		evos: ["necturna"],
 		eggGroups: ["Grass", "Field"],
+		spritenum: 1169,
 	},
 	cupra: {
 		num: -107,
@@ -13473,6 +13486,7 @@ exports.BattlePokedex = {
 		color: "Brown",
 		evos: ["argalis"],
 		eggGroups: ["Bug"],
+		spritenum: 1170,
 	},
 	argalis: {
 		num: -108,
@@ -13487,6 +13501,7 @@ exports.BattlePokedex = {
 		evos: ["aurumoth"],
 		evoLevel: 30,
 		eggGroups: ["Bug"],
+		spritenum: 1171,
 	},
 	brattler: {
 		num: -109,
@@ -13499,6 +13514,7 @@ exports.BattlePokedex = {
 		color: "Brown",
 		evos: ["malaconda"],
 		eggGroups: ["Grass", "Dragon"],
+		spritenum: 1172,
 	},
 	cawdet: {
 		num: -110,
@@ -13511,6 +13527,7 @@ exports.BattlePokedex = {
 		color: "Gray",
 		evos: ["cawmodore"],
 		eggGroups: ["Flying"],
+		spritenum: 1173,
 	},
 	volkritter: {
 		num: -111,
@@ -13523,6 +13540,7 @@ exports.BattlePokedex = {
 		color: "Red",
 		evos: ["volkraken"],
 		eggGroups: ["Water 1", "Water 2"],
+		spritenum: 1174,
 	},
 	snugglow: {
 		num: -112,
@@ -13535,6 +13553,7 @@ exports.BattlePokedex = {
 		color: "Purple",
 		evos: ["plasmanta"],
 		eggGroups: ["Water 1", "Water 2"],
+		spritenum: 1175,
 	},
 	floatoy: {
 		num: -113,
@@ -13547,6 +13566,7 @@ exports.BattlePokedex = {
 		color: "White",
 		evos: ["caimanoe"],
 		eggGroups: ["Water 1", "Field"],
+		spritenum: 1176,
 	},
 	caimanoe: {
 		num: -114,
@@ -13561,6 +13581,7 @@ exports.BattlePokedex = {
 		evos: ["naviathan"],
 		evoLevel: 21,
 		eggGroups: ["Water 1", "Field"],
+		spritenum: 1177,
 	},
 	pluffle: {
 		num: -115,
@@ -13573,6 +13594,7 @@ exports.BattlePokedex = {
 		color: "Pink",
 		evos: ["kerfluffle"],
 		eggGroups: ["Fairy", "Human-Like"],
+		spritenum: 1178,
 	},
 	pokestarufo: {
 		num: -5001,

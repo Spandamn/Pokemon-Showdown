@@ -291,7 +291,7 @@ exports.Formats = [
 		name: "[Gen 7] Last Will",
 		desc: [
 			"Every Pokemon will use the move in their last moveslot before fainting in battle.",
-			"&bullet; <a href=\"http://www.smogon.com/forums/threads/3601362/\">Last Will</a>"
+			"&bullet; <a href=\"http://www.smogon.com/forums/threads/3601362/\">Last Will</a>",
 		],
 		mod: ['gen7'],
 		ruleset: ['[Gen 7] OU'],
@@ -311,7 +311,7 @@ exports.Formats = [
 		ruleset: ['[Gen 7] Ubers', 'Baton Pass Clause'],
 		banlist: ['Rule:nicknameclause'],
 		searchShow: false,
-		onValidateTeam: function(team) {
+		onValidateTeam: function (team) {
 			let nameTable = {};
 			for (let i = 0; i < team.length; i++) {
 				let name = team[i].name;
@@ -323,7 +323,7 @@ exports.Formats = [
 				}
 			}
 		},
-		validateSet: function(set, teamHas) {
+		validateSet: function (set, teamHas) {
 			let crossTemplate = this.tools.getTemplate(set.name);
 			if (!crossTemplate.exists) return this.validateSet(set, teamHas);
 			let template = this.tools.getTemplate(set.species);
@@ -342,7 +342,7 @@ exports.Formats = [
 				'def': 'Defense',
 				'spa': 'Special Attack',
 				'spd': 'Special Defense',
-				'spe': 'Speed'
+				'spe': 'Speed',
 			};
 			for (let statid in template.baseStats) {
 				let evoStat = template.baseStats[statid] + crossTemplate.baseStats[statid] - crossPrevoTemplate.baseStats[statid];
@@ -394,7 +394,7 @@ exports.Formats = [
 			return mixedTemplate;
 		},
 		onSwitchInPriority: 1,
-		onSwitchIn: function(pokemon) {
+		onSwitchIn: function (pokemon) {
 			if (pokemon.crossEvolved) {
 				this.add('-start', pokemon, 'typechange', pokemon.types.join('/'), '[silent]');
 			}

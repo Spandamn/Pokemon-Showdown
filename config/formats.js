@@ -372,7 +372,7 @@ exports.Formats = [
 		onModifyTemplate: function (template, pokemon) {
 			if (pokemon.set.name === pokemon.set.species) return template;
 			let crossTemplate = this.getTemplate(pokemon.name);
-			if (!crossTemplate.exists) continue;
+			if (!crossTemplate.exists) return template;
 			let crossPrevoTemplate = this.getTemplate(crossTemplate.prevo);
 			let mixedTemplate = Object.assign({}, template);
 			mixedTemplate.baseSpecies = mixedTemplate.species = template.species + '-' + crossTemplate.species;

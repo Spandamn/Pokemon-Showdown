@@ -629,23 +629,27 @@ exports.BattleMovedex = {
 		name: "Cheerleading Squad",
 		pp: 10,
 		priority: 0,
-		onHit: function (target) {
+		onHit: function (pokemon, target) {
 			let moves = [];
 			//Get the list of useable moves from healthy pokemon
 			for (let j = 0; j < target.side.pokemon.length; j++) {
 				let pokemon = target.side.pokemon[j];
 				if (pokemon === target) continue;
-				if (!pokemon.side.pokemon[i] ||	pokemon.side.pokemon[i].fainted || pokemon.side.pokemon[i].status) {
+				if (!pokemon.side.pokemon[j] ||	pokemon.side.pokemon[j].fainted || pokemon.side.pokemon[j].status) {
 					continue;
 				}
+				let randomMoves = [];
 				for (let i = 0; i < pokemon.moveset.length; i++) {
 					let move = pokemon.moveset[i].id;
 					let noAssist = {
 						assist:1, belch:1, bestow:1, bounce:1, chatter:1, circlethrow:1, copycat:1, counter:1, covet:1, destinybond:1, detect:1, dig:1, dive:1, dragontail:1, endure:1, feint:1, fly:1, focuspunch:1, followme:1, helpinghand:1, kingsshield:1, matblock:1, mefirst:1, metronome:1, mimic:1, mirrorcoat:1, mirrormove:1, naturepower:1, phantomforce:1, protect:1, ragepowder:1, roar:1, shadowforce:1, sketch:1, skydrop:1, sleeptalk:1, snatch:1, spikyshield:1, struggle:1, switcheroo:1, thief:1, transform:1, trick:1, whirlwind:1,
 					};
 					if (!noAssist[move] && !this.getMove(move).isZ) {
-						moves.push(move);
+						randomMoves.push(move);
 					}
+				}
+				if (randomMoves.length) {
+					moves.push(randomMoves[this.random(randomMoves.length)]);
 				}
 			}
 			if (!moves.length) {

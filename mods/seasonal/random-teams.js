@@ -111,11 +111,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'glitzer popping',
 				evs: {hp: 4, def: 252, spd: 252}, nature: 'Calm',
 			},
-			/*'Zod': {
+			'Zod': {
 				species: 'Oricorio-Pom-Pom', ability: 'Drizzle', item: 'Leftovers', gender: 'M', //needs confirmation
 				moves: ['Quiver Dance', 'Thunder', 'Hurricane'],
 				signatureMove: 'Cheerleading Squad',
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Modest', */
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Modest',
+			},
 		};
 
 		// Generate the team randomly.

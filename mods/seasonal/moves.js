@@ -492,6 +492,37 @@ exports.BattleMovedex = {
 		target: "allAdjacent",
 		type: "Electric",
 	},
+	// Temporaryanonymous
+	spoopyedgecut: {
+		accuracy: 100,
+		basePower: 80,
+		category: "Physical",
+		id: "spoopyedgecut",
+		isViable: true,
+		isNonstandard: true,
+		name: "SPOOPY EDGE CUT",
+		pp: 30,
+		priority: 1,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		onTryHit: function (target, source) {
+			this.add('-message', '*@Temporaryanonymous teleports behind you*');
+			this.attrLastMove('[still]');
+			this.add('-anim', source, "Night Shade", target);
+		},
+		onHit: function (pokemon) {
+			if (pokemon.hp <= 0 || pokemon.fainted) {
+				this.add('c|@Temporaryanonymous|YOU ARE ALREADY DEAD *unsheathes glorious cursed nippon steel katana and cuts you in half with it* heh......nothing personnel.........kid......................');
+			}
+		},
+		onMoveFail: function (target, source, move) {
+			this.add('-message', '*@Temporaryanonymous teleports behind you*');
+			this.add('c|@Temporaryanonymous|YOU ARE ALREADY DEAD *misses* Tch......not bad.........kid......................');
+		},
+		secondary: false,
+		self: {boosts: {accuracy: -2}},
+		target: "normal",
+		type: "Ghost",
+	},
 	// Teremiare
 	batonthief: {
 		accuracy: true,
@@ -617,10 +648,11 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "???",
 	},
-	//ZOD
+	// ZOD
 	"cheerleadingsquad": {
 		accuracy: 100,
 		category: "Status",
+		shortDesc: "Use random moves, one from each healthy Pokemon on your team.",
 		desc: "Works like Beat Up + Assist so for example if you had 4 mons left it would choose a random move from their move pools and use it against the opponent (including special moves) at the reduced attack rate of 50%",
 		id: "cheerleadingsquad",
 		name: "Cheerleading Squad",
@@ -652,8 +684,10 @@ exports.BattleMovedex = {
 			if (!moves.length) {
 				return false;
 			}
-			//Use these moves, still have to implement the power reduction thingy though
+			//Use these moves, with base power halved if it exists
 			for (let move of moves) {
+				move = this.getMove(move);
+				if (move.basePower) move.basePower = Math.floor(move.basePower / 2);
 				this.useMove(move, target);
 			}
 		},

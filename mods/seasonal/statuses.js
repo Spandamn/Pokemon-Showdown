@@ -71,7 +71,7 @@ exports.BattleStatuses = {
 	},
 	innovamania: {
 		exists: true,
-		onStart: function (target, source) {
+		onStart: function (pokemon) {
 			let sentences = ['Don\'t take this seriously', 'These Black Glasses sure look cool', 'Ready for some fun?( ͡° ͜ʖ ͡°)', '( ͡° ͜ʖ ͡°'];
 			this.add('c|@innovamania|' + sentences[this.random(4)]);
 			this.boost({atk: 6, def: 6, spa: 6, spd: 6, spe: 6, accuracy: 6}, pokemon);

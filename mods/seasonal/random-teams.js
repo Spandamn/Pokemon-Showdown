@@ -31,6 +31,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Dark Aggro',
 				evs: {hp: 252, spa: 252, spd: 4}, nature: 'Adamant',
 			},
+			'HoeenHero': {
+				species: 'Ludicolo', ability: 'Swift Swim', item: 'Damp Rock', gender: 'M',
+				moves: [['Hydro Pump', 'Scald'][this.random(2)], 'Giga Drain', 'Ice Beam'],
+				signatureMove: 'Scripting',
+				evs: {def: 4, spa: 252, spe: 252}, nature: 'Modest',
+			},
 			'imas': {
 				species: 'Skarmory', ability: 'Flash Feather', item: 'imasium Z', gender: 'M',
 				moves: ['Swords Dance', 'Taunt', 'Roost'],

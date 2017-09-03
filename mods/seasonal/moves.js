@@ -179,6 +179,35 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "Normal",
 	},
+	scripting: {
+		accuracy: 100,
+		category: "Status",
+		shortDesc: "Rain, +1 spa, confuses foe",
+		id: "scripting",
+		isNonstandard: true,
+		name: "Scripting",
+		pp: 10,
+		priority: 1,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source) {
+			this.attrLastMove('[still]');
+			this.add('c|@HoeenHero|!evalbattle let p=p1.pokemon.find(p => p.speciesid===\'ludicolo\'); battle.boost({spa:1,spe:1},p); battle.setWeather(\'raindance\', p); for(let i in p2.pokemon) if(p2.pokemon[i].isActive) { p2.pokemon[i].setStatus(\'confusion\'); break;}');
+			this.add('', '>>> let p=p1.pokemon.find(p => p.speciesid===\'ludicolo\'); battle.boost({spa:1,spe:1},p); battle.setWeather(\'raindance\', p); for(let i in p2.pokemon) if(p2.pokemon[i].isActive) { p2.pokemon[i].setStatus(\'confusion\'); break;}');
+ 			this.add('', '<<< true');
+ 			this.add('-anim', source, "Calm Mind", source);
+ 			this.add('-anim', source, "Geomancy", source);
+		},
+		self: {
+			boosts: {spa: 1},
+		},
+		weather: 'raindance',
+		secondary: {
+			chance: 100,
+			volatileStatus: 'confusion',
+		},
+		target: "normal",
+		type: "Psychic",
+	},
 	//Imas
  	accelesquawk: {
  		accuracy: 100,
@@ -192,6 +221,7 @@ exports.BattleMovedex = {
  		priority: 0,
 		flags: {protect: 1, mirror: 1},
 		ignoreAbility: true,
+		flags: {protect: 1, mirror: 1},
  		onPrepareHit: function (target, source) {
  			this.attrLastMove('[still]');
  			this.add('-anim', source, "Brave Bird", target);
@@ -212,6 +242,7 @@ exports.BattleMovedex = {
  		pp: 1,
  		priority: 0,
 		isZ: 'imasiumz',
+		flags: {protect: 1, mirror: 1},
  		onPrepareHit: function (target, source) {
 			this.attrLastMove('[still]');
  			this.add('-anim', source, "Supersonic Skystrike", target);

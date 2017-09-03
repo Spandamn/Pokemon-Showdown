@@ -48,6 +48,15 @@ exports.BattleStatuses = {
 			this.add('c|@Level 51|IndexError: list index out of range');
 		},
 	},
+	hoeenhero: {
+		exists: true,
+		onStart: function () {
+			this.add('c|@HoeenHero|I have cheat codes!');
+		},
+		onFaint: function () {
+			this.add('c|@HoeenHero|No! My cheats wern\'t enough ;-;');
+		},
+	},
 	imas: {
 		exists: true,
 		onStart: function () {
@@ -65,7 +74,7 @@ exports.BattleStatuses = {
 		onStart: function (target, source) {
 			let sentences = ['Don\'t take this seriously', 'These Black Glasses sure look cool', 'Ready for some fun?( ͡° ͜ʖ ͡°)', '( ͡° ͜ʖ ͡°'];
 			this.add('c|@innovamania|' + sentences[this.random(4)]);
-			this.boost({atk: 6, def: 6, spa: 6, spd: 6, spe: 6, accuracy: 6}, source);
+			this.boost({atk: 6, def: 6, spa: 6, spd: 6, spe: 6, accuracy: 6}, pokemon);
 		},
 		onFaint: function () {
 			let sentences = ['Did you rage quit?', 'How\'d you lose with this set?'];

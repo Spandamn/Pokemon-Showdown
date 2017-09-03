@@ -680,7 +680,7 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "???",
 	},
-	// ZOD
+	// Zod
 	"cheerleadingsquad": {
 		accuracy: 100,
 		category: "Status",
@@ -690,6 +690,7 @@ exports.BattleMovedex = {
 		name: "Cheerleading Squad",
 		pp: 10,
 		priority: 0,
+		flags: {protect: 1}
 		onHit: function (pokemon, target) {
 			let moves = [];
 			//Get the list of useable moves from healthy pokemon
@@ -718,6 +719,7 @@ exports.BattleMovedex = {
 			}
 			//Use these moves, with base power halved if it exists
 			for (let move of moves) {
+				if (target.fainted) break;
 				move = this.getMove(move);
 				if (move.basePower) move.basePower = Math.floor(move.basePower / 2);
 				this.useMove(move, target);

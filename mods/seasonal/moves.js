@@ -680,11 +680,7 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "???",
 	},
-<<<<<<< HEAD
 	// Zod
-=======
-	// ZOD
->>>>>>> 4625714b80c0c575758087aef1f352cf62ad8b78
 	"cheerleadingsquad": {
 		accuracy: 100,
 		category: "Status",

@@ -168,4 +168,16 @@ exports.BattleStatuses = {
 			}
 		},
 	},
+	zod: {
+		exists: true,
+		onStart: function () {
+			this.add('c|%ZOD|Get ready to go full out!');
+		},
+		onFaint: function (pokemon) {
+			this.add(`c|%ZOD|I'm sorry ${pokemon.side.foe.name}, but you're off the team for the rest of the season.`);
+		},
+		onSwitchOut: function () {
+			this.add('c|%ZOD|Pause the music I need some water');
+		},
+	},
 };

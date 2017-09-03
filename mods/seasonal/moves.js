@@ -503,6 +503,7 @@ exports.BattleMovedex = {
 		name: "SPOOPY EDGE CUT",
 		pp: 30,
 		priority: 1,
+		shortDesc: "Usually moves first. Lowers user's accuracy by 2.",
 		flags: {contact: 1, protect: 1, mirror: 1},
 		onTryHit: function (target, source) {
 			this.add('-message', '*@Temporaryanonymous teleports behind you*');

@@ -518,9 +518,10 @@ exports.BattleMovedex = {
 	// panpawn
 	lafireblaze420: {
 		accuracy: 75,
-		basePower: 150,
+		basePower: 0,
+		damage: 150,
 		category: "Physical",
-		shortDesc: "20% chance to burn the target.",
+		shortDesc: "Does 150 damage. 20% chance to burn the target.",
 		id: "lafireblaze420",
 		isNonstandard: true,
 		name: "LaFireBlaze420",
@@ -654,7 +655,7 @@ exports.BattleMovedex = {
 			this.attrLastMove(['still']);
 			this.add('-anim', source, "Spacial Rend", target); // confirmed with Trickster
 		},
-		onHitField: function (target, source, effect) {
+		onHit: function (target, source, effect) {
 			this.addPseudoWeather('trickroom', source, effect, '[of] ' + source);
 		},
 		effect: {

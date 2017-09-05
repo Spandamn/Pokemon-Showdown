@@ -79,6 +79,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Next Level Strats',
 				evs: {hp: 236, def: 220, spd: 48, spe: 4}, nature: 'Calm',
 			},
+			'Megazard': {
+				species: 'Drampa', ability: 'Insensible', item: 'Leftovers', gender: 'M',
+				moves: ['Roost', 'Calm Mind', 'Lava Plume'],
+				signatureMove: 'Dragon\'s Wrath',
+				evs: {hp: 248, def: 8, spd: 252}, nature: 'Calm',
+			},
 			'MochaMint': {
 				species: 'Deerling', ability: 'Sturdy', item: 'Eviolite', gender: 'M', //needs confirmation
 				moves: ['Protect', 'Nuzzle', 'U-Turn'],
@@ -97,13 +103,13 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Geomagnetic Storm',
 				evs: {def: 252, spa: 4, spe: 252}, nature: 'Bold',
 			},
-			/*'Temporaryanonymous': {
+			'Temporaryanonymous': {
 				species: 'Doublade', ability: 'Tough Claws', item: 'Eviolite',
 				gender: 'M',
 				moves: ['Swords Dance', 'Gear Grind', ['Sacred Sword', 'X-Scissor', 'Knock off'][this.random(3)]],
 				signatureMove: 'SPOOPY EDGE CUT',
 				evs: {atk: 252, hp: 252, def: 4}, nature: 'Adamant',
-			},*/
+			},
 			'Teremiare': {
 				species: 'Zorua', ability: 'Super Prankster', item: 'Red Card', gender: 'M',
 				moves: ['Topsy-Turvy', 'Taunt', 'Memento'],

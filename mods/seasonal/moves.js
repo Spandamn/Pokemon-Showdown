@@ -466,6 +466,24 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "Flying",
 	},
+	// Megazard
+	dragonswrath: {
+		accuracy: 100,
+		basePower: 107,
+		category: "Special",
+		shortDesc: "Super effective on Fairy.",
+		id: "dragonswrath",
+		isViable: true,
+		name: "dragonswrath",
+		pp: 17,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onEffectiveness: function (typeMod, type) {
+			if (type === 'Fairy') return 1;
+		},
+		target: "normal",
+		type: "Dragon",
+	},
 	// MochaMint
 	caraccident: {
 		accuracy: true,

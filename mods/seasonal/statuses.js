@@ -70,6 +70,18 @@ exports.BattleStatuses = {
 			this.add('c|@Level 51|IndexError: list index out of range');
 		},
 	},
+	megazard: {
+		exists: true,
+		onStart: function () {
+			this.add('c|%Megazard|Thank you for choosing Drampa™');
+		},
+		onFaint: function () {
+			this.add('c|%Megazard|Please send any feedback to your local Drampa™ distributor.');
+		},
+		onSwitchOut: function () {
+			this.add('c|%Megazard|The Drampa™ product is not under warranty.');
+		},
+	},
 	hoeenhero: {
 		exists: true,
 		onStart: function () {

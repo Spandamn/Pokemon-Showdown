@@ -34,6 +34,35 @@ exports.BattleMovedex = {
 		target: "normal",
 		type: "Electric",
 	},
+	// Arcticblast
+	trashalanche: {
+		accuracy: 100,
+		basePower: 0,
+		basePowerCallback: function (pokemon, target) {
+			pokemon.addVolatile('trashalanche');
+			return this.clampIntRange(pokemon.volatiles.trashalanche.basePowerEx, 20, 200);
+		},
+		category: "Physical",
+		desc: "After this move is used, every time the user takes a hit, the base power of this move increases by 20.",
+		shortDesc: "This move's base power increases every time the user takes a hit.",
+		id: "trashalanche",
+		name: "Trashalanche",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1},
+		secondary: false,
+		effect: {
+			duration: 1,
+			onStart: function (pokemon) {
+				this.effectData.basePowerEx = 0;
+			},
+			onHit: function (pokemon) {
+				this.effectData.basePowerEx += 20;
+			},
+		},
+		target: "normal",
+		type: "Poison",
+	},
 	// Andy (AndrewGoncel)
 	pilfer: {
 		accuracy: true,

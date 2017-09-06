@@ -33,6 +33,15 @@ exports.BattleStatuses = {
 		},
 		
 	},
+	articblast: {
+		exists: true,
+		onStart: function () {
+			this.add('c|%Articblast|THIS IS MY TRASH FRIEND');
+		},
+		onFaint: function () {
+			this.add('c|%Articblast|o');
+		},
+	},
 	astara: {
 		exists: true,
 		onStart: function () {

@@ -19,6 +19,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: "Pilfer",
 				evs: {hp:252, atk: 252, spe:4}, nature: 'Adamant',
 			},
+			'Articblast': {
+				species: 'Garbodor', ability: 'Speed Boost', item: 'Choice Band', gender: 'M',
+				moves: ['acidspray', 'knockoff', 'earthquake'],
+				signatureMove: "Trashalanche",
+				evs: {atk: 252, spd:4, spe:252}, nature: 'Adamant',
+			},
 			'Astara': {
 				species: 'Jirachi', ability: 'Cursed Body', item: ['Leftovers', 'Sitrus Berry'][this.random(2)], gender: 'F', shiny: true,
 				moves: ['psystrike', 'moonblast', 'nastyplot', 'scald', 'recover'],

@@ -126,6 +126,26 @@ exports.BattleMovedex = {
 		target: "normal",
 		type: "Normal",
 	},
+	// Auzbat
+	fatbat: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Raises the user's Defense and Special Defense by 1 stage.",
+		shortDesc: "Raises the user's Defense and Sp. Def by 1.",
+		id: "fatbat",
+		name: "Fat Bat",
+		pp: 20,
+		priority: 0,
+		flags: {snatch: 1},
+		boosts: {
+			def: 1,
+			spd: 1,
+		},
+		secondary: false,
+		target: "self",
+		type: "Poison",
+	},
 	// Beowulf
 	buzzingofthestorm: {
 		accuracy: 100,

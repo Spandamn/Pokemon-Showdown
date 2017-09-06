@@ -25,6 +25,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Star Bolt Desperation',
 				evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
 			},
+			'AuzBat': {
+				species: 'Golbat', ability: 'Regenerator', item: 'Eviolite', gender: 'M',
+				moves: ['toxic', 'defog', ['superfang', 'bravebird'][this.random(2)]],
+				signatureMove: "Fat Bat",
+				evs: {hp:212, spd:240, spe:56}, nature: 'Careful',
+			},
 			'Beowulf': {
 				species: 'Beedrill', ability: 'Download', item: 'Beedrillite', gender: 'M',
 				moves: ['spikyshield', 'gunkshot', ['sacredfire', 'boltstrike', 'diamondstorm'][this.random(3)]],

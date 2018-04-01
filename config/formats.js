@@ -363,22 +363,28 @@ let Formats = [
 		section: "OM of the Month",
 		column: 2,
 	},
-	{
-		name: "[Gen 7] 2v2 Doubles",
-		desc: `Double battle where you bring four Pok&eacute;mon to Team Preview and choose only two.`,
+	{	//creds: Kris n me
+		name: "[Gen 7] Linked [WIP]",
+		desc: `The first two moves in a Pok&eacute;mon's moveset are used simultaneously.`,
 		threads: [
-			`&bullet; <a href="http://www.smogon.com/forums/threads/3606989/">2v2 Doubles</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3627804/">Linked</a>`,
 		],
 
-		mod: 'gen7',
-		gameType: 'doubles',
-		// searchShow: false,
-		teamLength: {
-			validate: [2, 4],
-			battle: 2,
+		mod: 'linked',
+		ruleset: ['Gen 7] OU'],
+		banlist: ['King\'s Rock', 'Razor Fang'],
+		restrictedMoves: ['Baneful Bunker', 'Detect', 'Nature\'s Madness', 'Night Shade', 'Protect', 'Seismic Toss', 'Spiky Shield', 'Super Fang'],
+		onValidateSet: function (set, format) {
+			const restrictedMoves = format.restrictedMoves || [];
+			let problems = [];
+			for (const [i, moveid] of set.moves.entries()) {
+				let move = this.getMove(moveid);
+				if ((i === 0 || i === 1) && restrictedMoves.includes(move.name)) {
+					problems.push(`${set.name || set.species}'s move ${move.name} is banned from being in a link.`);
+				}
+			}
+			return problems;
 		},
-		ruleset: ['Gen 7] Doubles OU'],
-		banlist: ['Salamence-Mega', 'Tapu Lele', 'Focus Sash', 'Final Gambit', 'Perish Song'],
 	},
 	{
 		name: "[Gen 7] Nature Swap",

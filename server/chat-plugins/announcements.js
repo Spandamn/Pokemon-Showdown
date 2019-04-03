@@ -57,7 +57,7 @@ const commands = {
 		new(target, room, user, connection, cmd, message) {
 			if (!target) return this.parse('/help announcement new');
 			target = target.trim();
-			if (room.battle) return this.errorReply("Announcements do not support announcements.");
+			if (room.battle) return this.errorReply("Battles do not support announcements.");
 
 			let text = Chat.filter(this, target, user, room, connection);
 			if (target !== text) return this.errorReply("You are not allowed to use filtered words in announcements.");
@@ -158,7 +158,7 @@ const commands = {
 		`/announcement htmlcreate [announcement] - Creates a announcement, with HTML allowed. Requires: # & ~`,
 		`/announcement timer [minutes] - Sets the announcement to automatically end after [minutes]. Requires: % @ # & ~`,
 		`/announcement display - Displays the announcement`,
-		`/announcement end - Ends a announcement and displays the results. Requires: % @ # & ~`,
+		`/announcement end - Ends a announcement. Requires: % @ # & ~`,
 	],
 };
 

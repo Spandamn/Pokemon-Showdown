@@ -761,6 +761,47 @@ let Formats = [
 		column: 2,
 	},
 	{
+		name: "[Gen 7] Secret Slot",
+		desc: "The last move in a Pokemon's set is passed on to the next teammate in line, giving them an extra moveslot. At team preview you can rearrange your team in any order, letting you mix things up. ",
+
+		mod: 'gen7',
+		teamLength: {
+			validate: [6, 6],
+			battle: 6,
+		},
+		ruleset: ['[Gen 7] OU'],
+		banlist: ['Battle Bond'],
+		onValidateSet: function (set) {
+			let restrictedMoves = ['Extreme Speed', 'Geomancy', 'Shell Smash', 'Shift Gear', 'Spore'];
+			let lastMove = this.getMove(set.moves[set.moves.length - 1]).name;
+			if (restrictedMoves.includes(lastMove)) {
+				return [`${set.name || set.species} cannot have ${lastMove} in its last moveslot.`];
+			}
+		},
+		onBeforeSwitchIn: function () {
+			if (this.processDone) return;
+			this.processDone = true;
+			for (let side of this.sides) {
+				for (let i = 0; i < side.pokemon.length; i++) {
+					let pokemon = side.pokemon[i];
+					let prevPoke = side.pokemon[i === 0 ? side.pokemon.length - 1 : i - 1];
+					let move = this.getMove(prevPoke.moves[prevPoke.moves.length - 1]);
+					pokemon.moveSlots.push({
+						move: move.name,
+						id: move.id,
+						pp: ((move.noPPBoosts || move.isZ) ? move.pp : move.pp * 8 / 5),
+						maxpp: ((move.noPPBoosts || move.isZ) ? move.pp : move.pp * 8 / 5),
+						target: move.target,
+						disabled: false,
+						disabledSource: '',
+						used: false,
+					});
+					// if (pokemon.originalAbility) pokemon.ability = pokemon.baseAbility = pokemon.originalAbility; // unhack
+				}
+			}
+		},
+	},
+	{
 		name: "[Gen 7] Balanced Hackmons",
 		desc: `Anything that can be hacked in-game and is usable in local battles is allowed.`,
 		threads: [

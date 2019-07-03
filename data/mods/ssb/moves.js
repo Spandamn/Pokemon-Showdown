@@ -2905,6 +2905,13 @@ let BattleMovedex = {
 			this.heal(target.maxhp); // Aesthetic only as the healing happens after you fall asleep in-game
 			this.boost({atk: 1, spa: 1}, target, source);
 		},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, "Rest", source);
+			this.add('-anim', source, "Calm Mind", source);
+		},
 		secondary: null,
 		target: "self",
 		type: "Fairy",

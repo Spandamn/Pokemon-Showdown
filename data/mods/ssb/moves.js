@@ -2306,23 +2306,6 @@ let BattleMovedex = {
 		name: "Llamacide",
 		pp: 10,
 		flags: {},
-		secondary: {
-			status: "frz",
-			chance: 10,
-		},
-		target: "normal",
-		type: "Ice",
-		onModifyMove(move) {
-			if (!move.secondaries) {
-				move.secondaries = [];
-			}
-			move.secondaries.push({
-				chance: 40,
-				boosts: {
-					def: -1,
-				},
-			});
-		},
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2331,6 +2314,20 @@ let BattleMovedex = {
 			this.add('-anim', source, "Plasma Fists", target);
 			this.add('-anim', source, "Sheer Cold", target);
 		},
+		secondaries: [
+			{
+				status: "frz",
+				chance: 10,
+			},
+			{
+				chance: 40,
+				boosts: {
+					def: -1,
+				},
+			},
+		],
+		target: "normal",
+		type: "Ice",
 	},
 	// MajorBowman
 	blazeofglory: {

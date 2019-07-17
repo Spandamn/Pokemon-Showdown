@@ -1743,7 +1743,7 @@ let BattleStatuses = {
 		},
 		onEnd() {
 			this.add('-weather', 'none');
-    },
+		},
 	},
 	// Custom effect for Rage's multihit
 	enrageeeeed: {

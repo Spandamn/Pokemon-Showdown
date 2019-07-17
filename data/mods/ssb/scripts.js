@@ -107,6 +107,20 @@ let BattleScripts = {
 		}
 		if (noLock && pokemon.volatiles.lockedmove) delete pokemon.volatiles.lockedmove;
 	},
+	// Modded to allow arrays as Mega Stone options
+	canMegaEvo(pokemon) {
+		let altForme = pokemon.baseTemplate.otherFormes && this.getTemplate(pokemon.baseTemplate.otherFormes[0]);
+		let item = pokemon.getItem();
+		if (altForme && altForme.isMega && altForme.requiredMove && pokemon.baseMoves.includes(toID(altForme.requiredMove)) && !item.zMove) return altForme.species;
+		if (item.megaEvolves !== pokemon.baseTemplate.baseSpecies || item.megaStone === pokemon.species) {
+			return null;
+		}
+		if (Array.isArray(item.megaStone)) {
+			if (item.megaStone.indexOf(pokemon.species)) return null;
+			return item.megaStone[Math.floor(this.random() * item.megaStone.length)];
+		}
+		return item.megaStone;
+	},
 	// Modded to allow unlimited mega evos
 	runMegaEvo(pokemon) {
 		const templateid = pokemon.canMegaEvo || pokemon.canUltraBurst;
@@ -291,6 +305,13 @@ let BattleScripts = {
 		if (prevTerrain) this.singleEvent('End', this.getEffect(prevTerrain), prevTerrainData, this);
 		this.runEvent('TerrainStart', source, source, status);
 		return true;
+	},
+	modifyDamage(baseDamage, pokemon, target, move, suppressMessages) {
+		if (pokemon.status === 'brn' && move.category === 'Physical' && !(pokemon.hasAbility('guts') || pokemon.hasAbility('superguarda'))) {
+			if (this.gen < 6 || move.id !== 'facade') {
+				baseDamage = this.modify(baseDamage, 0.5);
+			}
+		}
 	},
 	pokemon: {
 		getActionSpeed() {

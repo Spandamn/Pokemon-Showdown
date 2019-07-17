@@ -71,6 +71,32 @@ let BattlePokedex = {
 		inherit: true,
 		abilities: {0: 'Poison Heal'}, 	// Ability change is permanent
 	},
+	// Kris
+	rotomfan: {
+		inherit: true,
+		abilities: {0: "Adaptability"},
+		baseStats: {hp: 50, atk: 65, def: 127, spa: 145, spd: 127, spe: 106},
+	},
+	rotomfrost: {
+		inherit: true,
+		abilities: {0: "Adaptability"},
+		baseStats: {hp: 50, atk: 65, def: 127, spa: 145, spd: 127, spe: 106},
+	},
+	rotomheat: {
+		inherit: true,
+		abilities: {0: "Adaptability"},
+		baseStats: {hp: 50, atk: 65, def: 127, spa: 145, spd: 127, spe: 106},
+	},
+	rotommow: {
+		inherit: true,
+		abilities: {0: "Adaptability"},
+		baseStats: {hp: 50, atk: 65, def: 127, spa: 145, spd: 127, spe: 106},
+	},
+	rotomwash: {
+		inherit: true,
+		abilities: {0: "Adaptability"},
+		baseStats: {hp: 50, atk: 65, def: 127, spa: 145, spd: 127, spe: 106},
+	},
 	// Level 51
 	porygon2: {
 		inherit: true,
@@ -143,15 +169,15 @@ let BattlePokedex = {
 		inherit: true,
 		types: ['Electric', 'Fighting'],
 	},
-	// Saburo
-	metagrossmega: {
-		inherit: true,
-		abilities: {0: 'Levitate'},
-	},
 	// Sunny
 	sceptilemega: {
 		inherit: true,
 		abilities: {0: 'Contrary'},
+	},
+	// Zalm
+	weedle: {
+		inherit: true,
+		baseStats: {hp: 105, atk: 130, def: 90, spa: 20, spd: 90, spe: 90},
 	},
 };
 

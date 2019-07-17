@@ -784,6 +784,49 @@ let BattleStatuses = {
 			this.add(`c|@KingSwordYT|BUAAAAAA IYA AYÚDAME :(`);
 		},
 	},
+	kipkluif: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|+Kipkluif|I like bacon.`);
+		},
+		onSwitchOut() {
+			this.add(`c|+Kipkluif|Run away da, run run away da`);
+		},
+		onFaint() {
+			this.add(`c|+Kipkluif|Aah! Well, at least I have chicken.`);
+		},
+		// Footballer innate
+		onBasePowerPriority: 8,
+		onBasePower(basePower, pokemon, target, move) {
+			if (move.name.includes('Kick') && !pokemon.transformed && !pokemon.illusion) {
+				this.chainModify(1.75);
+			}
+		},
+	},
+	kris: {
+		noCopy: true,
+		onStart(pokemon) {
+			this.add(`c|+Kris|glhf`);
+			if (pokemon.illusion) return;
+			for (const target of pokemon.side.foe.active) {
+				if (!target || target.fainted) continue;
+				for (const moveSlot of target.moveSlots) {
+					const move = this.getMove(moveSlot.move);
+					const moveType = move.id === 'hiddenpower' ? target.hpType : move.type;
+					if (move.category !== 'Status' && (this.getImmunity(moveType, pokemon) && this.getEffectiveness(moveType, pokemon) > 0 || move.ohko)) {
+						this.add('-ability', pokemon, 'Anticipation');
+						return;
+					}
+				}
+			}
+		},
+		onSwitchOut() {
+			this.add(`c|+Kris|lol bye`);
+		},
+		onFaint() {
+			this.add(`c|+Kris|While you were playing Pokemon, I was studying the blade.`);
+		},
+	},
 	level51: {
 		noCopy: true,
 		onStart() {
@@ -847,6 +890,19 @@ let BattleStatuses = {
 		},
 		onFaint() {
 			this.add(`c|@MacChaeger|im gonna pyuk`);
+		},
+	},
+	madmonty: {
+		noCopy: true,
+		onStart(pokemon) {
+			this.add(`c|+Mad Monty ¾°|/me puts on a coat, to protect himself from the cold.`);
+			this.add(`c|+Mad Monty ¾°|Don't get eaten by llamas!`);
+		},
+		onSwitchOut() {
+			this.add(`c|+Mad Monty ¾°|Oh, I see how it is. Ok, fine. Be that way. I'll just be over here, then.`);
+		},
+		onFaint() {
+			this.add(`c|+Mad Monty ¾°|I take it back- I hope you DO get eaten by llamas. Toodles!`);
 		},
 	},
 	majorbowman: {
@@ -1157,9 +1213,30 @@ let BattleStatuses = {
 			this.add(`c|%Rach|I oversold your move`);
 		},
 	},
+	rageuser: {
+		noCopy: true,
+		onStart(pokemon) {
+			this.add(`c|+Rage|I'm about to ruin this mans whole career`);
+		},
+		onSwitchOut() {
+			this.add(`c|+Rage|Ain't supposed to be like that chief, we out`);
+		},
+		onFaint() {
+			this.add(`c|+Rage|/me quits`);
+		},
+	},
 	raid: {
 		noCopy: true,
 		// No messages provided
+	},
+	ransei: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|@Ransei| Sup! I have been brought from the world of Hackmons to give you a preview of our characteristics. I’ve been genetically engineered to beat you at all costs. Expect to lose this fight!`);
+		},
+		onFaint() {
+			this.add(`c|@Ransei|ripsei`);
+		},
 	},
 	rorymercury: {
 		noCopy: true,
@@ -1178,13 +1255,13 @@ let BattleStatuses = {
 	saburo: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|+Saburo|Look beyond what you see`);
+			this.add(`c|+Saburo|I ROCK!`);
 		},
 		onSwitchOut() {
-			this.add(`c|+Saburo|Gotta go teleport somewhere brb`);
+			this.add(`c|+Saburo|I'll be back to rock your world.`);
 		},
 		onFaint() {
-			this.add(`c|+Saburo|...you see too much`);
+			this.add(`c|+Saburo|This is... rock bottom.`);
 		},
 	},
 	samjo: {
@@ -1512,6 +1589,18 @@ let BattleStatuses = {
 			this.add(`c|+XpRienzo ☑◡☑|Wait what?`);
 		},
 	},
+	zalm: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|+Zalm|<(:O)000>`);
+		},
+		onSwitchOut() {
+			this.add(`c|+Zalm|Woah`);
+		},
+		onFaint() {
+			this.add(`c|+Zalm|Tfw still no mega weedle`);
+		},
+	},
 	zarel: {
 		noCopy: true,
 		onStart() {
@@ -1547,6 +1636,19 @@ let BattleStatuses = {
 				move.basePower += 20;
 				this.debug('glitch out base power boost');
 			}
+		},
+	},
+	// Type-changing custom effect for Saburo
+	magmaore2: {
+		duration: 1,
+		noCopy: true,
+		onStart(pokemon, source) {
+			source.setType(source.types.map(type => type === "Ground" ? "Fire" : type));
+			this.add('-start', source, 'typechange', source.types.join('/'), '[from] move: x1');
+		},
+		onEnd(source) {
+			source.setType(source.types.map(type => type === "Fire" ? "Ground" : type));
+			this.add('-start', source, 'typechange', source.types.join('/'), '[from] move: x1');
 		},
 	},
 	// Modified type setup for arceus
@@ -1641,6 +1743,22 @@ let BattleStatuses = {
 		},
 		onEnd() {
 			this.add('-weather', 'none');
+    },
+	},
+	// Custom effect for Rage's multihit
+	enrageeeeed: {
+		onStart(pokemon, source) {
+			this.add('-message', `${pokemon.name}'s next attack will hit multiple times!`);
+		},
+		onPrepareHit(source, target, move) {
+			if (move.category !== 'Status') {
+				move.multihit = [2, 5];
+				move.basePower = 25;
+				this.effectData.usedup = true;
+			}
+		},
+		onAfterMove(pokemon, source) {
+			if (this.effectData.usedup) pokemon.removeVolatile('enrageeeeed');
 		},
 	},
 };

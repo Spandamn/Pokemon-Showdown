@@ -13,6 +13,7 @@
  * @property {{hp?: number, atk?: number, def?: number, spa?: number, spd?: number, spe?: number}=} ivs
  * @property {string | string[]} nature
  * @property {number=} level
+ * @property {number=} happiness
  * @property {(number|boolean)=} shiny
  */
 
@@ -384,6 +385,18 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Dragon Warrior Touch',
 				evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
 			},
+			'Kipkluif': {
+				species: 'Combusken', ability: 'Speed Boost', item: 'Eviolite', gender: 'M',
+				moves: ['High Jump Kick', 'Blaze Kick', 'Trop Kick'],
+				signatureMove: 'Salute the Colonel',
+				evs: {hp: 252, atk: 252}, nature: 'Adamant',
+			},
+			'Kris': {
+				species: 'Rotom', ability: 'Adaptability', item: 'Thunder Stone', gender: 'N',
+				moves: [['Defog', 'Will-O-Wisp', 'Charge'], 'Thunderbolt', ['Recover', 'Volt Switch']],
+				signatureMove: 'Ectoplasm',
+				evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
+			},
 			'Level 51': {
 				species: 'Porygon2', ability: 'Stamina', item: 'Eviolite', gender: 'N',
 				moves: ['Recover', ['Seismic Toss', 'Night Shade'], ['Cosmic Power', 'Aqua Ring']],
@@ -407,6 +420,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				moves: ['Scald', 'Aeroblast', 'Sleep Talk'],
 				signatureMove: 'Nap Time',
 				evs: {hp: 252, spa: 80, spe: 176}, ivs: {atk: 0}, nature: 'Modest',
+			},
+			'Mad Monty ¾°': {
+				species: 'Zekrom', ability: 'Minnesnowta', item: 'Expert Belt', gender: 'N',
+				moves: ['Fusion Bolt', 'Avalanche', 'Hone Claws'],
+				signatureMove: 'Llamacide',
+				evs: {atk: 252, spa: 4, spe: 252}, ivs: {def: 0}, nature: 'Lonely', shiny: true,
 			},
 			'MajorBowman': {
 				species: 'Victini', ability: 'Victory Star', item: 'Victinium Z', gender: 'M',
@@ -553,11 +572,23 @@ class RandomStaffBrosTeams extends RandomTeams {
 				signatureMove: 'Stunner',
 				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
 			},
+			'Rage': {
+				species: 'Salamence', ability: 'Intimidate', item: 'Salamencite', gender: 'M',
+				moves: ['Extreme Speed', 'Thousand Arrows', 'Frustration'],
+				signatureMove: 'Rageeeee',
+				evs: {atk: 252, spd: 4, spe: 252}, nature: 'Jolly', happiness: 0,
+			},
 			'Raid': {
 				species: 'Moltres', ability: 'Tempest', item: 'Life Orb', gender: 'N',
 				moves: ['Hurricane', 'Roost', 'U-Turn'],
 				signatureMove: 'Firestorm',
 				evs: {def: 4, spa: 252, spe: 252}, nature: 'Timid',
+			},
+			'Ransei': {
+				species: 'Audino-Mega', ability: 'Superguarda', item: 'Safety Goggles', gender: 'M',
+				moves: ['Photon Geyser', 'Sacred Fire', 'Play Rough'],
+				signatureMove: 'Mashup Motive',
+				evs: {hp: 248, atk: 252, spe: 8}, nature: 'Adamant',
 			},
 			'Rory Mercury': {
 				species: 'Charjabug', ability: 'Recharge', item: 'Eviolite', gender: 'M',
@@ -566,10 +597,10 @@ class RandomStaffBrosTeams extends RandomTeams {
 				evs: {hp: 252, atk: 252, def: 4}, ivs: {spe: 0}, nature: 'Brave',
 			},
 			'Saburo': {
-				species: 'Metagross', ability: 'Levitate', item: 'Metagrossite', gender: 'M',
-				moves: ['Psychic Fangs', 'Iron Head', ['Earthquake', 'Ice Punch']],
-				signatureMove: 'Soulbend',
-				evs: {hp: 184, atk: 148, spe: 176}, nature: 'Jolly', shiny: true,
+				species: 'Rhydon', ability: 'Fur Coat', item: 'Eviolite', gender: 'M',
+				moves: ['Thousand Arrows', 'Slack Off', ['Glare', 'Toxic']],
+				signatureMove: 'Magma Ore',
+				evs: {hp: 252, atk: 16, spd: 240}, nature: 'Adamant',
 			},
 			'SamJo': {
 				species: 'Mamoswine', ability: 'Thiccer Fat', item: 'Thiccinium Z', gender: '',
@@ -688,7 +719,7 @@ class RandomStaffBrosTeams extends RandomTeams {
 			'Xayah': {
 				species: 'Noivern', ability: 'Dancer', item: 'Flyinium Z', gender: 'F',
 				moves: ['Clanging Scales', 'Roost', 'Fiery Dance'],
-				signatureMove: 'Stunning Dance',
+				signatureMove: 'Feather Snare',
 				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 			'xfix': {
@@ -708,6 +739,12 @@ class RandomStaffBrosTeams extends RandomTeams {
 				moves: ['Core Enforcer', 'Volt Switch', 'Psystrike'],
 				signatureMove: 'Blue Flare',
 				evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+			},
+			'Zalm': {
+				species: 'Weedle', ability: 'Triage', item: 'Black Sludge', gender: 'M',
+				moves: ['Swords Dance', 'Leech Life', 'Horn Leech'],
+				signatureMove: 'TwinWeedle',
+				evs: {atk: 252, def: 128, spd: 128}, nature: 'Adamant',
 			},
 			'Zarel': {
 				species: 'Meloetta', ability: 'Serene Grace', item: '', gender: 'M',
@@ -770,6 +807,7 @@ class RandomStaffBrosTeams extends RandomTeams {
 				evs: {hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0},
 				ivs: {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31},
 				level: ssbSet.level || 100,
+				happiness: ssbSet.happiness || 255,
 				shiny: typeof ssbSet.shiny === 'number' ? this.randomChance(1, ssbSet.shiny) : ssbSet.shiny,
 			};
 			if (ssbSet.ivs) {
@@ -794,9 +832,17 @@ class RandomStaffBrosTeams extends RandomTeams {
 				set.moves.push(move);
 			}
 			set.moves.push(ssbSet.signatureMove);
+			if (name === 'Arsenal' && this.getItem(set.item).onPlate) {
+				set.species = 'Arceus-' + this.getItem(set.item).onPlate;
+			}
 			if (name === 'The Immortal' && set.item === 'Choice Scarf') set.moves[3] = 'Superpower';
 			if (name === 'irritated' && !set.moves.includes('Double Iron Bash')) set.moves[this.random(3)] = 'Double Iron Bash';
 			team.push(set);
+			// Swap last and second to last sets if last set has an illusion variant
+			if (team.length === 6 && set.ability.includes("Illusion")) {
+				team[5] = team[4];
+				team[4] = set;
+			}
 		}
 		return team;
 	}

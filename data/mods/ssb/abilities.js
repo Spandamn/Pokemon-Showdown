@@ -562,6 +562,25 @@ let BattleAbilities = {
 			}
 		},
 	},
+	// Mad Monty ¾°
+	minnesnowta: {
+		desc: "This Pokemon is immune to Ice-type moves. Its Ice and Electric type attacks have their power multiplied by 1.2x.",
+		shortDesc: "This Pokemon's Ice and Electric attacks  have their power multiplied by 1.2; Ice immunity.",
+		onTryHit(target, source, move) {
+			if (target !== source && move.type === 'Ice') {
+				this.add('-immune', target, '[from] ability: Minnesnowta');
+			}
+		},
+		onBasePowerPriority: 8,
+		onBasePower(basePower, attacker, defender, move) {
+			if (['Electric', 'Ice'].includes(move.type)) {
+				this.debug('Minnesnowta boost');
+				return this.chainModify([0x1333, 0x1000]);
+			}
+		},
+		id: "minnesnowta",
+		name: "Minnesnowta",
+	},
 	// Marshmallon
 	sightseeing: {
 		desc: "If this Pokemon is a Castform, its type and moves changes to the current weather condition's type, except Sandstorm. The user's Defense, Special Attack, Special Defense, Speed, and Accuracy are all boosted 1.5x during weather.",
@@ -835,6 +854,38 @@ let BattleAbilities = {
 		},
 		onModifyMove(move) {
 			if (move.type === 'Flying') move.accuracy = true;
+		},
+	},
+	// Ransei
+	superguarda: {
+		desc: "This user's Attack is doubled until it is hit by a super effective attack. If this Pokemon is statused, its Attack is 1.5x; ignores burn halving physical damage. This Pokemon can only be damaged by direct attacks.",
+		shortDesc: "Atk 2x until hit by SE move. 1.5x Atk if statused. Immune to indirect dmg.",
+		id: "superguarda",
+		name: "Superguarda",
+		isNonstandard: "Custom",
+		onDamage(damage, target, source, effect) {
+			if (effect.effectType !== 'Move') {
+				return false;
+			}
+		},
+		onAfterDamage(damage, target, source, move) {
+			if (target.getMoveHitData(move).typeMod > 0) {
+				if (!target.m.heavilydamaged) {
+					this.add('-message', `${target.name}'s attack was reduced after that super effective attack!`);
+					target.m.heavilydamaged = true;
+				}
+				this.add(`c|@Ransei|Yo really? Why do you keep hitting me with super effective moves?`);
+			}
+		},
+		onModifyAtk(atk, pokemon) {
+			let atkmult = 1;
+			if (!pokemon.m.heavilydamaged) {
+				atkmult *= 2;
+			}
+			if (pokemon.m.status) {
+				atkmult *= 1.5;
+			}
+			return this.chainModify(atkmult);
 		},
 	},
 	// Rory Mercury

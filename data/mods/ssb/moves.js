@@ -1054,6 +1054,14 @@ let BattleMovedex = {
 			}
 			return success;
 		},
+		// @ts-ignore
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, "Haze", target);
+			this.add('-anim', source, "Defog", target);
+		},
 		onHitFieldPriority: -4,
 		onHitField() {
 			this.add('-clearallboost');

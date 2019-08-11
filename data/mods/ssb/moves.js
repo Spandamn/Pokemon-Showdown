@@ -1030,7 +1030,6 @@ let BattleMovedex = {
 		desc: "Resets the stat stages of all active Pokemon to 0, then lowers opponents evasion by 1 and removes hazards.",
 		shortDesc: "Eliminates all stat changes; lowers target's evasion by 1; removes hazards.",
 		id: "birbtotherescue",
-		isViable: true,
 		name: "Birb to the Rescue",
 		pp: 15,
 		priority: 1,

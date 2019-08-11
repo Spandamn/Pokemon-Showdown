@@ -188,7 +188,7 @@ class RandomStaffBrosTeams extends RandomTeams {
 			},
 			'Catalystic': {
 				species: 'Ho-oh', ability: 'Magic Guard', item: ['Toxic Orb'], gender: 'M',
-				moves: ['Sacred Firr', 'Brave Bird', 'Strength Sap'],
+				moves: ['Sacred Fire', 'Brave Bird', 'Strength Sap'],
 				signatureMove: 'Birb to the Rescue',
 				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
 			},

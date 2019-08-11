@@ -1035,6 +1035,10 @@ let BattleMovedex = {
 		priority: 1,
 		flags: {protect: 1, reflectable: 1, mirror: 1, authentic: 1},
 		onHit(target, source, move) {
+			this.add('-clearallboost');
+			for (const pokemon of this.getAllActive()) {
+				pokemon.clearBoosts();
+			}
 			let success = false;
 			if (!target.volatiles['substitute'] || move.infiltrates) success = !!this.boost({evasion: -1});
 			let removeTarget = ['reflect', 'lightscreen', 'auroraveil', 'safeguard', 'mist', 'spikes', 'toxicspikes', 'stealthrock', 'stickyweb'];
@@ -1060,14 +1064,6 @@ let BattleMovedex = {
 		onPrepareHit(target, source) {
 			this.add('-anim', source, "Haze", target);
 			this.add('-anim', source, "Defog", target);
-		},
-		// @ts-ignore
-		onHitFieldPriority: -4,
-		onHitField() {
-			this.add('-clearallboost');
-			for (const pokemon of this.getAllActive()) {
-				pokemon.clearBoosts();
-			}
 		},
 		secondary: null,
 		target: "normal",

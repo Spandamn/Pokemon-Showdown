@@ -1054,7 +1054,6 @@ let BattleMovedex = {
 			}
 			return success;
 		},
-		// @ts-ignore
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1062,6 +1061,7 @@ let BattleMovedex = {
 			this.add('-anim', source, "Haze", target);
 			this.add('-anim', source, "Defog", target);
 		},
+		// @ts-ignore
 		onHitFieldPriority: -4,
 		onHitField() {
 			this.add('-clearallboost');

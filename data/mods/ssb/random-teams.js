@@ -307,10 +307,16 @@ class RandomStaffBrosTeams extends RandomTeams {
 				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
 			},
 			'Gallant Spear': {
-				species: 'Rapidash', ability: 'Trombe!', item: ['Eject Button', 'Choice Band'], gender: 'M',
+				species: 'Rapidash', ability: 'Trombe!', item: 'Life Orb', gender: 'M',
 				moves: ['High Horsepower', 'U-turn', 'Recover'],
 				signatureMove: 'Storm Assault OGs',
 				evs: {atk: 252, spd: 4, spe: 252}, nature: 'Jolly', shiny: true,
+			},
+			'Gimm1ck': {
+				species: 'Beartic', ability: 'Russian Rush', item: ['Eject Button', 'Choice Band'], gender: 'M',
+				moves: ['Icicle Crash', 'Earthquake', 'Close Combat'],
+				signatureMove: 'Slav Squat',
+				evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 			},
 			'GMars': {
 				species: 'Minior-Meteor', ability: 'Mystery Shell', item: 'White Herb', gender: 'N',

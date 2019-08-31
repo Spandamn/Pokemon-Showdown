@@ -463,6 +463,7 @@ let BattleAbilities = {
 	},
 	// Gimm1ck
 	"russianrush": {
+		desc: "If Hail is active, this Pokemon's Speed and Accuracy is doubled.",
 		shortDesc: "If Hail is active, this Pokemon's Speed and Accuracy is doubled.",
 		onModifySpe(spe, pokemon) {
 			if (this.field.isWeather('hail')) {
@@ -476,8 +477,9 @@ let BattleAbilities = {
 				return accuracy * 2;
 			}
 		},
-		id: "ruasianrush",
+		id: "russianrush",
 		name: "Russian Rush",
+		isNonstandard: "Custom",
 	},
 	// GMars
 	mysteryshell: {

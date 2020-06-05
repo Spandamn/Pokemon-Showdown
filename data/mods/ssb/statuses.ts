@@ -40,7 +40,8 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	// Please keep statuses organized alphabetically based on staff member name!
 	elgino: {
 		noCopy: true,
-		onStart() {
+		onStart(target, pokemon) {
+			this.add('-start', pokemon, 'typechange', pokemon.getTypes(true).join('/'), '[silent]');
 			this.add(`c|${getName('Elgino')}|Time to save Hyrule!`);
 		},
 		onSwitchOut() {

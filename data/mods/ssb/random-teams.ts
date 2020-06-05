@@ -38,7 +38,7 @@ export const ssbSets: SSBSets = {
 		species: 'Celebi', ability: 'Magic Guard', item: 'Life Orb', gender: 'M',
 		moves: ['Leaf Storm', 'Nasty Plot', 'Power Gem'],
 		signatureMove: 'Navi\'s Grace',
-		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid', shiny: true,
+		evs: {hp: 4, spa: 252, spe: 252}, ivs: {atk: 0}, nature: 'Timid', shiny: true,
 	},
 	GXS: {
 		species: 'Porygon-Z', ability: 'Virus Upload', item: 'Life Orb', gender: 'N',
@@ -50,7 +50,7 @@ export const ssbSets: SSBSets = {
 		species: 'Leafeon', ability: 'Photosynthesis', item: ['Life Orb', 'Miracle Seed'], gender: 'M',
 		moves: ['Solar Blade', ['Body Slam', 'X-Scissor'], 'Thousand Arrows'],
 		signatureMove: 'Terraforming',
-		evs: {atk: 252, def: 4, spe: 252}, ivs: {atk: 0}, nature: 'Jolly',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 	},
 	'OM~!': {
 		species: 'Magneton', ability: 'Triage', item: 'Metronome', gender: 'N',

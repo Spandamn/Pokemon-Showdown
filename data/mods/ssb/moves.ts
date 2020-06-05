@@ -110,7 +110,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		priority: 0,
 		flags: {protect: 1},
 		onTryMove() {
-			this.attrLastMove('[still]'); // For custom animations
+			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Hyperspace Hole', source);

@@ -76,7 +76,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 				const yourItem = target.takeItem(source);
 				if (!yourItem) return;
 				if (!source.setItem(yourItem)) {
-					target.item = yourItem.id; // bypass setItem so we don't break choicelock or anything
+					target.item = yourItem.id;
 					return;
 				}
 				this.add('-item', source, yourItem, '[from] ability: Greedy Magician', '[of] ' + target);

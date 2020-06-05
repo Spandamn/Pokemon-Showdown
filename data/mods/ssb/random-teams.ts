@@ -46,6 +46,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Data Corruption',
 		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
 	},
+	Kris: {
+		species: 'Unown', ability: 'Protean', item: 'Life Orb', gender: 'N',
+		moves: ['Light of Ruin', 'Psystrike', ['Secret Sword', 'Mind Blown', 'Seed Flare']],
+		signatureMove: 'ebhewbnjgWEGAER',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+	},
 	Mitsuki: {
 		species: 'Leafeon', ability: 'Photosynthesis', item: ['Life Orb', 'Miracle Seed'], gender: 'M',
 		moves: ['Solar Blade', ['Body Slam', 'X-Scissor'], 'Thousand Arrows'],
@@ -62,6 +68,12 @@ export const ssbSets: SSBSets = {
 		species: 'Absol', ability: 'Intimidate', item: 'Absolite', gender: 'M',
 		moves: ['Play Rough', 'U-turn', 'Close Combat'],
 		signatureMove: 'Healing you?',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly', level: 100, shiny: false,
+	},
+	'Paradise ╱╲☼': {
+		species: 'Slaking', ability: 'Unaware', item: 'Choice Scarf', gender: '',
+		moves: ['Sacred Fire', 'Spectral Thief', 'Icicle Crash'],
+		signatureMove: 'Rapid Turn',
 		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly', level: 100, shiny: false,
 	},
 	'Perish Song': {

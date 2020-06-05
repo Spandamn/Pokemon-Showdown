@@ -34,6 +34,12 @@ export const ssbSets: SSBSets = {
 	// Nature needs to be a valid nature with the first letter capitalized ex: Modest
 	*/
 	// Please keep sets organized alphabetically based on staff member name!
+	Elgino: {
+		species: 'Celebi', ability: 'Magic Guard', item: 'Life Orb', gender: 'M',
+		moves: ['Leaf Storm', 'Nasty Plot', 'Power Gem'],
+		signatureMove: 'Navi\'s Grace',
+		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid', shiny: true,
+	},
 	GXS: {
 		species: 'Porygon-Z', ability: 'Virus Upload', item: 'Life Orb', gender: 'N',
 		moves: ['Nasty Plot', 'Aura Sphere', 'Thunderbolt'],
@@ -44,7 +50,7 @@ export const ssbSets: SSBSets = {
 		species: 'Leafeon', ability: 'Photosynthesis', item: ['Life Orb', 'Miracle Seed'], gender: 'M',
 		moves: ['Solar Blade', ['Body Slam', 'X-Scissor'], 'Thousand Arrows'],
 		signatureMove: 'Terraforming',
-		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
+		evs: {atk: 252, def: 4, spe: 252}, ivs: {atk: 0}, nature: 'Jolly',
 	},
 	'OM~!': {
 		species: 'Magneton', ability: 'Triage', item: 'Metronome', gender: 'N',

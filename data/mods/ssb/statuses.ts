@@ -38,6 +38,18 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	IMPORTANT: Obtain the username from getName
 	*/
 	// Please keep statuses organized alphabetically based on staff member name!
+	elgino: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Elgino')}|Time to save Hyrule!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Elgino')}|Hold on I need to stock up on ${['Bombs', 'Arrows', 'Magic', 'Seeds'][this.random(4)]}`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Elgino')}|I'm out of fairies D:!`);
+		},
+	},
 	gxs: {
 		noCopy: true,
 		onStart() {

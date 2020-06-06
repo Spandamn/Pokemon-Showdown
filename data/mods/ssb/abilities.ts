@@ -159,13 +159,13 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 				if (pokemon.mode !== 5) pokemon.mode = 5;
 				return;
 			}
-			let assignNewMoves = function (moves) {
+			const assignNewMoves = function (moves) {
 				const oldMoves = Object.assign([], pokemon.baseMoveSlots);
 				pokemon.baseMoveSlots = [];
 				pokemon.moveSlots = [];
 				let slot = 0;
-				for (const newMove of newMoves) {
-					let move = pokemon.battle.dex.getMove(toID(newMove));
+				for (const newMove of moves) {
+					const move = pokemon.battle.dex.getMove(toID(newMove));
 					if (!move.id) continue;
 					pokemon.baseMoveSlots.push({
 						move: move.name,

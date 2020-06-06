@@ -468,7 +468,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Psychic",
 	},
 
-	"mode5offensive": {
+	mode5offensive: {
 		accuracy: true,
 		basePower: 30,
 		category: "Special",

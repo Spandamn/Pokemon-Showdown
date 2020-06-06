@@ -41,8 +41,8 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	elgino: {
 		noCopy: true,
 		onStart(target, pokemon) {
-			this.add('-start', pokemon, 'typechange', pokemon.getTypes(true).join('/'), '[silent]');
 			this.add(`c|${getName('Elgino')}|Time to save Hyrule!`);
+			this.add('-start', pokemon, 'typechange', pokemon.getTypes(true).join('/'), '[silent]');
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('Elgino')}|Hold on I need to stock up on ${['Bombs', 'Arrows', 'Magic', 'Seeds'][this.random(4)]}`);

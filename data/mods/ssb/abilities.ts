@@ -149,6 +149,54 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 	},
+	// Robb576
+	"thenumbersgame": {
+		desc: "Changes the pokemon's form upon switch-in depending on the amount of pokemon still alive on the user's team; Necrozma-Dusk-Mane if 3 or fewer, Necrozma-Ultra if it is the last Pokemon left on the team.",
+		shortDesc: "Changes the pokemon's form upon switch-in depending on the amount of pokemon still alive on the user's team.",
+		name: "The Numbers Game",
+		onStart(pokemon) {
+			if (pokemon.side.pokemonLeft > 3) {
+				if (pokemon.mode !== 5) pokemon.mode = 5;
+				return;
+			}
+			let assignNewMoves = function (moves) {
+				const oldMoves = Object.assign([], pokemon.baseMoveSlots);
+				pokemon.baseMoveSlots = [];
+				pokemon.moveSlots = [];
+				let slot = 0;
+				for (const newMove of newMoves) {
+					let move = pokemon.battle.dex.getMove(toID(newMove));
+					if (!move.id) continue;
+					pokemon.baseMoveSlots.push({
+						move: move.name,
+						id: move.id,
+						maxpp: ((move.noPPBoosts || move.isZ) ? move.pp : move.pp * 8 / 5),
+						pp: (oldMoves[slot].pp * move.pp) / (move.pp * 8 / 5),
+						target: move.target,
+						disabled: false,
+						disabledSource: '',
+						used: false,
+					});
+					slot++;
+				}
+			};
+			if (pokemon.side.pokemonLeft === 1 && pokemon.mode === 7) {
+				pokemon.formeChange("Necrozma-Ultra");
+				pokemon.setItem("modium6z");
+				pokemon.mode = 6;
+				const newMoves = ['Photon Geyser', 'Earthquake', 'Dynamax Cannon', 'Fusion Flare'];
+				assignNewMoves(newMoves);
+				return;
+			}
+			if (pokemon.mode === 5) {
+				pokemon.formeChange("Necrozma-Dusk-Mane");
+				pokemon.setItem("leftovers");
+				pokemon.mode = 7;
+				const newMoves = ['Sunsteel Strike', 'Toxic', 'Rapid Spin', 'Mode [7: Defensive]'];
+				assignNewMoves(newMoves);
+			}
+		},
+	},
 	// Modified Illusion to support SSB volatiles
 	illusion: {
 		inherit: true,

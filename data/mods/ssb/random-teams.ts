@@ -94,6 +94,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Psycho Drive',
 		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid', shiny: true,
 	},
+	Robb576: {
+		species: 'Necrozma-Dawn-Wings', ability: 'The Numbers Game', item: 'Metronome', gender: 'M',
+		moves: ['Moongeist Beam', 'Psystrike', 'Thunder Wave'],
+		signatureMove: 'Mode [5: Offensive]',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Modest',
+	},
 };
 
 export class RandomStaffBrosTeams extends RandomTeams {

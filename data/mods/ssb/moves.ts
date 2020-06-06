@@ -440,6 +440,89 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		target: "normal",
 		type: "Psychic",
 	},
+
+	// Robb576
+	"integeroverflow": {
+		accuracy: true,
+		basePower: 200,
+		category: "Special",
+		desc: "This move becomes a physical attack if the user's Attack is greater than its Special Attack, including stat stage changes. This move and its effects ignore the Abilities of other Pokemon.",
+		shortDesc: "Physical if user's Atk > Sp. Atk. Ignores Abilities.",
+		name: "Integer Overflow",
+		pp: 1,
+		priority: 0,
+		flags: {},
+		onModifyMove(move, pokemon) {
+			if (pokemon.getStat('atk', false, true) > pokemon.getStat('spa', false, true)) move.category = 'Physical';
+		},
+		ignoreAbility: true,
+		isZ: "modium6z",
+		secondary: null,
+		target: "normal",
+		type: "Psychic",
+	},
+
+	"mode5offensive": {
+		accuracy: 100,
+		basePower: 30,
+		category: "Special",
+		desc: "This move hits three times. Every hit has a 20% chance to drop the target's SpD by 1 stage.", // long description
+		shortDesc: "Hits three times. Every hit has a 20% chance to drop the target's SpD by 1 stage.",
+		name: "Mode [5: Offensive]",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]'); // For custom animations
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Focus Blast', source);
+			this.add('-anim', source, 'Zap Cannon', source);
+		}, // For custom animations
+		secondary: {
+			chance: 20,
+			boosts: {
+				spd: -1,
+			},
+		},
+		target: "normal",
+		type: "Fighting",
+	},
+
+	"mode7defensive": {
+		accuracy: 100,
+		basePower: 0,
+		category: "Status",
+		desc: "This move cures the user's party of all status conditions, and then forces the target to switch to a random ally.",
+		shortDesc: "Cures the user's party of all status conditions; and then forces the target to switch to a random ally.",
+		name: "Mode [7: Defensive]",
+		pp: 15,
+		priority: 0, // should be -6, waiting on QC
+		flags: {sound: 1, distance: 1, authentic: 1},
+		forceSwitch: true,
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Heal Bell', source);
+			this.add('-anim', source, 'Roar', source);
+		},
+		onHit(pokemon, source) {
+			this.add('-activate', source, 'move: Heal Bell');
+			const side = pokemon.side;
+			let success = false;
+			for (const ally of side.pokemon) {
+				if (ally.hasAbility('soundproof')) continue;
+				if (ally.cureStatus()) success = true;
+			}
+			return success;
+		},
+		target: "normal",
+		type: "Normal",
+	},
+
 	// These moves need modified to support Snowstorm (Perish Song's ability)
 	auroraveil: {
 		inherit: true,

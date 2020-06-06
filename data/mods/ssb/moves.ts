@@ -452,6 +452,12 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 1,
 		priority: 0,
 		flags: {},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Light That Burns The Sky', target);
+		},
 		onModifyMove(move, pokemon) {
 			if (pokemon.getStat('atk', false, true) > pokemon.getStat('spa', false, true)) move.category = 'Physical';
 		},
@@ -474,12 +480,12 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		flags: {protect: 1},
 		onTryMovePriority: 100,
 		onTryMove() {
-			this.attrLastMove('[still]'); // For custom animations
+			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Focus Blast', target);
 			this.add('-anim', source, 'Zap Cannon', target);
-		}, // For custom animations
+		},
 		secondary: {
 			chance: 20,
 			boosts: {

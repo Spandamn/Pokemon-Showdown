@@ -442,7 +442,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	},
 
 	// Robb576
-	"integeroverflow": {
+	integeroverflow: {
 		accuracy: true,
 		basePower: 200,
 		category: "Special",

@@ -497,7 +497,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Fighting",
 	},
 
-	"mode7defensive": {
+	mode7defensive: {
 		accuracy: 100,
 		basePower: 0,
 		category: "Status",

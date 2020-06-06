@@ -157,7 +157,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		name: "The Numbers Game",
 		onStart(pokemon) {
 			if (pokemon.side.pokemonLeft > 3) return;
-			const assignNewMoves = function (poke: Pokemon, moves: string[]) {
+			const assignNewMoves = (poke: Pokemon, moves: string[]) => {
 				const carryOver = poke.moveSlots.slice().map(m => {
 					return m.pp / m.maxpp;
 				});

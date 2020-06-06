@@ -35,6 +35,32 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// Jett
+	deceiver: {
+		desc: "This Pokemon's moves that match one of its types have a same-type attack bonus of 2 instead of 1.5. If this Pokemon is at full HP, it survives one hit with at least 1 HP. +1 Speed on switch in.", // Too long?
+		shortDesc: "(Adaptability + Sturdy, +1 Speed on Switching In)",
+		onStart() {
+			this.boost({spe: 1}); // User has asked to remove this if its too strong in playtesting
+		},
+		onModifyMove(move) {
+			move.stab = 2;
+		},
+		onTryHit(pokemon, target, move) {
+			if (move.ohko) {
+				this.add('-immune', pokemon, '[from] ability: Deceiver');
+				return null;
+			}
+		},
+		onDamagePriority: -100,
+		onDamage(damage, target, source, effect) {
+			if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === 'Move') {
+				this.add('-ability', target, 'Deceiver');
+				return target.hp - 1;
+			}
+		},
+		name: "Deceiver",
+	},
+
 	// Mitsuki
 	photosynthesis: {
 		desc: "On switch-in, this Pokemon summons Sunny Day. If Sunny Day is active and this Pokemon is not holding Utility Umbrella, this Pokemon's Speed is doubled. If Sunny Day is active, this Pokemon's Attack is multiplied by 1.5 and it loses 1/8 of its maximum HP, rounded down, at the end of each turn. If this Pokemon is holding Utility Umbrella, its Attack remains the same and it does not lose any HP.",

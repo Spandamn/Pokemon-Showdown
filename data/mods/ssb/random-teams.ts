@@ -40,6 +40,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Data Corruption',
 		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
 	},
+	Jett: {
+		species: 'Sneasel', ability: 'Deceiver', item: 'Heavy Duty Boots', gender: 'M',
+		moves: ['Knock Off', 'Icicle Crash', 'Counter'],
+		signatureMove: 'The Hunt is On!',
+		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
+	},
 	Kris: {
 		species: 'Unown', ability: 'Protean', item: 'Life Orb', gender: 'N',
 		moves: ['Light of Ruin', 'Psystrike', ['Secret Sword', 'Mind Blown', 'Seed Flare']],

@@ -50,6 +50,18 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			this.add(`c|${getName('GXS')}|A Critical Error Has Occurred. Would You Like To Send A Report? Sending Report.`);
 		},
 	},
+	jett: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Jett')}|It's a good day for a hunt.`);
+		},
+		onSwitchOut(source) {
+			this.add(`c|${getName('Jett')}|I'll be back for more.`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Jett')}|They got lucky.`);
+		},
+	},
 	kris: {
 		noCopy: true,
 		onStart(source) {

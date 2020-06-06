@@ -87,8 +87,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
-			this.add('-anim', source, 'Sucker Punch', source);
-			this.add('-anim', source, 'Pursuit', source);
+			this.add('-anim', source, 'Sucker Punch', target);
+			this.add('-anim', source, 'Pursuit', target);
 		},
 		beforeTurnCallback(pokemon) {
 			for (const side of this.sides) {

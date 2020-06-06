@@ -463,7 +463,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	},
 
 	"mode5offensive": {
-		accuracy: 100,
+		accuracy: true,
 		basePower: 30,
 		category: "Special",
 		desc: "This move hits three times. Every hit has a 20% chance to drop the target's SpD by 1 stage.", // long description
@@ -477,8 +477,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			this.attrLastMove('[still]'); // For custom animations
 		},
 		onPrepareHit(target, source) {
-			this.add('-anim', source, 'Focus Blast', source);
-			this.add('-anim', source, 'Zap Cannon', source);
+			this.add('-anim', source, 'Focus Blast', target);
+			this.add('-anim', source, 'Zap Cannon', target);
 		}, // For custom animations
 		secondary: {
 			chance: 20,
@@ -486,6 +486,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 				spd: -1,
 			},
 		},
+		multihit: 3,
 		target: "normal",
 		type: "Fighting",
 	},

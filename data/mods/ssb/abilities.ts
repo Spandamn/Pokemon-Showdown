@@ -155,19 +155,15 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		shortDesc: "Changes the pokemon's form upon switch-in depending on the amount of pokemon still alive on the user's team.",
 		name: "The Numbers Game",
 		onStart(pokemon) {
-			if (pokemon.side.pokemonLeft > 3) {
-				if (pokemon.mode !== 5) pokemon.mode = 5;
-				return;
-			}
-			const assignNewMoves = function (moves) {
-				const oldMoves = Object.assign([], pokemon.baseMoveSlots);
-				pokemon.baseMoveSlots = [];
-				pokemon.moveSlots = [];
+			if (pokemon.side.pokemonLeft > 3) return;
+			const assignNewMoves = function (poke: Pokemon, moves: Any) {
+				const oldMoves = Object.assign([], poke.moveSlots);
+				poke.moveSlots = [];
 				let slot = 0;
 				for (const newMove of moves) {
-					const move = pokemon.battle.dex.getMove(toID(newMove));
+					const move = poke.battle.dex.getMove(toID(newMove));
 					if (!move.id) continue;
-					pokemon.baseMoveSlots.push({
+					poke.moveSlots.push({
 						move: move.name,
 						id: move.id,
 						maxpp: ((move.noPPBoosts || move.isZ) ? move.pp : move.pp * 8 / 5),
@@ -178,22 +174,21 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 						used: false,
 					});
 					slot++;
+					if (!oldMoves[slot]) slot--;
 				}
 			};
-			if (pokemon.side.pokemonLeft === 1 && pokemon.mode === 7) {
-				pokemon.formeChange("Necrozma-Ultra");
+			if (pokemon.side.pokemonLeft === 1 && pokemon.species.name === "Necrozma-Dusk-Mane") {
+				pokemon.formeChange("Necrozma-Ultra", this.effect, true);
 				pokemon.setItem("modium6z");
-				pokemon.mode = 6;
 				const newMoves = ['Photon Geyser', 'Earthquake', 'Dynamax Cannon', 'Fusion Flare'];
-				assignNewMoves(newMoves);
+				assignNewMoves(pokemon, newMoves);
 				return;
 			}
-			if (pokemon.mode === 5) {
-				pokemon.formeChange("Necrozma-Dusk-Mane");
+			if (pokemon.species.name === "Necrozma-Dawn-Wings") {
+				pokemon.formeChange("Necrozma-Dusk-Mane", this.effect, true);
 				pokemon.setItem("leftovers");
-				pokemon.mode = 7;
 				const newMoves = ['Sunsteel Strike', 'Toxic', 'Rapid Spin', 'Mode [7: Defensive]'];
-				assignNewMoves(newMoves);
+				assignNewMoves(pokemon, newMoves);
 			}
 		},
 	},

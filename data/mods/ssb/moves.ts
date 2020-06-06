@@ -517,7 +517,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Roar', source);
 		},
 		onHit(pokemon, source) {
-			this.add('-activate', source, 'move: Heal Bell');
+			this.add('-activate', source, 'move: Mode [7: Defensive]');
 			const side = pokemon.side;
 			let success = false;
 			for (const ally of side.pokemon) {

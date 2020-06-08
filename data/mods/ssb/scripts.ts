@@ -203,7 +203,7 @@ export const BattleScripts: ModdedBattleScriptsData = {
 		if (noLock && pokemon.volatiles.lockedmove) delete pokemon.volatiles.lockedmove;
 	},
 
-	// For Jett's The Hunt is On!
+	// For Jett xx's The Hunt is On!
 	useMoveInner(moveOrMoveName, pokemon, target, sourceEffect, zMove, maxMove) {
 		if (!sourceEffect && this.effect.id) sourceEffect = this.effect;
 		if (sourceEffect && ['instruct', 'custapberry'].includes(sourceEffect.id)) sourceEffect = null;

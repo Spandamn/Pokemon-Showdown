@@ -72,13 +72,13 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Normal",
 	},
 
-	// Jett
-	"thehuntison": {
+	// Jett xx
+	thehuntison: {
 		accuracy: 100,
 		basePower: 55,
 		category: "Physical",
-		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn. Raises user's Attack by 2 if this KOes the target.",
-		shortDesc: "If a foe is switching out, hits it at 2x power. User gains +2 attack if this KOes the target.",
+		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn. Raises the user's Attack by 2 stages if this move KOes the target.",
+		shortDesc: "Foe: 2x power when switching. +2 Atk if KO.",
 		name: "The Hunt is On!",
 		pp: 15,
 		priority: 0,
@@ -110,7 +110,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		onAfterMoveSecondarySelf(pokemon, target, move) {
 			if (!target || target.fainted || target.hp <= 0) {
 				this.boost({atk: 2}, pokemon, pokemon, move);
-				this.add(`c|+Jett|Gotcha!`);
+				this.add(`c|+Jett xx|Gotcha!`);
 			}
 		},
 		effect: {

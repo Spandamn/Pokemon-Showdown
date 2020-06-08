@@ -40,7 +40,7 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Data Corruption',
 		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
 	},
-	Jett: {
+	'Jett xx': {
 		species: 'Sneasel', ability: 'Deceiver', item: 'Heavy Duty Boots', gender: 'M',
 		moves: ['Knock Off', 'Icicle Crash', 'Counter'],
 		signatureMove: 'The Hunt is On!',

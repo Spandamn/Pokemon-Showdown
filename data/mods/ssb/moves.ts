@@ -37,13 +37,13 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	*/
 	// Please keep sets organized alphabetically based on staff member name!
 	// Elgino
-	"navisgrace": {
+	navisgrace: {
 		accuracy: 100,
 		basePower: 90,
 		category: "Special",
 		desc: "This move is super effective on Steel- and Poison-type Pokemon.",
-		shortDesc: "This move is super effective on Steel- and Poison-type Pokemon.",
-		name: "Navi\'s Grace",
+		shortDesc: "Super effective on Steel and Poison types.",
+		name: "Navi's Grace",
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},

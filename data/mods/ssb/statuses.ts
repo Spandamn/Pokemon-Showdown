@@ -45,7 +45,7 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			this.add('-start', pokemon, 'typechange', pokemon.getTypes(true).join('/'), '[silent]');
 		},
 		onSwitchOut() {
-			this.add(`c|${getName('Elgino')}|Hold on I need to stock up on ${['Bombs', 'Arrows', 'Magic', 'Seeds'][this.random(4)]}`);
+			this.add(`c|${getName('Elgino')}|Hold on I need to stock up on ${this.sample(['Bombs', 'Arrows', 'Magic', 'Seeds'])}`);
 		},
 		onFaint() {
 			this.add(`c|${getName('Elgino')}|I'm out of fairies D:!`);

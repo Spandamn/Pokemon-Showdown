@@ -842,6 +842,7 @@ export const Formats: (FormatsData | {section: string, column?: number})[] = [
 		},
 		onSwitchInPriority: 100,
 		onSwitchIn(pokemon) {
+			pokemon.m.identified = true;
 			let name: string = toID(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
 			if (this.dex.getSpecies(name).exists || name === 'perishsong') {
 				// Certain pokemon have volatiles named after their id
@@ -855,6 +856,10 @@ export const Formats: (FormatsData | {section: string, column?: number})[] = [
 			const status = this.dex.getEffect(name);
 			if (status?.exists) {
 				pokemon.addVolatile(name, pokemon);
+			}
+			if (!pokemon.side.sideConditions['tracker']) {
+				// Initialize the tracker side condition for Darth's ability
+				pokemon.side.addSideCondition('tracker');
 			}
 		},
 	},

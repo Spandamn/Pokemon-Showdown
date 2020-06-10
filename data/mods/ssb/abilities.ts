@@ -356,7 +356,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 				types.push(this.dex.getMove(m).type);
 			}
 			let type = types[this.random(types.length)];
-			while (!pokemon.setType(type))
+			while (!pokemon.setType(type)) {
 				type = types[this.random(types.length)];
 			}
 			this.add('-start', pokemon, 'typechange', type);

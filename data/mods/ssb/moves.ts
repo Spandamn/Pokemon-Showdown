@@ -839,8 +839,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "Prevents the target from switching out, adds Dragon to the target's type. Has a 5% chance to either confuse the user or guarentee the next attack to be a critical hit, 15% chance to raise users Attack, Defense, Special Attack, Special Defense or Speed by 1, and a 15% chance to raise both user's Special Attack and Speed by 1 stage.",
-		shortDesc: "Prevents the target from switching out, adds Dragon to the target's type. Randomly does more things. Please refer to docs.",
+		desc: "Prevents the target from switching out and adds Dragon to the target's type. Has a 5% chance to either confuse the user or guarantee that the next attack is a critical hit, 15% chance to raise the user's Attack, Defense, Special Attack, Special Defense, or Speed by 1 stage, and a 15% chance to raise user's Special Attack and Speed by 1 stage.",
+		shortDesc: "Target: can't switch,+Dragon. Does other things.",
 		name: "Dungeons & Dragons",
 		pp: 10,
 		priority: 0,
@@ -857,13 +857,15 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		onHit(target, source, move) {
 			this.add(`c|${getName('PiraTe Princess')}|did someone say d&d?`);
 			target.addVolatile('trapped', source, move, 'trapper');
-			if (!target.hasType('Dragon') && target.addType('Dragon')) this.add('-start', target, 'typeadd', 'Dragon', '[from] move: Dungeons & Dragons');
+			if (!target.hasType('Dragon') && target.addType('Dragon')) {
+				this.add('-start', target, 'typeadd', 'Dragon', '[from] move: Dungeons & Dragons');
+			}
 			const result = this.random(21);
 			if (result === 20) {
 				source.addVolatile('laserfocus');
 			} else if (result >= 2 && result <= 16) {
-				let boost = {};
-				const stats = ['atk', 'def', 'spa', 'spd', 'spe'];
+				const boost: BoostsTable = {};
+				const stats: BoostName[] = ['atk', 'def', 'spa', 'spd', 'spe'];
 				boost[stats[this.random(5)]] = 1;
 				this.boost(boost, source);
 			} else if (result >= 17 && result <= 19) {

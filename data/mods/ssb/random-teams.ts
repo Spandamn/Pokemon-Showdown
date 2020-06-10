@@ -164,7 +164,11 @@ export const ssbSets: SSBSets = {
 	},
 	'PiraTe Princess': {
 		species: 'Polteageist', ability: 'Wild Magic Surge', item: 'Expert Belt', gender: 'F',
-		moves: ['Moongeist Beam', 'Spacial Rend', ['Tri Attack', 'Fiery Dance', 'Scald', 'Discharge', 'Apple Acid', 'Ice Beam', 'Aura Sphere', 'Sludge Bomb', 'Earth Power', 'Oblivion Wing', 'Psyshock', 'Bug Buzz', 'Power Gem', 'Dark Pulse', 'Flash Cannon', 'Dazzling Gleam']],
+		moves: [
+			'Moongeist Beam', 'Spacial Rend', [
+				'Tri Attack', 'Fiery Dance', 'Scald', 'Discharge', 'Apple Acid', 'Ice Beam', 'Aura Sphere', 'Sludge Bomb', 'Earth Power', 'Oblivion Wing', 'Psyshock', 'Bug Buzz', 'Power Gem', 'Dark Pulse', 'Flash Cannon', 'Dazzling Gleam',
+			],
+		],
 		signatureMove: 'Dungeons & Dragons',
 		evs: {def: 4, spa: 252, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},

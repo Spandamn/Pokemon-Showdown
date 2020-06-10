@@ -337,22 +337,22 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 
 	// PiraTe Princess
 	wildmagicsurge: {
-		desc: "Randomly changes the Pokemon’s type at the end of every turn to the type of one of it’s moves; same-type attack bonus (STAB) is 2 instead of 1.5.",
-		shortDesc: "Adaptability + Randomly changes the Pokemon’s type at the end of every turn to the type of one of it’s moves",
+		desc: "Randomly changes the Pokemon's type at the end of every turn to the type of one of its moves; same-type attack bonus (STAB) is 2 instead of 1.5.",
+		shortDesc: "Adaptability + Randomly changes the Pokemon’s type to the type of one of its moves every turn.",
 		name: "Wild Magic Surge",
 		onModifyMove(move) {
 			move.stab = 2;
 		},
 		onResidual(pokemon) {
 			if (!pokemon.hp) return;
-			const moves = Object.values(pokemon.getMoves()).map(move => {return move.id});
-			let types = [];
-			for (let m of moves) {
-				types.push(this.dex.getMove(m).type);
+			const moves = Object.values(pokemon.getMoves()).map(move =>  move.id);
+			const types: string[] = [];
+			for (const move of moves) {
+				types.push(this.dex.getMove(move).type);
 			}
-			let type = types[this.random(types.length)];
+			let type = this.sample(types);
 			while (!pokemon.setType(type)) {
-				type = types[this.random(types.length)];
+				type = this.sample(types);
 			}
 			this.add('-start', pokemon, 'typechange', type);
 		},

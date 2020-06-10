@@ -862,6 +862,31 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Psychic",
 	},
 
+	// Ransei
+	ripsei: {
+		num: 515,
+		accuracy: 100,
+		basePower: 0,
+		damageCallback(pokemon) {
+			const damage = pokemon.hp;
+			const target = pokemon.side.foe.active[0];
+			if (target && target.hp <= 0) target.faint();
+			pokemon.faint();
+			return damage;
+		},
+		category: "Special",
+		desc: "Deals damage to the target equal to the user's current HP. If this move is successful, the user faints.",
+		shortDesc: "Does damage equal to the user's HP. User faints.",
+		name: "ripsei",
+		pp: 5,
+		priority: 1,
+		flags: {protect: 1},
+		selfdestruct: "ifHit",
+		secondary: null,
+		target: "normal",
+		type: "Fighting",
+	},
+
 	// Robb576
 	integeroverflow: {
 		accuracy: true,

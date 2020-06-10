@@ -380,7 +380,7 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			if (!target || target.fainted || target.hp <= 0) {
 				this.add(`c|${getName('Ransei')}|Ahah yes you got rekt! Welcome to Hackmons! gg m8!`);
 			} else {
-				this.add(`c|${getName('Ransei')}|ripsei… Ok look you might’ve won this time but I kid you not you’re losing next game!`);
+				this.add(`c|${getName('Ransei')}|ripsei... Ok look you might’ve won this time but I kid you not you’re losing next game!`);
 			}
 		},
 	},

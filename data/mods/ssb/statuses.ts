@@ -3,15 +3,15 @@ import {FS} from '../../../lib/fs';
 // Similar to User.usergroups. Cannot import here due to users.ts requiring Chat
 // This also acts as a cache, meaning ranks will only update when a hotpatch/restart occurs
 const usergroups: {[userid: string]: string} = {};
-const data = FS('config/usergroups.csv').readIfExistsSync().split('\n');
-for (const row of data) {
+const usergroupData = FS('config/usergroups.csv').readIfExistsSync().split('\n');
+for (const row of usergroupData) {
 	if (!toID(row)) continue;
 
 	const cells = row.split(',');
 	usergroups[toID(cells[0])] = cells[1] || ' ';
 }
 
-function getName(name: string): string {
+export function getName(name: string): string {
 	const userid = toID(name);
 	if (!userid) throw new Error('No/Invalid name passed to getSymbol');
 
@@ -38,6 +38,122 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	IMPORTANT: Obtain the username from getName
 	*/
 	// Please keep statuses organized alphabetically based on staff member name!
+	aethernum: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Aethernum')}|Hlelo ^_^ Lotad is so cute, don't you think? But don't underestimate him!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Aethernum')}|Sinking in this sea of possibilities for now...but i'll float back once again!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Aethernum')}|Ok, ok, i have procrastinated enough here, time to go ^_^' See ya around!`);
+		},
+	},
+	alpha: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Alpha')}|eccomi dimmi`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Alpha')}|FRATM FACI FRIDDU`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Alpha')}|caio`);
+		},
+	},
+	cantsay: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('cant say')}|haha volc go brrrr`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('cant say')}|lol CTed`);
+		},
+		onFaint() {
+			this.add(`c|${getName('cant say')}|${['imagine taking pokemon seriously when you can just get haxed', '/me plays curb your enthusiasm theme', 'bad players always get lucky'][this.random(3)]}`);
+		},
+		// Magic Guard Innate
+		onDamage(damage, target, source, effect) {
+			if (effect.effectType !== 'Move') {
+				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
+				return false;
+			}
+		},
+	},
+	cleann: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('cleann')}|The mainframe is open... intercept their messages and get out`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('cleann')}|Mission Success`);
+		},
+		onFaint() {
+			this.add(`c|${getName('cleann')}|Shazam! They've been destroyed from the inside...`);
+		},
+	},
+	darth: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Darth')}|Let the Guardian Angel protect thee!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Darth')}|Well, everyone needs a break at some point.`);
+		},
+	},
+	drampasgrandpa: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('drampa\'s grandpa')}|Where are my glasses?`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('drampa\'s grandpa')}|Darn kids...`);
+		},
+		onFaint() {
+			this.add(`c|${getName('drampa\'s grandpa')}|Bah humbug!`);
+		},
+	},
+	elgino: {
+		noCopy: true,
+		onStart(target, pokemon) {
+			this.add(`c|${getName('Elgino')}|Time to save Hyrule!`);
+			if (pokemon.illusion) return;
+			this.add('-start', pokemon, 'typechange', 'Grass/Fairy');
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Elgino')}|Hold on I need to stock up on ${this.sample(['Bombs', 'Arrows', 'Magic', 'Seeds'])}`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Elgino')}|I'm out of fairies D:!`);
+		},
+	},
+	flare: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Flare')}|Let's get this started.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Flare')}|Shunshin No Jutsu!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Flare')}|Sorry, things were initially better, but ¯\\_(ツ)_/¯`);
+		},
+	},
+	frostyicelad: {
+		noCopy: true,
+		onStart(source) {
+			this.add(`c|${getName('frostyicelad ❆')}|Oh i guess its my turn now! Time to sweep!`);
+			if (source.species.id !== 'frosmothmega' || source.illusion) return;
+			this.add('-start', source, 'typechange', 'Bug/Ice');
+		},
+		onSwitchOut(source) {
+			this.add(`c|${getName('frostyicelad ❆')}|Hey! ${source.side.name} why dont you keep me in and let me sweep? Mean.`);
+		},
+		onFaint() {
+			this.add(`c|${getName('frostyicelad ❆')}|So c-c-cold`);
+		},
+	},
 	gxs: {
 		noCopy: true,
 		onStart() {
@@ -50,16 +166,54 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			this.add(`c|${getName('GXS')}|A Critical Error Has Occurred. Would You Like To Send A Report? Sending Report.`);
 		},
 	},
+	instruct: {
+		noCopy: true,
+		onStart(source) {
+			this.add(`c|${getName('Instruct')}|Howdy! ${source.side.foe.name}, are you there? It's me, your best friend.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Instruct')}|Don't worry about me. Someone has to take care of these flowers.`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Instruct')}|I'm not ready to say goodbye to someone like you again...`);
+		},
+	},
 	jettxx: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|${getName('Jett xx')}|It's a good day for a hunt.`);
+			this.add(`c|${getName('Jett x_x')}|It's a good day for a hunt.`);
 		},
 		onSwitchOut(source) {
-			this.add(`c|${getName('Jett xx')}|I'll be back for more.`);
+			this.add(`c|${getName('Jett x_x')}|I'll be back for more.`);
 		},
 		onFaint() {
-			this.add(`c|${getName('Jett xx')}|They got lucky.`);
+			this.add(`c|${getName('Jett x_x')}|They got lucky.`);
+    },
+  },
+	jho: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Jho')}|Hey there party people`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Jho')}|The Terminator(1984), 00:57:10`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Jho')}|Unfortunately, CAP no longer accepts custom elements`);
+		},
+	},
+	kaijubunny: {
+		noCopy: true,
+		onStart(source) {
+			this.add(`c|${getName('Kaiju Bunny')}|I heard SOMEONE wasn't getting enough affection! ￣( ÒㅅÓ)￣`);
+			if (source.species.id !== 'lopunnymega' || source.illusion) return;
+			this.add('-start', source, 'typechange', 'Normal/Fairy');
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Kaiju Bunny')}|Brb, need more coffee ￣( =ㅅ=)￣`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Kaiju Bunny')}|Wow, okay, r00d ￣(ಥㅅಥ)￣`);
 		},
 	},
 	kris: {
@@ -79,14 +233,17 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 		},
 		// phuck innate
 		onDamage(damage, target, source, effect) { // Magic Guard
-			if (!source || !source.species.id.startsWith('unown') || source.illusion) return;
+			if (effect.id === 'heavyhailstorm') return;
+			if (target.illusion) return;
+			if (!target.species.id.includes('unown')) return;
 			if (effect.effectType !== 'Move') {
 				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
 				return false;
 			}
 		},
 		onResidual(pokemon) {
-			if (!pokemon.species.id.startsWith('unown') || pokemon.illusion) return;
+			if (pokemon.illusion) return;
+			if (!pokemon.species.id.includes('unown')) return;
 			// So this doesn't activate upon switching in
 			if (pokemon.activeTurns < 1) return;
 			const unownLetters = 'abcdefghijklmnopgrstuvwxyz'.split('');
@@ -118,6 +275,18 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 				this.add('-activate', pokemon, 'ability: phuck');
 				pokemon.formeChange(`unown${chosenLetter === 'a' ? '' : chosenLetter}`, this.effect, true);
 			}
+		},
+	},
+	majorbowman: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('MajorBowman')}|Aaaand Cracktion!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('MajorBowman')}|This isn't Maury Povich!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('MajorBowman')}|Never loved ya.`);
 		},
 	},
 	mitsuki: {
@@ -210,6 +379,127 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			this.add(`c|${getName('Rabia')}|im top 500 in relevant tiers and lead gp, i have 8 badges, im fine, gg`);
 		},
 	},
+	robb576: {
+		noCopy: true,
+		onStart(target, pokemon) {
+			if (pokemon.side.pokemonLeft === 1) {
+				this.add(`c|${getName('Robb576')}|This is our last stand. Give it everything you got ${pokemon.side.name}!`);
+			} else {
+				this.add(`c|${getName('Robb576')}|1, 2, 3, 4, dunno how to count no more!`);
+			}
+		},
+		onSwitchOut(pokemon) {
+			if (pokemon.side.pokemonLeft === 1) { // pls contacc
+				this.add(`c|${getName('Robb576')}|Something went wrong. Please contact HoeenHero to fix this`);
+			} else {
+				this.add(`c|${getName('Robb576')}|5, 7, 6, I will be right back into the mix!`);
+			}
+		},
+		onFaint(pokemon) {
+			if (pokemon.species.name === "Necrozma-Ultra") {
+				this.add(`c|${getName('Robb576')}|gg better luck next time. Sorry I couldn't handle them all :^(`);
+			} else {
+				this.add(`c|${getName('Robb576')}|8, 9, 10, it has been a pleasure man!`);
+			}
+		},
+	},
+	segmr: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Segmr')}|*awakens conquerors haki* Greetings.`);
+		},
+		onSwitchOut(pokemon) {
+			if (!pokemon.switchFlag || pokemon.switchFlag !== 'disconnect') {
+				this.add(`c|${getName('Segmr')}|The beauty of a stable internet connection is it allows you to`);
+			}
+			this.add(`l|Segmr`);
+		},
+		onFaint(pokemon) {
+			const name = pokemon.side.foe.active[0].illusion ?
+				pokemon.side.foe.active[0].illusion.name : pokemon.side.foe.active[0].name;
+			this.add(`c|${getName('Segmr')}|I'm sorry ${name} but could you please stop talking to me`);
+		},
+	},
+	zodiax: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Zodiax')}|Zodiax is here to Zodihax`);
+		},
+		onSwitchOut(pokemon) {
+			this.add(`c|${getName('Zodiax')}|Don't worry I'll be back again`);
+		},
+		onFaint(pokemon) {
+			const name = pokemon.side.foe.name;
+			this.add(`c|${getName('Zodiax')}|${name}, Why would you hurt this poor little pompombirb :(`);
+		},
+		onPrepareHit(source, target, move) {
+			if (move.name === 'Big Storm Coming') {
+				this.add(`c|${getName('Zodiax')}|There is a hail no storm okayyyyyy`);
+			}
+		},
+		// Big Storm Coming base power reduction effect
+		onBasePower(basePower, pokemon, target, move) {
+			if (pokemon.m.bigstormcoming) {
+				return this.chainModify([0x4CC, 0x1000]);
+			}
+		},
+	},
+	// Heavy Hailstorm status support for Alpha
+	heavyhailstorm: {
+		name: 'HeavyHailstorm',
+		effectType: 'Weather',
+		duration: 3,
+		onTryMovePriority: 1,
+		onTryMove(attacker, defender, move) {
+			if (move.type === 'Steel' && move.category !== 'Status') {
+				this.debug('Heavy Hailstorm Steel suppress');
+				this.add('-fail', attacker, move, '[from] Heavy Hailstorm');
+				this.attrLastMove('[still]');
+				return null;
+			}
+		},
+		onWeatherModifyDamage(damage, attacker, defender, move) {
+			if (move.type === 'Ice') {
+				this.debug('Heavy Hailstorm ice boost');
+				return this.chainModify(1.5);
+			}
+		},
+		onStart(battle, source, effect) {
+			this.add('-weather', 'Heavy Hailstorm');
+			this.effectData.source = source;
+		},
+		onModifyMove(move, pokemon, target) {
+			if (!this.field.isWeather('heavyhailstorm')) return;
+			if (move.category !== "Status") {
+				this.debug('Adding Heavy Hailstorm freeze');
+				if (!move.secondaries) move.secondaries = [];
+				for (const secondary of move.secondaries) {
+					if (secondary.status === 'frz') return;
+				}
+				move.secondaries.push({
+					chance: 10,
+					status: 'frz',
+				});
+			}
+		},
+		onAnySetWeather(target, source, weather) {
+			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'snowstorm', 'heavyhailstorm'];
+			if (this.field.getWeather().id === 'heavyhailstorm' && !strongWeathers.includes(weather.id)) return false;
+		},
+		onResidualOrder: 1,
+		onResidual() {
+			this.add('-weather', 'Heavy Hailstorm', '[upkeep]');
+			if (this.field.isWeather('heavyhailstorm')) this.eachEvent('Weather');
+		},
+		onWeather(target, source, effect) {
+			if (target.side === this.effectData.source.side) return;
+			// Hail is strongerfrom Heavy Hailstormnone
+			if (!target.hasType('Ice')) this.damage(target.baseMaxhp / 8);
+		},
+		onEnd() {
+			this.add('-end', 'Heavy Hailstorm');
+		},
+	},
 	// Snowstorm status support for Perish Song's ability
 	snowstorm: {
 		name: 'Snowstorm',
@@ -236,7 +526,97 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			if (!target.hasType('Ice')) this.damage(target.baseMaxhp / 16);
 		},
 		onEnd() {
-			this.add('-weather', 'none');
+			this.add('-end', 'Snowstorm');
+		},
+	},
+	// Modified futuremove support for Segmr's move (Disconnect)
+	futuremove: {
+		// this is a slot condition
+		name: 'futuremove',
+		duration: 3,
+		onResidualOrder: 3,
+		onEnd(target) {
+			const data = this.effectData;
+			// time's up; time to hit! :D
+			const move = this.dex.getMove(data.move);
+			if (target.fainted || target === data.source) {
+				this.hint(`${move.name} did not hit because the target is ${(data.fainted ? 'fainted' : 'the user')}.`);
+				return;
+			}
+
+			this.add('-end', target, 'move: ' + move.name);
+			target.removeVolatile('Protect');
+			target.removeVolatile('Endure');
+
+			if (data.source.hasAbility('infiltrator') && this.gen >= 6) {
+				data.moveData.infiltrates = true;
+			}
+			if (data.source.hasAbility('normalize') && this.gen >= 6) {
+				data.moveData.type = 'Normal';
+			}
+			if (data.source.hasAbility('adaptability') && this.gen >= 6) {
+				data.moveData.stab = 2;
+			}
+			// @ts-ignore
+			const hitMove: ActiveMove = new this.dex.Data.Move(data.moveData);
+
+			// Support for Segmr's custom move
+			if (move.name === 'Disconnect') this.add(`j|${getName('Segmr')}`);
+			this.trySpreadMoveHit([target], data.source, hitMove);
+			// Support for Segmr's custom move
+			if (move.name === 'Disconnect') this.add(`c|${getName('Segmr')}|so as i was saying, then move hits`);
+		},
+	},
+	raindrop: {
+		name: 'Raindrop',
+		noCopy: true,
+		onStart(target) {
+			if (target.activeTurns < 1) return;
+			this.effectData.layers = 1;
+			this.effectData.def = 0;
+			this.effectData.spd = 0;
+			this.add('-start', target, 'Raindrop');
+			const [curDef, curSpD] = [target.boosts.def, target.boosts.spd];
+			this.boost({def: 1, spd: 1}, target, target);
+			if (curDef !== target.boosts.def) this.effectData.def--;
+			if (curSpD !== target.boosts.spd) this.effectData.spd--;
+		},
+		onResidual(target) {
+			if (this.effectData.def >= 6 && this.effectData.spd >= 6) return false;
+			if (target.activeTurns < 1) return;
+			this.effectData.layers++;
+			this.add('-start', target, 'Raindrop');
+			const curDef = target.boosts.def;
+			const curSpD = target.boosts.spd;
+			this.boost({def: 1, spd: 1}, target, target);
+			if (curDef !== target.boosts.def) this.effectData.def--;
+			if (curSpD !== target.boosts.spd) this.effectData.spd--;
+		},
+		onEnd(target) {
+			if (this.effectData.def || this.effectData.spd) {
+				const boosts: SparseBoostsTable = {};
+				if (this.effectData.def) boosts.def = this.effectData.def;
+				if (this.effectData.spd) boosts.spd = this.effectData.spd;
+				this.boost(boosts, target, target);
+			}
+			this.add('-end', target, 'Raindrop');
+			if (this.effectData.def !== this.effectData.layers * -1 || this.effectData.spd !== this.effectData.layers * -1) {
+				this.hint("Raindrop keeps track of how many times it successfully altered each stat individually.");
+			}
+		},
+	},
+	// Custom side condition to allow the ability to track what mon was last in for Darth's Ability.
+	tracker: {
+		onStart(source) {
+			const mon = source.active[0];
+			if (mon.name !== 'Darth') {
+				this.effectData.storedTypes = mon.getTypes();
+			}
+		},
+		onSwitchIn(pokemon) {
+			if (pokemon.name !== 'Darth') {
+				this.effectData.storedTypes = pokemon.getTypes();
+			}
 		},
 	},
 };

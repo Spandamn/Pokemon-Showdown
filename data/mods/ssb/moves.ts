@@ -1017,7 +1017,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
-			this.add('-anim', source, 'All Out Pummelling', target);
+			this.add('-anim', source, 'All Out Pummeling', target);
 		},
 		recoil: [40, 100],
 		target: "normal",

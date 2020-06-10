@@ -412,8 +412,8 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 
 	// Sundar
 	oneforall: {
-		desc: "This Pokemon's contact moves have their power multiplied by 1.3. If this Pokemon KOs its target with a recoil move,it recovers 25% of its max HP.",
-		shortDesc: "Tough Claws + recovers 25% of max HP when KOs a Pokemon with a recoil move.",
+		desc: "This Pokemon's contact moves have their power multiplied by 1.3. If this Pokemon KOes the target with a recoil move, it regains 25% of its max HP.",
+		shortDesc: "Tough Claws + recovers 25% max HP when foe is KOed with a recoil move.",
 		onBasePowerPriority: 21,
 		onBasePower(basePower, attacker, defender, move) {
 			if (move.flags['contact']) {
@@ -421,7 +421,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		onSourceAfterFaint(length, target, source, effect) {
-			if (effect && effect.effectType === 'Move' && effect.recoil) this.heal(source.baseMaxhp / 4);
+			if (effect?.effectType === 'Move' && effect?.recoil) this.heal(source.baseMaxhp / 4);
 		},
 	},
 	// Modified Illusion to support SSB volatiles

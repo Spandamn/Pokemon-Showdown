@@ -81,6 +81,6 @@ export const BattlePokedex: {[k: string]: ModdedSpeciesData} = {
 	// Sundar
 	charizardmegax: {
 		inherit: true,
-		abilities: {0: 'One For All'},
+		abilities: {0: "One For All"},
 	},
 };

@@ -340,11 +340,6 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		desc: "Randomly changes the Pokemon’s type at the end of every turn to the type of one of it’s moves; same-type attack bonus (STAB) is 2 instead of 1.5.",
 		shortDesc: "Adaptability + Randomly changes the Pokemon’s type at the end of every turn to the type of one of it’s moves",
 		name: "Wild Magic Surge",
-		onHit (target, source, move) {
-			if (move?.effectType === 'Move' && target.getMoveHitData(move).crit) {
-				this.add(`c|${getName('PiraTe Princess')}|brb making tea`);
-			}
-		},
 		onModifyMove(move) {
 			move.stab = 2;
 		},

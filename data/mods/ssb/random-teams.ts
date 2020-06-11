@@ -50,7 +50,7 @@ export const ssbSets: SSBSets = {
 		species: 'Hoopa', ability: 'Greedy Magician', item: 'Focus Sash', gender: 'N',
 		moves: ['Hyperspace Hole', 'Shadow Ball', 'Aura Sphere'],
 		signatureMove: 'Unbind',
-		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},
 	'OM~!': {
 		species: 'Magneton', ability: 'Triage', item: 'Metronome', gender: 'N',

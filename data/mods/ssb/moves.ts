@@ -420,7 +420,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		onAfterMoveSecondarySelf(pokemon, target, move) {
 			if (!target || target.fainted || target.hp <= 0) {
 				this.boost({atk: 2}, pokemon, pokemon, move);
-				this.add(`c|+Jett xx|Gotcha!`);
+				this.add(`c|${getName('Jett xx')}|Gotcha!`);
 			}
 		},
 		effect: {

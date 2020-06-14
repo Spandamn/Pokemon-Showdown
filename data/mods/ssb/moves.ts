@@ -1019,7 +1019,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'All Out Pummeling', target);
 		},
-		recoil: [40, 100],
+		recoil: [4, 10],
 		target: "normal",
 		type: "Dragon",
 	},

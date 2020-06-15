@@ -124,7 +124,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		},
 		onModifyType(move, pokemon) {
 		if (pokemon.baseSpecies.baseSpecies !== 'Hoopa') return;
-			move.type = pokmeon.species.types[1];
+			move.type = pokemon.species.name === 'Hoopa-Unbound' ? 'Dark' : 'Psychic';
 		},
 		secondary: null,
 		target: "normal",

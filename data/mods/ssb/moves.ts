@@ -877,6 +877,13 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 5,
 		priority: 1,
 		flags: {protect: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Final Gambit', target);
+		},
 		onAfterMove(pokemon, target, move) {
 			if (pokemon.moveThisTurnResult === true) {
 				pokemon.faint();

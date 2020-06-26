@@ -864,14 +864,10 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 
 	// Ransei
 	ripsei: {
-		num: 515,
 		accuracy: 100,
 		basePower: 0,
 		damageCallback(pokemon) {
 			const damage = pokemon.hp;
-			const target = pokemon.side.foe.active[0];
-			if (target && target.hp <= 0) target.faint();
-			pokemon.faint();
 			return damage;
 		},
 		category: "Special",
@@ -881,7 +877,11 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 5,
 		priority: 1,
 		flags: {protect: 1},
-		selfdestruct: "ifHit",
+		onAfterMove(pokemon, target, move) {
+			if (pokemon.moveThisTurnResult === true) {
+				pokemon.faint();
+			}
+		},
 		secondary: null,
 		target: "normal",
 		type: "Fighting",

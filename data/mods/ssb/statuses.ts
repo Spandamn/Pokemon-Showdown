@@ -370,10 +370,7 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	ransei: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|${getName('Ransei')}|Switch In Message`);
-		},
-		onSwitchOut() {
-			this.add(`c|${getName('Ransei')}|Switch Out Message`);
+			this.add(`c|${getName('Ransei')}|Sup! This is Gen 8 so imma run an Eternamax set. Best of luck. You’ll need it :^)`);
 		},
 		onFaint(pokemon) {
 			const target = pokemon.side.foe.active[0];

@@ -403,8 +403,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		beforeTurnCallback(pokemon) {
 			for (const side of this.sides) {
 				if (side === pokemon.side) continue;
-				side.addSideCondition('thehuntison', pokemon);
-				const data = side.getSideConditionData('thehuntison');
+				side.addSideCondition('pursuit', pokemon);
+				const data = side.getSideConditionData('pursuit');
 				if (!data.sources) {
 					data.sources = [];
 				}

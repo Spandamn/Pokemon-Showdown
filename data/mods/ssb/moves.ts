@@ -382,7 +382,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "???",
 	},
 
-// Jett x_x
+	// Jett x_x
 	thehuntison: {
 		accuracy: 100,
 		basePower: 55,

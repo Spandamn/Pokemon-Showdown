@@ -286,10 +286,7 @@ export const BattleScripts: ModdedBattleScriptsData = {
 			return false;
 		}
 
-		const {
-			targets,
-			pressureTargets
-		} = pokemon.getMoveTargets(move, target);
+		const {targets, pressureTargets} = pokemon.getMoveTargets(move, target);
 		if (targets.length) {
 			target = targets[targets.length - 1]; // in case of redirection
 		}

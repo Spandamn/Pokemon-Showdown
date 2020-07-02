@@ -188,8 +188,8 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('Jett x_x')}|They got lucky.`);
-    },
-  },
+		},
+	},
 	jho: {
 		noCopy: true,
 		onStart() {

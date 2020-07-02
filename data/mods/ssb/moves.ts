@@ -386,6 +386,14 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	thehuntison: {
 		accuracy: 100,
 		basePower: 55,
+		basePowerCallback(pokemon, target, move) {
+			// You can't get here unless the pursuit effect succeeds
+			if (target.beingCalledBack) {
+				this.debug('Thehuntison damage boost');
+				return move.basePower * 2;
+			}
+			return move.basePower;
+		},
 		category: "Physical",
 		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn. Raises the user's Attack by 2 stages if this move KOes the target.",
 		shortDesc: "Foe: 2x power when switching. +2 Atk if KO.",

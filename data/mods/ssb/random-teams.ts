@@ -101,7 +101,7 @@ export const ssbSets: SSBSets = {
 		moves: ['Knock Off', 'Icicle Crash', 'Counter'],
 		signatureMove: 'The Hunt is On!',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
-  },
+	},
 	Instruct: {
 		species: 'Cinderace', ability: 'Determination', item: 'Flame Plate', gender: 'N',
 		moves: ['Pyro Ball', 'Sacred Sword', 'Bolt Strike'],

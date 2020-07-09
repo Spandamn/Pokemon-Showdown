@@ -198,7 +198,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		name: "Grapes",
 		pp: 10,
 		priority: 0,
-		flags: {protect: 1, heal: 1},
+		flags: {heal: 1},
 		drain: [1, 2],
 		secondary: {
 			chance: 50,

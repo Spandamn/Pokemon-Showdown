@@ -199,7 +199,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {heal: 1},
-		drain: [1, 2],
+		heal: [1, 2],
 		secondary: {
 			chance: 50,
 			self: {

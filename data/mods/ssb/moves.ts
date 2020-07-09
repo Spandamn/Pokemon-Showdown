@@ -1780,20 +1780,14 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		secondary: {
-			chance: 100,
-			self: {
-				boosts: {
-					spe: 1,
-				},
-			},
-		},
+		secondary: null,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Volt Switch', target);
 			this.add('-anim', source, 'Nasty Plot', source);
+			this.boost({spe: 1}, source);
 		},
 		target: "normal",
 		type: "Electric",

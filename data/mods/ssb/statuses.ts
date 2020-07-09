@@ -90,9 +90,10 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 	arsenal: {
 		noCopy: true,
 		onStart(pokemon) {
-			// Innate
-			this.boost({atk: 1}, pokemon);
 			this.add(`c|${getName('Arsenal')}|Wenger Out`);
+			// Innate
+			if (pokemon.illusion) return;
+			this.boost({atk: 1}, pokemon);
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('Arsenal')}|Wait.. Wenger is gone?? STAN OUT`);

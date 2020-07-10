@@ -2009,7 +2009,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		priority: 0,
 		flags: {protect: 1, mirror: 1, sound: 1, authentic: 1},
 		secondary: null,
-		onPrepareHit(target, source, move) {
+		onAfterMove(source) {
 			const formeMoves: {[key: string]: string[]} = {
 				meloetta: ["Quiver Dance", "Feather Dance", "Lunar Dance", "Relic Song"],
 				meloettapirouette: ["Revelation Dance", "Fiery Dance", "Petal Dance", "Relic Song"],

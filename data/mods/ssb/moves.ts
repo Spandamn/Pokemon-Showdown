@@ -1645,6 +1645,34 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Normal",
 	},
 
+	// SectoniaServant
+	homunculussvanity: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
+		shortDesc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
+		name: "Homunculus’s Vanity",
+		pp: 10,
+		priority: 0,
+		flags: {snatch: 1},
+		boosts: {
+			spa: 1,
+		},
+		self: {
+			onHit(source) {
+				let boost: {[k: string]: number} = {};
+				boost[['def', 'spd'][this.random(2)]] = 1;
+				this.boost(boost, source);
+				this.add(`c|${getName('SectoniaServant')}|Jelly baby ;w;`);
+			},
+		},
+		secondary: null,
+		target: "self",
+		type: "Psychic",
+		zMove: {boost: {atk: 1}},
+	},
+
 	// Segmr
 	disconnect: {
 		accuracy: 100,

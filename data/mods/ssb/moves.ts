@@ -1843,6 +1843,34 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Normal",
 	},
 
+	// Trickster
+	soulshatteringstare: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Curses the opponent and blocks it from healing.",
+		shortDesc: "Curses the opponent and blocks it from healing.",
+		name: "Soul-Shattering Stare",
+		pp: 10,
+		priority: -7,
+		flags: {authentic: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Volt Switch', target);
+			this.add('-anim', source, 'Nasty Plot', source);
+		},
+		onHit(pokemon) {
+			pokemon.addVolatile('healblock');
+		},
+		volatileStatus: 'curse',
+		secondary: null,
+		target: "randomNormal",
+		type: "Ghost",
+		contestType: "Tough",
+	},
+
 	// yuki
 	classchange: {
 		accuracy: true,

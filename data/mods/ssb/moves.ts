@@ -1858,8 +1858,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
-			this.add('-anim', source, 'Volt Switch', target);
-			this.add('-anim', source, 'Nasty Plot', source);
+			this.add('-anim', source, 'Glare', target);
+			this.add('-anim', source, 'Trick-or-Treat', source);
 		},
 		onHit(pokemon) {
 			pokemon.addVolatile('healblock');

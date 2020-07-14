@@ -295,7 +295,7 @@ export const ssbSets: SSBSets = {
 	SectoniaServant: {
 		species: 'Reuniclus', ability: 'Magic Guard', item: 'Leftovers', gender: 'M',
 		moves: [['Psystrike', 'Psychic'], 'Moonblast', 'Recover'],
-		signatureMove: 'Homunculus’s Vanity',
+		signatureMove: 'Homunculus\'s Vanity',
 		evs: {hp: 252, def: 4, spa: 252}, ivs: {atk: 0, spe: 0}, nature: 'Quiet', shiny: true,
 	},
 	Segmr: {

@@ -1652,7 +1652,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		category: "Status",
 		desc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
 		shortDesc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
-		name: "Homunculus’s Vanity",
+		name: "Homunculus's Vanity",
 		pp: 10,
 		priority: 0,
 		flags: {snatch: 1},

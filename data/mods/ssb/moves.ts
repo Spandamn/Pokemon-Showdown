@@ -1094,7 +1094,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		sideCondition: "nexthunt",
+		sideCondition: 'nexthunt',
 		beforeTurnCallback(pokemon) {
 			pokemon.side.addSideCondition("nexthunt");
 		},

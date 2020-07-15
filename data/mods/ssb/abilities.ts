@@ -535,7 +535,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		onModifyAtkPriority: 5,
 		onModifyAtk(atk, attacker, defender, move) {
 			if (move.type === 'Dark') {
-				this.debug('Dark Royyalty boost');
+				this.debug('Dark Royalty boost');
 				return this.chainModify(1.2);
 			}
 		},
@@ -546,9 +546,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 				return this.chainModify(1.2);
 			}
 		},
-		name: "Queenly Majesty",
-		rating: 2,
-		num: 214,
+		name: "Dark Royalty",
 	},
 
 	// Mitsuki

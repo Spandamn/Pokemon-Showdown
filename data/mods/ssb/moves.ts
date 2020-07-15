@@ -1863,8 +1863,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		},
 		onHit(pokemon) {
 			pokemon.addVolatile('healblock');
+			pokemon.addVolatile('curse');
 		},
-		volatileStatus: 'curse',
 		secondary: null,
 		target: "randomNormal",
 		type: "Ghost",

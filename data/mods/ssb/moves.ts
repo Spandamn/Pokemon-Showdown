@@ -1097,6 +1097,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		sideCondition: "nexthunt",
 		beforeTurnCallback(pokemon) {
 			pokemon.side.addSideCondition("nexthunt");
+			pokemon.side.sideConditions.nexthunt.duration = 69;
 		},
 		onTryMove() {
 			this.attrLastMove('[still]');
@@ -1106,7 +1107,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		},
 		effect: {
 			onStart(side, source) {
-				if (side.sideConditions.duration === 0) return;
+				if (side.sideConditions.nexthunt.duration === 69) return; //hacky
 				this.effectData.positions = [];
 				for (const i of side.active.keys()) {
 					this.effectData.positions[i] = false;
@@ -1145,10 +1146,13 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 				}
 			},
 		},
-		onTryHit(pokemon) {
-			if (!pokemon.side.sideConditions.nexthunt) return;
+		onTryHit(target, source, move) {
+			if (!source.side.sideConditions.nexthunt) {
+				delete move.selfSwitch;
+				return;
+			}
 		},
-		selfSwitch: false,
+		selfSwitch: true,
 		secondary: null,
 		target: "self",
 		type: "Normal",

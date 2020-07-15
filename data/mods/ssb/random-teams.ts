@@ -207,7 +207,7 @@ export const ssbSets: SSBSets = {
 	"Litt♥Eleven": {
 		species: 'Bisharp', ability: 'Dark Royalty', item: 'Black Glasses', gender: 'M',
 		moves: ['Sucker Punch', 'Knock Off', 'Iron Head'],
-		signatureMove: ' /nexthunt',
+		signatureMove: '/nexthunt',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Adamant', shiny: true,
 	},
 	MajorBowman: {

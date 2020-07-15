@@ -1094,42 +1094,28 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		sideCondition: 'nexthunt',
-		beforeTurnCallback(pokemon) {
-			pokemon.side.addSideCondition("nexthunt");
-			pokemon.side.sideConditions.nexthunt.duration = 69;
-		},
+		sideCondition: "nexthunt",
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Teleport', source);
 		},
+		onTryHit(target, source, move) {
+			if (!move.selfSwitch) return;
+		},
 		effect: {
-			onStart(side, source) {
-				if (side.sideConditions.nexthunt.duration === 69) return; //hacky
-				this.effectData.positions = [];
-				for (const i of side.active.keys()) {
-					this.effectData.positions[i] = false;
-				}
-				this.effectData.positions[source.position] = true;
-			},
-			onDamage(damage, target, source, move) {
-				if (target === source) return;
-				if (damage > 0 && target.side === this.effectData.target && target === this.effectData.source) {
-					target.side.removeSideCondition("nexthunt");
+			duration: 1,
+			onHit(pokemon, source, move) {
+				if (move.category !== 'Status' && pokemon === this.effectData.source) {
+					delete move.selfSwitch;
 				}
 			},
-			onSwitchInPriority: 1,
-			onSwitchIn(target) {
-				const positions: boolean[] = this.effectData.positions;
-				if (target.position !== this.effectData.sourcePosition) {
-					return;
-				}
-				if (!target.fainted) {
+			onSwitchIn(pokemon) {
+				if (!pokemon.fainted) {
 					let totaldef = 0;
 					let totalspd = 0;
-					for (const poke of target.side.foe.active) {
+					for (const poke of pokemon.side.foe.active) {
 						if (!poke || poke.fainted) continue;
 						totaldef += poke.getStat('def', false, true);
 						totalspd += poke.getStat('spd', false, true);
@@ -1139,17 +1125,8 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 					} else if (totalspd) {
 						this.boost({atk: 1});
 					}
-					positions[target.position] = false;
 				}
-				if (!positions.some(affected => affected === true)) {
-					target.side.removeSideCondition('nexthunt');
-				}
-			},
-		},
-		onTryHit(target, source, move) {
-			if (!source.side.sideConditions.nexthunt) {
-				delete move.selfSwitch;
-				return;
+				pokemon.side.removeSideCondition("nexthunt");
 			}
 		},
 		selfSwitch: true,

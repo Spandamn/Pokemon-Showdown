@@ -463,6 +463,18 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			}
 		},
 	},
+	litteleven: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Litt♥Eleven')}|The coin is flipped, what follows is destiny alone.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Litt♥Eleven')}|Looks like my business is finished here... for now.`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Litt♥Eleven')}|Perhaps, coin tossing isn't the optimal way to win a war...`);
+		},
+	},
 	majorbowman: {
 		noCopy: true,
 		onStart() {

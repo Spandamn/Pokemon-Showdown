@@ -1083,6 +1083,77 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		type: "Bird",
 	},
 
+	// LittEleven
+	nexthunt: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "If this Pokemon does not take damage this turn, it switches out to another Pokemon in the party and gives it the Download boost. Fails otherwise.",
+		shortDesc: "If not damaged this turn, switches out and gives next Pokemon Download boost; fails otherwise.",
+		name: "/nexthunt",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		sideCondition: "nexthunt",
+		beforeTurnCallback(pokemon) {
+			pokemon.side.addSideCondition("nexthunt");
+		},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Teleport', source);
+		},
+		effect: {
+			onStart(side, source) {
+				if (side.sideConditions.duration === 0) return;
+				this.effectData.positions = [];
+				for (const i of side.active.keys()) {
+					this.effectData.positions[i] = false;
+				}
+				this.effectData.positions[source.position] = true;
+			},
+			onDamage(damage, target, source, move) {
+				if (target === source) return;
+				if (damage > 0 && target.side === this.effectData.target && target === this.effectData.source) {
+					target.side.removeSideCondition("nexthunt");
+				}
+			},
+			onSwitchInPriority: 1,
+			onSwitchIn(target) {
+				const positions: boolean[] = this.effectData.positions;
+				if (target.position !== this.effectData.sourcePosition) {
+					return;
+				}
+				if (!target.fainted) {
+					let totaldef = 0;
+					let totalspd = 0;
+					for (const poke of target.side.foe.active) {
+						if (!poke || poke.fainted) continue;
+						totaldef += poke.getStat('def', false, true);
+						totalspd += poke.getStat('spd', false, true);
+					}
+					if (totaldef && totaldef >= totalspd) {
+						this.boost({spa: 1});
+					} else if (totalspd) {
+						this.boost({atk: 1});
+					}
+					positions[target.position] = false;
+				}
+				if (!positions.some(affected => affected === true)) {
+					target.side.removeSideCondition('nexthunt');
+				}
+			},
+		},
+		onTryHit(pokemon) {
+			if (!pokemon.side.sideConditions.nexthunt) return;
+		},
+		selfSwitch: false,
+		secondary: null,
+		target: "self",
+		type: "Normal",
+	},
+
 	// Majorbowman
 	corrosivecloud: {
 		accuracy: true,

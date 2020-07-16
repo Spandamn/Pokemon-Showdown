@@ -5,7 +5,7 @@ In general, we welcome pull requests that fix bugs.
 
 For feature additions and large projects, please discuss with us at http://psim.us/development first. We'd hate to have to reject a pull request that you spent a long time working on...
 
-If you're looking for inspiration for something to do, the Ideas issue is a good place to look: https://github.com/Zarel/Pokemon-Showdown/issues/2444
+If you're looking for inspiration for something to do, the Ideas issue is a good place to look: https://github.com/smogon/pokemon-showdown/issues/2444
 
 
 License
@@ -110,6 +110,18 @@ If Volt Absorb absorbs Thunder Wave, Volt Absorb's TryHit handler shows the Volt
 
 If Water Absorb doesn't absorb Thunder Wave, Water Absorb's TryHit handler returns `undefined`, to show that Water Absorb does not interact with Thunder Wave.
 
+### `??` vs `||`
+
+We prefer using `||` instead of `??` for fallback, for a few reasons:
+
+- `sucrase` (our TypeScript to JavaScript compiler) makes `??` rather more complicated than ideal.
+
+- We rarely treat `0` or `''` differently from `null` (the same reason we use `!foo` instead of `foo == null` for null checks)
+
+- TypeScript does not actually allow us to have "non-empty strings" or "positive integers" as a type, so we have to deal with those cases no matter what.
+
+If, at a future point, TypeScript does allow us to constrain types better, we might consider using `??` for clarity. But for now, I see no reason to use `??` except in very niche situations where the difference matters.
+
 
 ES5 and ES6
 ------------------------------------------------------------------------
@@ -149,3 +161,11 @@ In general, use modern features; recent versions of V8 have fixed the performanc
 - **Template strings: ALWAYS** - Supported in Node 4+ and good performance in Node 6+; please start refactoring existing code over, but be careful not to use them for IDs (follow the String standards). Look at existing uses for guidance.
 
 Take "good performance" to mean "approximately on par with ES3" and "great performance" to mean "better than ES3".
+
+
+TypeScript Features
+------------------------------------------------------------------------
+
+- **Constant Enums: NEVER** - Not supported by Sucrase our current choice of transpiler.
+
+- **Default Properties: NEVER** - Bad performance when used with Sucrase. Prefer setting properties directly in a constructor instead.

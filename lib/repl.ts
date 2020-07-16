@@ -2,7 +2,7 @@
  * REPL
  *
  * Documented in logs/repl/README.md
- * https://github.com/Zarel/Pokemon-Showdown/blob/master/logs/repl/README.md
+ * https://github.com/smogon/pokemon-showdown/blob/master/logs/repl/README.md
  *
  * @author kota
  * @license MIT
@@ -12,6 +12,7 @@ import * as fs from 'fs';
 import * as net from 'net';
 import * as path from 'path';
 import * as repl from 'repl';
+import {crashlogger} from './crashlogger';
 
 export const Repl = new class {
 	/**
@@ -19,7 +20,7 @@ export const Repl = new class {
 	 */
 	socketPathnames: Set<string> = new Set();
 
-	listenersSetup: boolean = false;
+	listenersSetup = false;
 
 	setupListeners() {
 		if (Repl.listenersSetup) return;
@@ -78,7 +79,6 @@ export const Repl = new class {
 			repl.start({
 				input: socket,
 				output: socket,
-				// tslint:disable-next-line:ban-types
 				eval(cmd: string, context: any, unusedFilename: string, callback: Function): any {
 					try {
 						return callback(null, evalFunction(cmd));
@@ -98,15 +98,14 @@ export const Repl = new class {
 
 		server.once('error', (err: NodeJS.ErrnoException) => {
 			if (err.code === "EADDRINUSE") {
-				// tslint:disable-next-line:variable-name
 				fs.unlink(pathname, _err => {
 					if (_err && _err.code !== "ENOENT") {
-						require('./crashlogger')(_err, `REPL: ${filename}`);
+						crashlogger(_err, `REPL: ${filename}`);
 					}
 					server.close();
 				});
 			} else {
-				require('./crashlogger')(err, `REPL: ${filename}`);
+				crashlogger(err, `REPL: ${filename}`);
 				server.close();
 			}
 		});

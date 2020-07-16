@@ -11,8 +11,8 @@ Receiving messages
 
 The beginning of a battle will look something like this:
 
-    |player|p1|Anonycat|60
-    |player|p2|Anonybird|113
+    |player|p1|Anonycat|60|1200
+    |player|p2|Anonybird|113|1300
     |teamsize|p1|4
     |teamsize|p2|5
     |gametype|doubles
@@ -39,7 +39,7 @@ The beginning of a battle will look something like this:
     |
     |start
 
-`|player|PLAYER|USERNAME|AVATAR`
+`|player|PLAYER|USERNAME|AVATAR|RATING`
 
 > Player details.
 >
@@ -48,6 +48,7 @@ The beginning of a battle will look something like this:
 > - `USERNAME` is the username
 > - `AVATAR` is the player's avatar identifier (usually a number, but other
 >    values can be used for custom avatars)
+> - `RATING` is the player's Elo rating in the format they're playing. This will only be displayed in rated battles and when the player is first introduced otherwise it's blank
 
 `|teamsize|PLAYER|NUMBER`
 
@@ -310,10 +311,16 @@ stat boosts are minor actions.
 `|-fail|POKEMON|ACTION`
 
 > The specified `ACTION` has failed against the `POKEMON` targetted. The
-> `ACTION` in question can be a move that fails, or a stat drop blocked by an
-> ability like Hyper Cutter, in which case `ACTION` will be `unboost|STAT`,
-> where `STAT` indicates where the ability prevents stat drops. (For abilities
-> that block all stat drops, like Clear Body, `|STAT` does not appear.) 
+> `ACTION` in question should be a move that fails due to its own mechanics.
+> Moves (or effect activations) that fail because they're blocked by another
+> effect should use `-block` instead.
+
+`|-block|POKEMON|EFFECT|MOVE|ATTACKER`
+
+> An effect targeted at `POKEMON` was blocked by `EFFECT`. This may optionally
+> specify that the effect was a `MOVE` from `ATTACKER`. `[of]SOURCE` will note
+> the owner of the `EFFECT`, in the case that it's not `EFFECT` (for instance,
+> an ally with Aroma Veil.)
 
 `|-notarget|POKEMON`
 
@@ -337,6 +344,10 @@ stat boosts are minor actions.
 `|-heal|POKEMON|HP STATUS`
 
 > Same as `-damage`, but the Pokémon has healed damage instead.
+
+`|-sethp|POKEMON|HP`
+
+> The specified Pokémon `POKEMON` now has `HP` hit points.
 
 `|-status|POKEMON|STATUS`
 
@@ -369,9 +380,10 @@ stat boosts are minor actions.
 
 `|-swapboost|SOURCE|TARGET|STATS`
 
-> Swaps the boosts from `STATS` between the `SOURCE` Pokémon and `TARGET
-> Pokémon.`STATS`takes the form of a comma-separated list of`STAT`abbreviations
-> as described in`-boost`. (For example: Guard Swap, Heart Swap).
+> Swaps the boosts from `STATS` between the `SOURCE` Pokémon and `TARGET`
+> Pokémon. `STATS` takes the form of a comma-separated list of `STAT`
+> abbreviations as described in `-boost`. (For example: Guard Swap, Heart
+> Swap).
 
 `|-invertboost|POKEMON`
 
@@ -454,41 +466,60 @@ stat boosts are minor actions.
 
 > The `POKEMON` was immune to a move.
 
-`|-item|POKEMON|ITEM`
+`|-item|POKEMON|ITEM|[from]EFFECT`
 
 > The `ITEM` held by the `POKEMON` has been changed or revealed due to a move or 
-> ability. In addition, Air Balloon reveals itself when the Pokémon holding it 
-> switches in, so it will also cause this message to appear.
+> ability `EFFECT`.
+
+`|-item|POKEMON|ITEM`
+
+> `POKEMON` has just switched in, and its item `ITEM` is being announced to have a
+> long-term effect (will not use `[from]`). Air Balloon is the only current user of
+> this.
+
+`|-enditem|POKEMON|ITEM|[from]EFFECT`
+
+> The `ITEM` held by `POKEMON` has been destroyed by a move or ability (like
+> Knock Off), and it now holds no item.
+>
+> This will be silent `[silent]` if the item's ownership was changed (with a move
+> or ability like Thief or Trick), even if the move or ability would result in
+> a Pokémon without an item.
 
 `|-enditem|POKEMON|ITEM`
 
-> The `ITEM` held by `POKEMON` has been destroyed, and it now holds no item. This can 
-> be because of an item's own effects (consumed Berries, Air Balloon), or by a move or 
-> ability, like Knock Off. If a berry is consumed, it also has an additional modifier 
-> `|[eat]` to indicate that it was consumed. This message does not appear if the item's 
-> ownership was changed (with a move or ability like Thief or Trick), even if the move 
-> or ability would result in a Pokémon without an item.
+> `POKEMON`'s `ITEM` has destroyed itself (consumed Berries, Air Balloon). If a
+> berry is consumed, it also has an additional modifier `|[eat]` to indicate
+> that it was consumed.
+>
+> Sticky Barb does not announce itself with this or any other message when it
+> changes hands.
 
-`|-ability|POKEMON|ABILITY`
+`|-ability|POKEMON|ABILITY|[from]EFFECT`
 
-> The `ABILITY` of the `POKEMON` has been changed due to a move/ability, or it has
-> activated in a way that could not be better described by one of the other minor
-> messages. For example, Clear Body sends `-fail` when it blocks stat drops, while
-> Mold Breaker sends this message to reveal itself upon switch-in.
+> The `ABILITY` of the `POKEMON` has been changed due to a move/ability `EFFECT`.
 >
 > Note that Skill Swap does not send this message despite it changing abilities,
 > because it does not reveal abilities when used between allies in a Double or
 > Triple Battle.
 
+`|-ability|POKEMON|ABILITY`
+
+> `POKEMON` has just switched-in, and its ability `ABILITY` is being announced
+> to have a long-term effect (will not use `[from]`).
+>
+> Effects that start at switch-in include Mold Breaker and Neutralizing Gas. It
+> does not include abilities that activate once and don't have any long-term
+> effects, like Intimidate (Intimidate should use `-activate`).
+
 `|-endability|POKEMON`
 
-> The `POKEMON` has had its ability surpressed, either by a move like Gastro Acid, or 
-> by the effects of Mummy.
+> The `POKEMON` has had its ability suppressed by Gastro Acid.
 
 `|-transform|POKEMON|SPECIES`
 
-> The Pokémon `POKEMON` has transformed into `SPECIES` by the effect of Transform 
-> or the ability Imposter.
+> The Pokémon `POKEMON` has transformed into `SPECIES` by the move Transform or
+> the ability Imposter.
 
 `|-mega|POKEMON|MEGASTONE`
 
@@ -514,8 +545,11 @@ stat boosts are minor actions.
 
 > A miscellaneous effect has activated. This is triggered whenever an effect could 
 > not be better described by one of the other minor messages: for example, healing 
-> abilities like Water Absorb simply use `-heal`, and items that are consumed upon 
-> use have the `-enditem` message instead.
+> abilities like Water Absorb simply use `-heal`.
+>
+> Items usually activate with `-end`, although items with two messages, like Berries
+> ("POKEMON ate the Leppa Berry! POKEMON restored PP...!"), will send the "ate"
+> message as `-eat`, and the "restored" message as `-activate`.
 
 `|-hint|MESSAGE`
 
@@ -638,6 +672,8 @@ To be exact, `CHOICE` is one of:
 
 - `move MOVESPEC zmove`, to use a z-move version of a move
 
+- `move MOVESPEC max`, to Dynamax/Gigantamax and make a move
+
 - `switch SWITCHSPEC`, to make a switch
 
 `MOVESPEC` is:
@@ -646,15 +682,15 @@ To be exact, `CHOICE` is one of:
   - `MOVESLOTSPEC` is a move name (capitalization/spacing-insensitive) or
     1-based move slot number
   - `TARGETSPEC` is a 1-based target slot number. Add a `-` in front of it to
-    refer to allies. Remember that slots oppose each other, so in a battle, the
-    slots go as follows:
+    refer to allies, and a `+` to refer to foes. Remember that slots go in
+    opposite directions, like this:
 
-         Triples       Doubles     Singles
-         3  2  1         2  1         1
-        -1 -2 -3        -1 -2        -1
+         Triples       Doubles
+        +3 +2 +1        +2 +1
+        -1 -2 -3        -1 -2
 
-    (But note that slot numbers are unnecessary in Singles: you can never
-    choose a target in Singles.)
+    (Slot numbers are unnecessary in Singles: you can never choose a target in
+    Singles.)
 
 `SWITCHSPEC` is:
 
@@ -666,17 +702,18 @@ To be exact, `CHOICE` is one of:
 Once a choice has been set for all players who need to make a choice, the
 battle will continue.
 
-All decisions except `/undo` can be sent with `|RQID` at the end. `RQID` is
-`REQUEST.rqid` from `|request|`. Each `RQID` is a unique number used to
-identify which action the request was intended for and is used to protect
-against race conditions involving `/undo` (the cancel button).
-
 If an invalid decision is sent (trying to switch when you're trapped by
 Mean Look or something), you will receive a message starting with:
 
-`|error|[Invalid choice]`
+`|error|[Invalid choice] MESSAGE`
 
-This will tell you to send a different decision.
+This will tell you to send a different decision. If your previous choice
+revealed additional information (For example: a move disabled by Imprison
+or a trapping effect), the error will be followed with a `|request|` command
+to base your decision off of:
+
+`|error|[Unavailable choice] MESSAGE`  
+`|request|REQUEST`
 
 ### Choice requests
 
@@ -688,8 +725,17 @@ is:
 > Gives a JSON object containing a request for a choice (to move or
 > switch). To assist in your decision, `REQUEST.active` has information
 > about your active Pokémon, and `REQUEST.side` has information about your
-> your team as a whole. `REQUEST.rqid` is an optional request ID (see
-> "Sending decisions" for details).
+> your team as a whole.
+>
+> If you're using the simulator through a Pokémon Showdown server,
+> `REQUEST.rqid` is an optional request ID. It will not exist if you're
+> using the simulator directly through `import sim` or
+> `./pokemon-showdown simulate-battle`.
+>
+> When sending decisions to a Pokémon Showdown server with `/choose`, you
+> can add `|RQID` at the end. `RQID` is `REQUEST.rqid`, and it identifies
+> which request the decision was intended for, making sure "Undo" doesn't
+> cause the next decision to be sent for the wrong turn.
 
 Example request object:
 

@@ -1228,6 +1228,16 @@ export const commands: ChatCommands = {
 	challenge(target, room, user, connection) {
 		target = this.splitTarget(target);
 		const targetUser = this.targetUser;
+		const sep: string[] = target.split(',');
+		let teammate: User?, isMulti: boolean;
+		if (Dex.getFormat(sep[1]).gameType === 'multi') {
+			isMulti = true;
+			teammate = Users.get(sep[sep.length-1]);
+			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate.name || sep[sep.length - 1]}' was not found.`);
+			sep.pop();
+			target = sep.join(",");
+			return Ladders(target).makeChallenge(connection, targetUser, teammate);
+		}
 		if (!targetUser || !targetUser.connected) {
 			return this.popupReply(`The user '${this.targetUsername}' was not found.`);
 		}
@@ -1281,7 +1291,7 @@ export const commands: ChatCommands = {
 
 	accept(target, room, user, connection) {
 		target = this.splitTarget(target);
-		if (target) return this.popupReply(`This command does not support specifying multiple users`);
+		const team = target;
 		const targetUser = this.targetUser || this.pmTarget;
 		if (!targetUser) return this.popupReply(`User "${this.targetUsername}" not found.`);
 		return Ladders.acceptChallenge(connection, targetUser);

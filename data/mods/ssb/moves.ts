@@ -1656,6 +1656,14 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {snatch: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Cosmic Power', source);
+			this.add('-anim', source, 'Psychic', target);
+		},
 		boosts: {
 			spa: 1,
 		},

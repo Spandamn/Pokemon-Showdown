@@ -290,6 +290,41 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			}
 		},
 	},
+	felucia: {
+		noCopy: true,
+		onStart(source) {
+			this.add(`c|${getName('Felucia')}|battlesignup! I dropped my dice somewhere and now all I can do is make you play with them (join using %join one)`);
+			if (source.species.id !== 'uxie' || source.illusion) return;
+			this.add('-start', source, 'typechange', 'Psychic/Normal');
+			if (this.effectData.moveChanged) return;
+			const randomMoveSlot = this.random(2) + 1;
+			const incompatibleMoves = ["nightshade", "calmmind"]; // Night Shade and Calm Mind cant be together
+			if (incompatibleMoves.includes(source.moveSlots[randomMoveSlot].id)) {
+				const othermoveSlot = randomMoveSlot === 1 ? 2 : 1;
+				if (source.moveSlots[othermoveSlot].id === incompatibleMoves[othermoveSlot - 1]) {
+					const alternateMove = othermoveSlot === 1 ? "Psyshock" : ['Thief', 'Toxic'][this.random(2)];
+					const move = this.dex.getMove(toID(alternateMove));
+					source.moveSlots[othermoveSlot] = {
+						move: move.name,
+						id: move.id,
+						pp: move.pp * 8 / 5,
+						maxpp: ((move.noPPBoosts || move.isZ) ? move.pp : move.pp * 8 / 5),
+						target: move.target,
+						disabled: false,
+						disabledSource: '',
+						used: false,
+					};
+					this.effectData.moveChanged = true;
+				}
+			}
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Felucia')}|battlesignup: I lost connection to a player so I guess I'll get a new one (/me in to sub)`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Felucia')}|%remp Felucia`);
+		},
+	},
 	flare: {
 		noCopy: true,
 		onStart() {

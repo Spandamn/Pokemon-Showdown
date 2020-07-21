@@ -1,4 +1,5 @@
 import {getName} from './statuses';
+import { tourannouncements } from '../../../config/config-example';
 
 export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	/*
@@ -464,6 +465,39 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		selfSwitch: true,
 		target: "normal",
 		type: "Normal",
+	},
+
+	// DragonWhale
+	cloakdance: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "If Mimikyu's Disguise is intact or if Mimikyu is the last remaining Pokemon, Attack goes up 2 stages. If Mimikyu's Disguise is busted and there are other Pokemon on Mimikyu's side, the Disguise will be repaired and Mimikyu will switch out.",
+		shortDesc: "Raises the user's Attack by 2.",
+		name: "Cloak Dance",
+		pp: 5,
+		priority: 0,
+		flags: {dance: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, ['Teleport', 'Swords Dance'][this.random(2)], target);
+		},
+		onHit(target, source) {
+			const flag = target.side.filter((ally: Pokemon) => ally === target || !ally.fainted).length > 1;
+			if (!target.volatiles['alolasdisguise'].busted || !flag) {
+				this.boost({atk: 2}, target);
+			} else {
+				this.add('-activate', target, 'move: Cloak Dance');
+				delete target.volatiles['alolasdisguise'].busted;
+				target.formeChange("Mimikyu");
+			}
+		},
+		selfSwitch: true,
+		secondary: null,
+		target: "self",
+		type: "Fairy",
 	},
 
 	// drampa's grandpa

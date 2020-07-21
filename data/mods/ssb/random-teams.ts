@@ -112,6 +112,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Archangel\'s Requiem',
 		evs: {hp: 252, def: 128, spd: 128}, nature: 'Bold',
 	},
+	DragonWhale: {
+		species: 'Mimikyu', ability: 'Alola\'s Disguise', item: 'Life Orb', gender: 'M',
+		moves: ['Play Rough', 'Spectral Thief', 'Shadow Sneak'],
+		signatureMove: 'CloakDance',
+		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
+	},
 	'drampa\'s grandpa': {
 		species: 'Drampa', ability: 'Old Manpa', item: 'Wise Glasses', gender: 'M',
 		moves: [

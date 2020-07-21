@@ -216,6 +216,52 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// DragonWhale
+	alolasdisguise: {
+		desc: "If this Pokemon is a Mimikyu, the first hit it takes in battle deals 0 neutral damage. Its disguise is then broken and it changes to Busted Form. Confusion damage also breaks the disguise.",
+		shortDesc: "(Mimikyu only) First hit deals 0 damage, breaks disguise.",
+		onDamagePriority: 1,
+		onDamage(damage, target, source, effect) {
+			if (
+				effect && effect.effectType === 'Move' &&
+				['mimikyu', 'mimikyutotem'].includes(target.species.id) && !target.transformed
+			) {
+				this.add('-activate', target, 'ability: Alola\'s Disguise');
+				this.effectData.busted = true;
+				return 0;
+			}
+		},
+		onCriticalHit(target, source, move) {
+			if (!target) return;
+			if (!['mimikyu', 'mimikyutotem'].includes(target.species.id) || target.transformed) {
+				return;
+			}
+			const hitSub = target.volatiles['substitute'] && !move.flags['authentic'] && !(move.infiltrates && this.gen >= 6);
+			if (hitSub) return;
+
+			if (!target.runImmunity(move.type)) return;
+			return false;
+		},
+		onEffectiveness(typeMod, target, type, move) {
+			if (!target) return;
+			if (!['mimikyu', 'mimikyutotem'].includes(target.species.id) || target.transformed) {
+				return;
+			}
+			const hitSub = target.volatiles['substitute'] && !move.flags['authentic'] && !(move.infiltrates && this.gen >= 6);
+			if (hitSub) return;
+
+			if (!target.runImmunity(move.type)) return;
+			return 0;
+		},
+		onUpdate(pokemon) {
+			if (['mimikyu', 'mimikyutotem'].includes(pokemon.species.id) && this.effectData.busted) {
+				const speciesid = pokemon.species.id === 'mimikyutotem' ? 'Mimikyu-Busted-Totem' : 'Mimikyu-Busted';
+				pokemon.formeChange(speciesid, this.effect, true);
+			}
+		},
+		name: "Alola's Disguise",
+	},
+
 	// drampa's grandpa
 	oldmanpa: {
 		desc: "This Pokemon's sound-based moves have their power multiplied by 1.3. This Pokemon takes halved damage from sound-based moves. This Pokemon ignores other Pokemon's Attack, Special Attack, and accuracy stat stages when taking damage, and ignores other Pokemon's Defense, Special Defense, and evasiveness stat stages when dealing damage. Upon switching in, this Pokemon's Defense and Special Defense are raised by 1 stage.",

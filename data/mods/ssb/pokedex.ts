@@ -21,6 +21,11 @@ export const BattlePokedex: {[k: string]: ModdedSpeciesData} = {
 		inherit: true,
 		baseStats: {hp: 62, atk: 88, def: 100, spa: 44, spd: 100, spe: 110},
 	},
+	// DragonWhale
+	mimikyu: {
+		inherit: true,
+		abilities: {'0': "Alola's Disguise"},
+	},
 	// Elgino
 	celebi: {
 		inherit: true,

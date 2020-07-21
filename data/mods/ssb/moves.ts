@@ -1,5 +1,4 @@
 import {getName} from './statuses';
-import { tourannouncements } from '../../../config/config-example';
 
 export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 	/*
@@ -473,7 +472,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 		basePower: 0,
 		category: "Status",
 		desc: "If Mimikyu's Disguise is intact or if Mimikyu is the last remaining Pokemon, Attack goes up 2 stages. If Mimikyu's Disguise is busted and there are other Pokemon on Mimikyu's side, the Disguise will be repaired and Mimikyu will switch out.",
-		shortDesc: "Raises the user's Attack by 2.",
+		shortDesc: "If Disguise intact or Mimikyu is the last remaining Pokemon, raises attack by 2; otherwise repairs Disguise and switches out.",
 		name: "Cloak Dance",
 		pp: 5,
 		priority: 0,

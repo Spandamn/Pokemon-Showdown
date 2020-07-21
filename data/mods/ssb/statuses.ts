@@ -750,7 +750,7 @@ export const BattleStatuses: {[k: string]: ModdedPureEffectData} = {
 			this.add(`c|${getName('vivalospride')}|hola mi amore`);
 		},
 		onSwitchOut() {
-			this.add(`c|${getName('vivalospride')}|no hablo españols`);
+			this.add(`c|${getName('vivalospride')}|no hablo español`);
 		},
 		onFaint() {
 			this.add(`c|${getName('vivalospride')}|classic honestly`);

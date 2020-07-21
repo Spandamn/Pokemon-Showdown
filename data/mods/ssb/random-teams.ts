@@ -146,7 +146,7 @@ export const ssbSets: SSBSets = {
 	},
 	Felucia: {
 		species: 'Uxie', ability: 'Regenerator', item: 'Red Card', gender: 'F',
-		moves: ['Strength Sap', ['Psyshock', 'Night Shade'], ['Thief', 'Toxic', 'Calm Mind']],
+		moves: ['Strength Sap', ['Psyshock', 'Night Shade'], ['Thief', 'Toxic']],
 		signatureMove: 'Rigged Dice',
 		evs: {hp: 252, def: 4, spd: 252}, nature: 'Calm',
 	},

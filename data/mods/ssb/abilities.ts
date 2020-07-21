@@ -763,7 +763,7 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 				this.add("-message", `Shadecession is now immune to ${this.effectData.immunities[0]} and ${this.effectData.immunities[1]} types!`);
 			},
 			onTryHit(target, source, move) {
-				if (target !== source && this.effectData.immunities(move.type)) {
+				if (target !== source && this.effectData.immunities.includes(move.type)) {
 					this.add('-immune', target, '[from] ability: Shady Deal');
 					return null;
 				}

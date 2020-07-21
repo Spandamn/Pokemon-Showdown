@@ -517,8 +517,8 @@ export const BattleAbilities: {[k: string]: ModdedAbilityData} = {
 
 	// LittEleven
 	darkroyalty: {
-		desc: "While this Pokemon is active, priority moves from opposing Pokemon targeted at allies are prevented from having an effect.",
-		shortDesc: "While this Pokemon is active, allies are protected from opposing priority moves.",
+		desc: "While this Pokemon is active, priority moves from opposing Pokemon targeted at allies are prevented from having an effect. Dark type moves are boosted 1.2x.",
+		shortDesc: "While this Pokemon is active, allies are protected from opposing priority moves. Dark type moves are boosted by 1.2x.",
 		onFoeTryMove(target, source, move) {
 			const targetAllExceptions = ['perishsong', 'flowershield', 'rototiller'];
 			if (move.target === 'foeSide' || (move.target === 'all' && !targetAllExceptions.includes(move.id))) {

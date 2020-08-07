@@ -115,7 +115,7 @@ export const ssbSets: SSBSets = {
 	DragonWhale: {
 		species: 'Mimikyu', ability: 'Alola\'s Disguise', item: 'Life Orb', gender: 'M',
 		moves: ['Play Rough', 'Spectral Thief', 'Shadow Sneak'],
-		signatureMove: 'CloakDance',
+		signatureMove: 'Cloak Dance',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
 	},
 	'drampa\'s grandpa': {

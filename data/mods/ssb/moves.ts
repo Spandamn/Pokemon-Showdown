@@ -490,7 +490,7 @@ export const BattleMovedex: {[k: string]: ModdedMoveData} = {
 			} else {
 				this.add('-activate', target, 'move: Cloak Dance');
 				delete target.volatiles['alolasdisguise'].busted;
-				target.formeChange("Mimikyu");
+				target.formeChange('Mimikyu');
 			}
 		},
 		selfSwitch: true,

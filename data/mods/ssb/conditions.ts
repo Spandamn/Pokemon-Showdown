@@ -66,13 +66,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 	aegii: {
 		noCopy: true,
 		onStart(pokemon) {
-			let quotes: string[] = [
-				`stream fiesta!!! https://youtu.be/eDEFolvLn0A`,
-				`stream more&more!!! https://youtu.be/mH0_XpSHkZo`,
-				`stream wannabe!!! https://youtu.be/fE2h3lGlOsk`,
-				`stream love bomb!!! https://youtu.be/-SK6cvkK4c0`
-			];
-			this.add(`c|${getName('aegii')}|${quotes[this.random(4)]}`);
+			this.add(`c|${getName('aegii')}|${[`stream fiesta!!! https://youtu.be/eDEFolvLn0A`, `stream more&more!!! https://youtu.be/mH0_XpSHkZo`, `stream wannabe!!! https://youtu.be/fE2h3lGlOsk`,  `stream love bomb!!! https://youtu.be/-SK6cvkK4c0`][this.random(4)]}`);
 			// Decide whether aegii will be special or not
 			if (!pokemon.m.hasMovesetFixed && this.random(2) === 1) return;
 			pokemon.m.hasMovesetFixed = true; // aegii will have a special moveset.

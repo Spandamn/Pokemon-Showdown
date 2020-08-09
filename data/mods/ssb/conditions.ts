@@ -95,13 +95,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			}
 		},
 		onSwitchOut() {
-			let quotes: string[] = [
-				`brb, buying albums`,
-				`brb, downloading fancams`,
-				`brb, streaming mvs`,
-				`brb, learning choreos`
-			];
-			this.add(`c|${getName('aegii')}|${quotes[this.random(4)]}`);
+			this.add(`c|${getName('aegii')}|${[`brb, buying albums`, `brb, buying albums`, `brb, streaming mvs`, `brb, learning choreos`][this.random(4)]}`);
 		},
 		onFaint() {
 			this.add(`c|${getName('aegii')}|i forgot to stan loona...`);

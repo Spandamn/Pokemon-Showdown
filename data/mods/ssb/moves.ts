@@ -2376,7 +2376,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Parting Shot', target);
 		},
 		onHit(target, source, move) {
-			const success = this.boost({spa: -2}, target, source);
+			const success = this.boost({atk: -2, spa: -2}, target, source);
 			if (!success && !target.hasAbility('mirrorarmor')) {
 				delete move.selfSwitch;
 			}

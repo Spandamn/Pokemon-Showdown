@@ -2368,6 +2368,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		pp: 20,
 		priority: 0,
 		flags: {protect: 1, reflectable: 1, mirror: 1, sound: 1, authentic: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Parting Shot', target);
+		},
 		onHit(target, source, move) {
 			const success = this.boost({spa: -2}, target, source);
 			if (!success && !target.hasAbility('mirrorarmor')) {

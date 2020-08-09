@@ -63,6 +63,50 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Aelita')}|X.A.N.A. is finally finished for good.`);
 		},
 	},
+	aegii: {
+		noCopy: true,
+		onStart(pokemon) {
+			let quotes: string[] = [
+				`stream fiesta!!! https://youtu.be/eDEFolvLn0A`,
+				`stream more&more!!! https://youtu.be/mH0_XpSHkZo`,
+				`stream wannabe!!! https://youtu.be/fE2h3lGlOsk`,
+				`stream love bomb!!! https://youtu.be/-SK6cvkK4c0`
+			];
+			this.add(`c|${getName('aegii')}|${quotes[this.random(4)]}`);
+			// Decide whether aegii will be special or not
+			if (!pokemon.m.hasMovesetFixed && this.random(2) === 1) return;
+			pokemon.m.hasMovesetFixed = true; // aegii will have a special moveset.
+			let specialMoves = ['Shadow Ball', 'Flash Cannon'];
+			pokemon.moveSlots.shift();
+			pokemon.moveSlots.shift();
+			for (const newMove of specialMoves) {
+				const moveData = pokemon.battle.dex.getMove(this.toID(newMove));
+				if (!moveData.id) continue;
+				pokemon.moveSlots.unshift({
+					move: moveData.name,
+					id: moveData.id,
+					pp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
+					maxpp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
+					target: moveData.target,
+					disabled: false,
+					disabledSource: '',
+					used: false,
+				});
+			}
+		},
+		onSwitchOut() {
+			let quotes: string[] = [
+				`brb, buying albums`,
+				`brb, downloading fancams`,
+				`brb, streaming mvs`,
+				`brb, learning choreos`
+			];
+			this.add(`c|${getName('aegii')}|${quotes[this.random(4)]}`);
+		},
+		onFaint() {
+			this.add(`c|${getName('aegii')}|i forgot to stan loona...`);
+		},
+	},
 	aeonic: {
 		noCopy: true,
 		onStart() {

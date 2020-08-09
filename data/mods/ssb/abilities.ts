@@ -67,6 +67,37 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// aegii
+	newstage: {
+		desc: "Stance Change; Haze, Heal Bell and Embargo start on switch in.",
+		shortDesc: "Stance Change; Haze, Heal Bell and Embargo start on switch in.",
+		onBeforeMovePriority: 0.5,
+		onBeforeMove(attacker, defender, move) {
+			if (attacker.species.baseSpecies !== 'Aegislash' || attacker.transformed) return;
+			if (move.category === 'Status' && move.id !== 'kingsshield') return;
+			const targetForme = (move.id === 'kingsshield' ? 'Aegislash' : 'Aegislash-Blade');
+			if (attacker.species.name !== targetForme) attacker.formeChange(targetForme);
+		},
+		onStart(pokemon) {
+			this.add('-clearallboost');
+			for (const pokemon of this.getAllActive()) {
+				pokemon.clearBoosts();
+			}
+			this.add('-activate', pokemon, 'move: Heal Bell');
+			const side = pokemon.side;
+			let success = false;
+			for (const ally of side.pokemon) {
+				if (ally !== pokemon && ally.hasAbility('soundproof')) continue;
+				if (ally.cureStatus()) success = true;
+			}
+			if (pokemon.side.foe.active[0]) {
+				pokemon.side.foe.active[0].addVolatile('embargo');
+				this.add('-start', pokemon, 'Embargo');
+			}
+		},
+		name: "New Stage",
+	},
+
 	// Aeonic
 	arsene: {
 		desc: "On switch-in, this Pokemon summons Sandstorm. If Sandstorm is active, this Pokemon's Speed is doubled. This Pokemon takes no damage from Sandstorm.",

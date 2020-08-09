@@ -241,6 +241,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Alphabet Soup',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	Lionyx: {
+		species: 'Gardevoir', ability: 'Tension', item: 'Blunder Policy', gender: 'F',
+		moves: [['Psychic', 'Psystrike'], 'Quiver Dance', ['Secret Sword', 'Mind Blown', 'Seed Flare']],
+		signatureMove: 'Big Bang',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid', shiny: true,
+	},
 	MajorBowman: {
 		species: 'Weezing-Galar', ability: 'Neutralizing Gas', item: 'Black Sludge', gender: 'M',
 		moves: ['Strange Steam', ['Toxic Spikes', 'Haze'], 'Recover'],

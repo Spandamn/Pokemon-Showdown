@@ -574,6 +574,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			}
 		},
 	},
+	lionyx: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Lionyx')}|Hi, this is ps-chan, how may I help you, user-kun? (｡◕‿‿◕｡)`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Lionyx')}|Teclis au secours`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Lionyx')}|It's all going terribly wrong...`);
+		},
+	},
 	majorbowman: {
 		noCopy: true,
 		onStart() {

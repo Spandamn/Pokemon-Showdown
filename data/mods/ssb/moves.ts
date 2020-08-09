@@ -209,6 +209,33 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Water",
 	},
 
+	// Akir
+	ravelin: {
+		accuracy: 100,
+		basePower: 70,
+		category: "Physical",
+		shortDesc: "This move does not check accuracy.",
+		name: "Ravelin",
+		pp: 5,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Aura Sphere', target);
+			this.add('-anim', source, 'Protect', source);
+		},
+		heal: [1, 2],
+		self: {
+			sideCondition: 'lightscreen',
+		},
+		secondary: null,
+		target: "normal",
+		type: "Steel",
+	},
+
 	// Alpha
 	blisteringiceage: {
 		accuracy: true,

@@ -243,7 +243,7 @@ export const ssbSets: SSBSets = {
 	},
 	Lionyx: {
 		species: 'Gardevoir', ability: 'Tension', item: 'Blunder Policy', gender: 'F',
-		moves: [['Psychic', 'Psystrike'], 'Quiver Dance', ['Secret Sword', 'Mind Blown', 'Seed Flare']],
+		moves: [['Psychic', 'Psystrike'], 'Quiver Dance', ['Blizzard', 'Focus Blast', 'Hurricane', 'Hydro Pump', 'Inferno', 'Zap Cannon']],
 		signatureMove: 'Big Bang',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid', shiny: true,
 	},

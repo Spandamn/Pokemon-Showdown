@@ -68,25 +68,8 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onStart(pokemon) {
 			this.add(`c|${getName('aegii')}|${[`stream fiesta!!! https://youtu.be/eDEFolvLn0A`, `stream more&more!!! https://youtu.be/mH0_XpSHkZo`, `stream wannabe!!! https://youtu.be/fE2h3lGlOsk`,  `stream love bomb!!! https://youtu.be/-SK6cvkK4c0`][this.random(4)]}`);
 			// Decide whether aegii will be special or not
-			if (!pokemon.m.hasMovesetFixed && this.random(2) === 1) return;
-			pokemon.m.hasMovesetFixed = true; // aegii will have a special moveset.
-			let specialMoves = ['Shadow Ball', 'Flash Cannon'];
-			pokemon.moveSlots.shift();
-			pokemon.moveSlots.shift();
-			for (const newMove of specialMoves) {
-				const moveData = pokemon.battle.dex.getMove(this.toID(newMove));
-				if (!moveData.id) continue;
-				pokemon.moveSlots.unshift({
-					move: moveData.name,
-					id: moveData.id,
-					pp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
-					maxpp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
-					target: moveData.target,
-					disabled: false,
-					disabledSource: '',
-					used: false,
-				});
-			}
+			if (!pokemon.m.hasMovesetFixed) return;
+			if (pokemon.set.moves[0] === "Shadow Ball") pokemon.m.hasMovesetFixed = true; // aegii has a special moveset.
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('aegii')}|${[`brb, buying albums`, `brb, buying albums`, `brb, streaming mvs`, `brb, learning choreos`][this.random(4)]}`);

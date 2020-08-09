@@ -510,6 +510,9 @@ export class RandomStaffBrosTeams extends RandomTeams {
 
 			// Any set specific tweaks occur here.
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
+			if (set.name === 'aegii' && this.random(2) === 1) {
+				set.moves = ['Shadow Ball', 'Flash Cannon', set.moves[2], set.moves[4]];
+			}
 
 			team.push(set);
 

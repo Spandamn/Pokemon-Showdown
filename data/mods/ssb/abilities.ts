@@ -130,7 +130,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 	fortifications: {
 		desc: "Sets up 1 layer of Spikes on switch in; opponent takes 1/16 damage if makes contact; Restores 1/16 of its max HP every turn.",
 		shortDesc: "Sets up 1 layer of Spikes on switch in; opponent takes 1/16 damage if makes contact; Restores 1/16 of its max HP every turn.",
-		onPreStart(pokemon) {
+		onSwitchInPriority: 1,
+		onSwitchIn(pokemon) {
 			this.add('-ability', pokemon, 'Fortifications', pokemon.side.foe);
 			pokemon.side.foe.addSideCondition('spikes');
 		},

@@ -228,9 +228,10 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Aura Sphere', target);
 			this.add('-anim', source, 'Protect', source);
 		},
-		heal: [1, 2],
-		self: {
-			sideCondition: 'lightscreen',
+		onAfterMoveSecondarySelf(pokemon, target, move) {
+			this.heal(pokemon.maxhp / 2, pokemon, pokemon, move);
+			if (pokemon.side.getSideCondition('lightscreen')) return;
+			pokemon.side.addSideCondition('lightscreen');
 		},
 		secondary: null,
 		target: "normal",

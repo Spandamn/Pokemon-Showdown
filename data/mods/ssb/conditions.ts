@@ -583,7 +583,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Lionyx')}|Teclis au secours`);
 		},
 		onFaint() {
-			this.add(`c|${getName('Lionyx')}|It's all going terribly wrong...`);
+			this.add(`c|${getName('Lionyx')}|The cold never bothered me anyway...`);
 		},
 	},
 	majorbowman: {

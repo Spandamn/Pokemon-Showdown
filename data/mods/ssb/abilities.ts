@@ -80,8 +80,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 		onStart(pokemon) {
 			this.add('-clearallboost');
-			for (const pokemon of this.getAllActive()) {
-				pokemon.clearBoosts();
+			for (const poke of this.getAllActive()) {
+				poke.clearBoosts();
 			}
 			this.add('-activate', pokemon, 'move: Heal Bell');
 			const side = pokemon.side;

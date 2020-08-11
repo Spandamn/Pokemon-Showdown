@@ -586,7 +586,8 @@ export class RandomStaffBrosTeams extends RandomTeams {
 
 			if (set.name === 'Marshmallon') {
 				if (set.moves[1] === set.moves[2]) {
-					set.moves[2] = ['Flare Blitz', 'Wood Hammer', 'Head Smash'].filter((move: string) => move !== set.moves[1])[this.random(2)];
+					const moveChoices = ['Flare Blitz', 'Wood Hammer', 'Head Smash'];
+					set.moves[2] = moveChoices.filter((move: string) => move !== set.moves[1])[this.random(2)];
 				}
 			}
 

@@ -85,10 +85,9 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 			this.add('-activate', pokemon, 'move: Heal Bell');
 			const side = pokemon.side;
-			let success = false;
 			for (const ally of side.pokemon) {
 				if (ally !== pokemon && ally.hasAbility('soundproof')) continue;
-				if (ally.cureStatus()) success = true;
+				ally.cureStatus()
 			}
 			if (pokemon.side.foe.active[0]) {
 				pokemon.side.foe.active[0].addVolatile('embargo');

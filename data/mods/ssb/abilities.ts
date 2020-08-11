@@ -795,7 +795,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 		onEnd(pokemon) {
 			pokemon.side.foe.removeSideCondition("stubbornness");
-		}
+		},
 	},
 
 	// Mitsuki

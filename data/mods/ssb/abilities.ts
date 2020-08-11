@@ -87,7 +87,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			const side = pokemon.side;
 			for (const ally of side.pokemon) {
 				if (ally !== pokemon && ally.hasAbility('soundproof')) continue;
-				ally.cureStatus()
+				ally.cureStatus();
 			}
 			if (pokemon.side.foe.active[0]) {
 				pokemon.side.foe.active[0].addVolatile('embargo');

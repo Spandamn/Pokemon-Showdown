@@ -766,7 +766,6 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 					}
 				}
 				let isBoosted = false;
-				let b: BoostName;
 				for (i in target.boosts) {
 					if (target.boosts[i]! >= 0) {
 						isBoosted = true;

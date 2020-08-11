@@ -733,6 +733,71 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// Marshmallon
+	stubbornness: {
+		desc: "this Pokemon does not take recoil damage; its Atk, Def, and SpD are immediately raised by 1 at the first instance that an opponent's stat is raised; after this, each time an opponent's has its stats boosted, the user gains +1 Atk.",
+		shortDesc: "Rock Head + boosts its Atk, Def, SpD by 1 on opponents first stat boost; after which with every of opponent's stat boost it raises its Atk by 1.",
+		name: "Stubbornness",
+		onStart(pokemon) {
+			pokemon.side.foe.addSideCondition('stubbornness', pokemon);
+		},
+		onDamage(damage, target, source, effect) {
+			if (effect.id === 'recoil') {
+				if (!this.activeMove) throw new Error("Battle.activeMove is null");
+				if (this.activeMove.id !== 'struggle') return null;
+			}
+		},
+		condition: {
+			onAfterEachBoost(boost, target, source, effect) {
+				let positiveBoost = false;
+				let i: BoostName;
+				for (i in boost) {
+					if (boost[i]! >= 0) {
+						positiveBoost = true;
+						break;
+					}
+				}
+				if (positiveBoost) {
+					if (!this.effectData.firstBoostOccured) {
+						this.effectData.firstBoostOccured = target;
+						this.boost({atk: 1, def: 1, spd: 1}, this.effectData.source);
+					} else {
+						this.boost({atk: 1}, this.effectData.source);
+					}
+				}
+				let isBoosted = false;
+				let b: BoostName;
+				for (i in target.boosts) {
+					if (target.boosts[i]! >= 0) {
+						isBoosted = true;
+						break;
+					}
+				}
+				if (isBoosted) {
+					target.abilityData.ending = false;
+					target.abilityData.suppressedBy = "stubbornness";
+				} else {
+					if (target.abilityData.suppressedBy! === "stubbornness") {
+						target.abilityData.ending = true;
+						delete target.abilityData.suppressedBy;
+					}
+				}
+			},
+			onFaint(pokemon) {
+				delete this.effectData.firstBoostOccured;
+			},
+			onEnd(pokemon) {
+				if (pokemon.abilityData.suppressedBy! === "stubbornness") {
+					pokemon.abilityData.ending = true;
+					delete pokemon.abilityData.suppressedBy;
+				}
+			},
+		},
+		onEnd(pokemon) {
+			pokemon.side.foe.removeSideCondition("stubbornness");
+		}
+	},
+
 	// Mitsuki
 	photosynthesis: {
 		desc: "On switch-in, this Pokemon summons Sunny Day. If Sunny Day is active and this Pokemon is not holding Utility Umbrella, this Pokemon's Speed is doubled. If Sunny Day is active, this Pokemon's Attack is multiplied by 1.5 and it loses 1/8 of its maximum HP, rounded down, at the end of each turn. If this Pokemon is holding Utility Umbrella, its Attack remains the same and it does not lose any HP.",

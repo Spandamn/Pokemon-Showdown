@@ -152,7 +152,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				} else {
 					this.boost({atk: -2}, source, target, this.dex.getActiveMove("K-Shield"));
 				}
-				let boost: {[key: string]: number} = {};
+				const boost: {[key: string]: number} = {};
 				if (source.m.hasMovesetFixed) {
 					boost['spa'] = 1;
 				} else {

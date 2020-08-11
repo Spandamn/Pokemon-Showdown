@@ -275,7 +275,7 @@ export const ssbSets: SSBSets = {
 	},
 	Marshmallon: {
 		species: 'Munchlax', ability: 'Stubbornness', item: 'Eviolite', gender: 'M',
-		moves: ['Head Charge',  ['Flare Blitz', 'Wood Hammer', 'Head Smash'], ['Flare Blitz', 'Wood Hammer', 'Head Smash']],
+		moves: ['Head Charge', ['Flare Blitz', 'Wood Hammer', 'Head Smash'], ['Flare Blitz', 'Wood Hammer', 'Head Smash']],
 		signatureMove: 'RAWWWR',
 		evs: {hp: 248, def: 252, spd: 8}, ivs: {spe: 0}, nature: 'Relaxed',
 	},

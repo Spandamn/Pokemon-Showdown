@@ -159,7 +159,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					boost['atk'] = 1;
 				}
 				this.boost(boost, source);
-				return this.NOT_FAIL;
 			},
 		},
 		secondary: null,

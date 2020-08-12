@@ -585,10 +585,11 @@ export class RandomStaffBrosTeams extends RandomTeams {
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
 
 			if (set.name === 'Marshmallon') {
-				if (set.moves[1] === set.moves[2]) {
-					const moveChoices = ['Flare Blitz', 'Wood Hammer', 'Head Smash'];
-					set.moves[2] = moveChoices.filter((move: string) => move !== set.moves[1])[this.random(2)];
-				}
+					const moveChoices = ['Head Charge', 'Flare Blitz', 'Wood Hammer', 'Head Smash'];
+					for (let i = 0; i < set.moves.length - 1; i++) {
+						set.moves[i] = this.sampleNoReplace(moveChoices); 
+					}
+					if (set.moves.indexOf('Head Charge') < 0) set.moves[this.random(3)] = 'Head Charge';
 			}
 
 			team.push(set);

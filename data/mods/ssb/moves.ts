@@ -1585,8 +1585,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Roar of Time', target);
 			this.add('-anim', source, 'Roar', target);
 		},
-		onHit(target, source) {
-			this.heal(Math.ceil(source.maxhp * 0.5), source);
+		onAfterMoveSecondarySelf(pokemon, target, move) {
+			this.heal(pokemon.maxhp / 2, pokemon, pokemon, move);
 		},
 		forceSwitch: true,
 		selfSwitch: true,

@@ -749,7 +749,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onSwitchOut(pokemon) {
 			if (pokemon.m.happened) delete pokemon.m.happened;
 		},
-		onAfterMoveSecondary(target, source, move) {
+		onAfterMove(target, source, move) {
 			const pokemon = source.side.foe.active[0];
 			if (source?.statsRaisedThisTurn) {
 				if (!pokemon.m.happened) {

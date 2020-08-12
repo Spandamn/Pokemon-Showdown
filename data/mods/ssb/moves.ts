@@ -160,7 +160,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					if (theMove.category === "Special") {
 						specCount++;
 					} else if (theMove.category === "Physical") {
-						physCount++
+						physCount++;
 					}
 				}
 				const boost: {[key: string]: number} = {};

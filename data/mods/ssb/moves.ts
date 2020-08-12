@@ -1227,7 +1227,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					pokemon.forceSwitchFlag = true;
 				}
 				if (this.effectData.count >= 3 || !this.effectData.source ||
-					this.effectData.source.fainted || this.effectData.source.hp <= 0) {
+					 	this.effectData.source.fainted || this.effectData.source.hp <= 0) {
 					pokemon.side.removeSideCondition('gaelstrom');
 				}
 			},

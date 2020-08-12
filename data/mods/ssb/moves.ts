@@ -1224,9 +1224,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			onSwitchIn(pokemon) {
 				if (!this.effectData.count) this.effectData.count = 1;
 				if (this.effectData.firstTarget !== pokemon && this.effectData.count++ < 3) {
-					this.forceSwitch([0], pokemon.side.active, this.effectData.source, this.effectData.sourceMove, this.effectData.sourceMove);
+					pokemon.forceSwitchFlag = true;
 				}
-				if (this.effectData.count >= 3 || !this.effectData.source || this.effectData.source.fainted || this.effectData.source.hp <= 0) pokemon.side.removeSideCondition('gaelstrom');
+				if (this.effectData.count >= 3 || !this.effectData.source || this.effectData.source.fainted || this.effectData.source.hp <= 0) {
+					pokemon.side.removeSideCondition('gaelstrom');
+				}
 			},
 			onEnd(side) {
 				side.addSideCondition(['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'][this.random(4)]);

@@ -584,13 +584,7 @@ export class RandomStaffBrosTeams extends RandomTeams {
 			// Any set specific tweaks occur here.
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
 
-			if (set.name === 'Marshmallon') {
-				const moveChoices = ['Head Charge', 'Flare Blitz', 'Wood Hammer', 'Head Smash'];
-				for (let i = 0; i < set.moves.length - 1; i++) {
-					set.moves[i] = this.sampleNoReplace(moveChoices);
-				}
-				if (!set.moves.includes('Head Charge')) set.moves[this.random(3)] = 'Head Charge';
-			}
+			if (set.name === 'Marshmallon' && !set.moves.includes('Head Charge')) set.moves[this.random(3)] = 'Head Charge';
 
 			team.push(set);
 

@@ -1587,7 +1587,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		forceSwitch: true,
 		selfSwitch: true,
-		heal: [1, 2],
+		secondary: {
+			self: {
+				heal: [1, 2],
+			},
+		},
 		target: "normal",
 		type: "Dark",
 	},

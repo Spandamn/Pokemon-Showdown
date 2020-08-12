@@ -1585,13 +1585,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Roar of Time', target);
 			this.add('-anim', source, 'Roar', target);
 		},
+		onHit(target, source) {
+			this.heal(Math.ceil(source.maxhp * 0.5), source);
+		},
 		forceSwitch: true,
 		selfSwitch: true,
-		secondary: {
-			self: {
-				heal: [1, 2],
-			},
-		},
+		secondary: null,
 		target: "normal",
 		type: "Dark",
 	},

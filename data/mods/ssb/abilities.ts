@@ -709,7 +709,6 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			pokemon.addVolatile('tension');
 		},
 		condition: {
-			duration: 1,
 			onStart(pokemon, source, effect) {
 				if (effect && (['imposter', 'psychup', 'transform'].includes(effect.id))) {
 					this.add('-start', pokemon, 'move: Tension', '[silent]');
@@ -727,6 +726,9 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			onSourceAccuracy(accuracy, target, source, move) {
 				if (move && source === this.effectData.target && target === this.effectData.source) return true;
 			},
+			onAfterMove(pokemon, source) {
+				pokemon.removeVolatile('tension');
+			},
 			onEnd(pokemon) {
 				this.add('-end', pokemon, 'move: Tension', '[silent]');
 			},
@@ -738,62 +740,25 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		desc: "this Pokemon does not take recoil damage; its Atk, Def, and SpD are immediately raised by 1 at the first instance that an opponent's stat is raised; after this, each time an opponent's has its stats boosted, the user gains +1 Atk.",
 		shortDesc: "Rock Head + boosts its Atk, Def, SpD by 1 on opponents first stat boost; after which with every of opponent's stat boost it raises its Atk by 1.",
 		name: "Stubbornness",
-		onStart(pokemon) {
-			pokemon.side.foe.addSideCondition('stubbornness', pokemon);
-		},
 		onDamage(damage, target, source, effect) {
 			if (effect.id === 'recoil') {
 				if (!this.activeMove) throw new Error("Battle.activeMove is null");
 				if (this.activeMove.id !== 'struggle') return null;
 			}
 		},
-		condition: {
-			onAfterEachBoost(boost, target, source, effect) {
-				let positiveBoost = false;
-				let i: BoostName;
-				for (i in boost) {
-					if (boost[i]! >= 0) {
-						positiveBoost = true;
-						break;
-					}
-				}
-				if (positiveBoost) {
-					if (!this.effectData.firstBoostOccured) {
-						this.effectData.firstBoostOccured = target;
-						this.boost({atk: 1, def: 1, spd: 1}, this.effectData.source);
-					} else {
-						this.boost({atk: 1}, this.effectData.source);
-					}
-				}
-				let isBoosted = false;
-				for (i in target.boosts) {
-					if (target.boosts[i]! >= 0) {
-						isBoosted = true;
-						break;
-					}
-				}
-				if (isBoosted) {
-					target.abilityData.ending = false;
-					target.abilityData.suppressedBy = "stubbornness";
-				} else {
-					if (target.abilityData.suppressedBy! === "stubbornness") {
-						target.abilityData.ending = true;
-						delete target.abilityData.suppressedBy;
-					}
-				}
-			},
-			onFaint(pokemon) {
-				delete this.effectData.firstBoostOccured;
-			},
-			onEnd(pokemon) {
-				if (pokemon.abilityData.suppressedBy! === "stubbornness") {
-					pokemon.abilityData.ending = true;
-					delete pokemon.abilityData.suppressedBy;
-				}
-			},
+		onSwitchOut(pokemon) {
+			if (pokemon.m.happened) delete pokemon.m.happened;
 		},
-		onEnd(pokemon) {
-			pokemon.side.foe.removeSideCondition("stubbornness");
+		onAfterMoveSecondary(target, source, move) {
+			const pokemon = source.side.foe.active[0];
+			if (source?.statsRaisedThisTurn) {
+				if (!pokemon.m.happened) {
+				 	this.boost({atk: 1, def: 1, spd: 1}, pokemon);
+					pokemon.m.happened = true;
+				} else {
+					this.boost({atk: 1}, pokemon);
+				}
+			}
 		},
 	},
 

@@ -68,8 +68,6 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onStart(pokemon) {
 			this.add(`c|${getName('aegii')}|${[`stream fiesta!!! https://youtu.be/eDEFolvLn0A`, `stream more&more!!! https://youtu.be/mH0_XpSHkZo`, `stream wannabe!!! https://youtu.be/fE2h3lGlOsk`, `stream love bomb!!! https://youtu.be/-SK6cvkK4c0`][this.random(4)]}`);
 			// Decide whether aegii will be special or not
-			if (!pokemon.m.hasMovesetFixed) return;
-			if (pokemon.set.moves[0] === "Shadow Ball") pokemon.m.hasMovesetFixed = true; // aegii has a special moveset.
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('aegii')}|${[`brb, buying albums`, `brb, buying albums`, `brb, streaming mvs`, `brb, learning choreos`][this.random(4)]}`);

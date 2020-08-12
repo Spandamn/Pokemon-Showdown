@@ -758,7 +758,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				}
 			}
 			if (success) {
-				if (!pokemon.m.happened) {
+				if (!source.m.happened) {
 				 	this.boost({atk: 1, def: 1, spd: 1}, source);
 					source.m.happened = true;
 				} else {

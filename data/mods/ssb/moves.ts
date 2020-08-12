@@ -1218,7 +1218,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		onAfterHit(target, source, move) {
 			let count = 0;
 			while (source.side.foe.active[0] && source.side.foe.active[0] !== target && count++ < 2) {
-				this.forceSwitch(undefined, source.side.foe.active, source, move, move);
+				this.forceSwitch(null, source.side.foe.active, source, move, move);
 			}
 			source.side.foe.addSideCondition(['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'][this.random(4)]);
 		},

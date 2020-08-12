@@ -152,13 +152,25 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				} else {
 					this.boost({atk: -2}, source, target, this.dex.getActiveMove("K-Shield"));
 				}
+				let specCount = 0;
+				let physCount = 0;
+				for (const moveSlot of target.moveSlots) {
+					const moveid = moveSlot.id;
+					const theMove = this.dex.getMove(moveid);
+					if (theMove.category === "Special") {
+						specCount++;
+					} else if (theMove.category === "Physical") {
+						physCount++
+					}
+				}
 				const boost: {[key: string]: number} = {};
-				if (source.m.hasMovesetFixed) {
+				if (specCount > physCount) {
 					boost['spa'] = 1;
 				} else {
 					boost['atk'] = 1;
 				}
 				this.boost(boost, source);
+				return this.NOT_FAIL;
 			},
 		},
 		secondary: null,

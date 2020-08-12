@@ -1215,12 +1215,22 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Hurricane', target);
 		},
-		onAfterHit(target, source, move) {
-			let count = 0;
-			while (source.side.foe.active[0] && source.side.foe.active[0] !== target && count++ < 2) {
-				this.forceSwitch([0], source.side.foe.active, source, move, move);
-			}
-			source.side.foe.addSideCondition(['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'][this.random(4)]);
+		onHit(target, source, move) {
+			target.side.addSideCondition('gaelstrom');
+			target.side.sideConditions['gaelstrom'].firstTarget = target;
+			target.side.sideConditions['gaelstrom'].sourceMove = move;
+		},
+		condition: {
+			onSwitchIn(pokemon) {
+				if (!this.effectData.count) this.effectData.count = 1;
+				if (this.effectData.firstTarget !== pokemon && this.effectData.count++ < 3) {
+					this.forceSwitch([0], pokemon.side.active, this.effectData.source, this.effectData.sourceMove, this.effectData.sourceMove);
+				}
+				if (this.effectData.count >= 3 || !this.effectData.source || this.effectData.source.fainted || this.effectData.source.hp <= 0) pokemon.side.removeSideCondition('gaelstrom');
+			},
+			onEnd(side) {
+				side.addSideCondition(['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'][this.random(4)]);
+			},
 		},
 		forceSwitch: true,
 		target: "normal",

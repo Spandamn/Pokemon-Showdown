@@ -749,14 +749,20 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onSwitchOut(pokemon) {
 			if (pokemon.m.happened) delete pokemon.m.happened;
 		},
-		onAfterMove(target, source, move) {
-			const pokemon = source.side.foe.active[0];
-			if (source?.statsRaisedThisTurn) {
+		onFoeAfterBoost(boost, target, source, effect) {
+			let success = false;
+			let i: BoostName;
+			for (i in boost) {
+				if (boost[i]! > 0) {
+					success = true;
+				}
+			}
+			if (success) {
 				if (!pokemon.m.happened) {
-				 	this.boost({atk: 1, def: 1, spd: 1}, pokemon);
-					pokemon.m.happened = true;
+				 	this.boost({atk: 1, def: 1, spd: 1}, source);
+					source.m.happened = true;
 				} else {
-					this.boost({atk: 1}, pokemon);
+					this.boost({atk: 1}, source);
 				}
 			}
 		},

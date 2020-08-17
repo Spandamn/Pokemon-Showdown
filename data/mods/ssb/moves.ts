@@ -742,10 +742,10 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			},
 			onEnd(pokemon) {
 				if (!pokemon.m.backupMoves) return;
-				for (const moveSlot of pokemon.moveSlots) {
+				for (const [index, moveSlot] of pokemon.moveSlots.entries()) {
 					if (!(pokemon.m.replacedMoves.includes(moveSlot.move))) continue;
-					pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)] = pokemon.m.backupMoves.shift();
-					pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)].pp = Math.floor(pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)].maxpp * (moveSlot.pp / moveSlot.maxpp));
+					pokemon.moveSlots[index] = pokemon.m.backupMoves.shift();
+					pokemon.moveSlots[index].pp = Math.floor(pokemon.moveSlots[index].maxpp * (moveSlot.pp / moveSlot.maxpp));
 				}
 				delete pokemon.m.backupMoves;
 				delete pokemon.m.replacedMoves;

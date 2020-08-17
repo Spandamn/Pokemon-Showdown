@@ -63,6 +63,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Aelita')}|X.A.N.A. is finally finished for good.`);
 		},
 	},
+	aegii: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('aegii')}|${[`stream fiesta!!! https://youtu.be/eDEFolvLn0A`, `stream more&more!!! https://youtu.be/mH0_XpSHkZo`, `stream wannabe!!! https://youtu.be/fE2h3lGlOsk`, `stream love bomb!!! https://youtu.be/-SK6cvkK4c0`][this.random(4)]}`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('aegii')}|${[`brb, buying albums`, `brb, buying albums`, `brb, streaming mvs`, `brb, learning choreos`][this.random(4)]}`);
+		},
+		onFaint() {
+			this.add(`c|${getName('aegii')}|i forgot to stan loona...`);
+		},
+	},
 	aeonic: {
 		noCopy: true,
 		onStart() {
@@ -109,6 +121,30 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('Alpha')}|caio`);
+		},
+	},
+	annika: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Annika')}|The circumstances of one's birth are irrelevant; it is what you do with the gift of life that determines who you are.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Annika')}|I'll be stronger when I'm back ^_^`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Annika')}|oh, I crashed the server again...`);
+		},
+	},
+	aquagtothepast: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('A Quag To The Past')}|Whatever happens, happens.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('A Quag To The Past')}|See you space cowboy...`);
+		},
+		onFaint() {
+			this.add(`c|${getName('A Quag To The Past')}|You're gonna carry that weight.`);
 		},
 	},
 	arandomduck: {
@@ -179,6 +215,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Beowulf')}|another one reincarnating into an isekai`);
 		},
 	},
+	biggie: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('biggie')}|gonna take you for a ride`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('biggie')}|mahvel baybee!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('biggie')}|it was all a dream`);
+		},
+	},
 	cake: {
 		noCopy: true,
 		onStart(target, pokemon) {
@@ -245,6 +293,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
 				return false;
 			}
+		},
+	},
+	celine: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Celine')}|Support has arrived!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Celine')}|Brb writing`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Celine')}|'Tis only a flesh wound!`); // escape the quote?
 		},
 	},
 	chloe: {
@@ -443,6 +503,20 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Hubriz')}|Delicate Flower Quest failed...`);
 		},
 	},
+	hydro: {
+		noCopy: true,
+		onStart(pokemon) {
+			this.add(`c|${getName('Hydro')}|Person reading this is a qt nerd and there is absolutely NOTHING u can do about it :)`);
+			if (pokemon.illusion) return;
+			this.add('-start', pokemon, 'typechange', pokemon.types.join('/'), '[silent]');
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Hydro')}|brb, taking a break from ur nerdiness`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Hydro')}|RUUUUUDEEE`);
+		},
+	},
 	inactive: {
 		noCopy: true,
 		onStart() {
@@ -470,13 +544,13 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 	jettxx: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|${getName('Jett x_x')}|It's a good day for a hunt.`);
+			this.add(`c|${getName('Jett x~x')}|It's a good day for a hunt.`);
 		},
 		onSwitchOut(source) {
-			this.add(`c|${getName('Jett x_x')}|I'll be back for more.`);
+			this.add(`c|${getName('Jett x~x')}|I'll be back for more.`);
 		},
 		onFaint() {
-			this.add(`c|${getName('Jett x_x')}|They got lucky.`);
+			this.add(`c|${getName('Jett x~x')}|They got lucky.`);
 		},
 	},
 	jho: {
@@ -515,6 +589,44 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('Kaiju Bunny')}|Wow, okay, r00d ￣(ಥㅅಥ)￣`);
+		},
+	},
+	kalalokki: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Kalalokki')}|(•_•)`);
+			this.add(`c|${getName('Kalalokki')}|( •_•)>⌐■-■`);
+			this.add(`c|${getName('Kalalokki')}|(⌐■_■)`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Kalalokki')}|(⌐■_■)`);
+			this.add(`c|${getName('Kalalokki')}|( •_•)>⌐■-■`);
+			this.add(`c|${getName('Kalalokki')}|(x_x)`);
+		},
+		onTryHit(pokemon, target, move) {
+			if (move.ohko) {
+				this.add('-immune', pokemon, '[from] ability: Sturdy');
+				return null;
+			}
+		},
+		onDamagePriority: -100,
+		onDamage(damage, target, source, effect) {
+			if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === 'Move') {
+				this.add('-ability', target, 'Sturdy');
+				return target.hp - 1;
+			}
+		},
+	},
+	kennedylfc: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('KennedyLFC')}|up the reds`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('KennedyLFC')}|brb Jayi is PMing me (again) -_-`);
+		},
+		onFaint() {
+			this.add(`c|${getName('KennedyLFC')}|I'm not meant to score goals anyway, I'm a defensive striker.`);
 		},
 	},
 	kingbaruk: {
@@ -626,6 +738,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('MajorBowman')}|Never loved ya.`);
 		},
 	},
+	marashmallon: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Marshmallon')}|I'm hungry. Are you edible? c:`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Marshmallon')}|RAWWWR`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Marshmallon')}|I'm still hungry. rawr. :c`);
+		},
+	},
 	mitsuki: {
 		noCopy: true,
 		onStart() {
@@ -715,12 +839,8 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 	},
 	om: {
 		noCopy: true,
-		onStart(source) {
+		onStart() {
 			this.add(`c|${getName('OM~!')}|What's up gamers?`);
-			if (source.illusion) return;
-			// hardcode since pokemon.ts is weird with 3 types
-			this.add('-start', source, 'typechange', source.types.join('/'), '[silent]');
-			this.add('-start', source, 'typeadd', 'Flying', '[silent]');
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('OM~!')}|Let me just ${['host murder for the 100th time', 'clean out scum zzz', 'ladder mnm rq'][this.random(3)]}`);
@@ -756,13 +876,13 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 	phiwings99: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|${getName('phiwings99')}|I'm boated.`);
+			this.add(`c|${getName('phiwings99')}|Pick.`);
 		},
 		onSwitchOut() {
 			this.add(`c|${getName('phiwings99')}|The fact you're switching this out means you probably didn't use the Z-Move right.`);
 		},
 		onFaint() {
-			this.add(`c|${getName('phiwings99')}|God, Nalei is fucking terrible at this game.`);
+			this.add(`c|${getName('phiwings99')}|I'm boated.`);
 		},
 	},
 	piloswinegripado: {
@@ -894,8 +1014,9 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onStart() {
 			this.add(`c|${getName('Struchni')}|~tt newgame`);
 		},
-		onSwitchOut(pokemon) {
+		onSwitchOut(source) {
 			this.add(`c|${getName('Struchni')}|~tt endgame`);
+			if (source.m.typeEff) delete source.m.typeEff;
 		},
 		onFaint(pokemon) {
 			this.add(`c|${getName('Struchni')}|**selfveto**`);
@@ -952,6 +1073,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('tiki')}|aksfgkjag o k`);
+		},
+	},
+	trace: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('trace')}|Daishouri!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('trace')}|¯\\_(ツ)_/¯`);
+		},
+		onFaint() {
+			this.add(`c|${getName('trace')}|sucks to sucks`);
 		},
 	},
 	trickster: {
@@ -1243,6 +1376,31 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onSwitchIn(pokemon) {
 			if (pokemon.name !== 'Darth') {
 				this.effectData.storedTypes = pokemon.getTypes();
+			}
+		},
+	},
+	// Custom status for A Quag To The Past's signature move
+	bounty: {
+		name: 'bounty',
+		effectType: 'Status',
+		onStart(target, source, sourceEffect) {
+			if (sourceEffect.effectType === 'Ability') {
+				this.add('-start', target, 'bounty', '[from] ability: ' + sourceEffect.name, '[of] ' + source);
+			} else {
+				this.add('-start', target, 'bounty');
+			}
+			// this.add('-start', target, 'bounty', '[silent]');
+		},
+		onSwitchIn(pokemon) {
+			if (pokemon.status === 'bounty') {
+				this.add('-start', pokemon, 'bounty');
+			}
+		},
+		onFaint(target, source, effect) {
+			if (effect.effectType !== 'Move') return;
+			if (source) {
+				this.add('-activate', target, 'ability: Bounty');
+				this.boost({atk: 1, def: 1, spa: 1, spd: 1, spe: 1}, source, target, effect);
 			}
 		},
 	},

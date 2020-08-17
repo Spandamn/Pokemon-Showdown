@@ -47,6 +47,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'XANA\'s Keys To Lyoko',
 		evs: {hp: 252, atk: 4, spd: 252}, nature: 'Careful',
 	},
+	aegii: {
+		species: 'Aegislash', ability: 'New Stage', item: 'Leftovers', gender: 'M',
+		moves: ['Shadow Claw', 'Iron Head', 'Shadow Sneak'],
+		signatureMove: 'K-Shield',
+		evs: {hp: 252, def: 64, spd: 192}, nature: 'Sassy',
+	},
 	Aeonic: {
 		species: 'Nosepass', ability: 'Arsene', item: 'Stone Plate', gender: 'M',
 		moves: ['Diamond Storm', 'Earthquake', 'Milk Drink'],
@@ -70,6 +76,18 @@ export const ssbSets: SSBSets = {
 		moves: ['Freeze-Dry', 'Ancient Power', 'Earth Power'],
 		signatureMove: 'Blizzard',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid', shiny: true,
+	},
+	Annika: {
+		species: 'Mewtwo', ability: 'Overprotective', item: 'Mewtwonite Y', gender: 'F',
+		moves: [['Rising Voltage', 'Lava Plume'], ['Hex', 'Aurora Beam'], ['Psychic', 'Psyshock']],
+		signatureMove: 'Refactor',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Quirky', shiny: true,
+	},
+	'A Quag To The Past': {
+		species: 'Quagsire', ability: 'Carefree', item: 'Quagnium Z', gender: 'M',
+		moves: ['Shore Up', 'Flip Turn', ['Haze', 'Toxic']],
+		signatureMove: 'Scorching Sands',
+		evs: {hp: 252, def: 252, spd: 4}, ivs: {spe: 0}, nature: 'Relaxed',
 	},
 	'a random duck': {
 		species: 'Ducklett', ability: 'Gale Wings v1', item: 'Heavy Duty Boots', gender: 'M',
@@ -101,8 +119,14 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Buzz Inspection',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly', shiny: 2,
 	},
+	biggie: {
+		species: 'Snorlax', ability: 'Super Armor', item: 'Leftovers', gender: 'M',
+		moves: ['Body Slam', 'Darkest Lariat', 'Assist'],
+		signatureMove: 'Juggernaut Punch',
+		evs: {hp: 4, def: 252, spd: 252}, nature: 'Brave',
+	},
 	Cake: {
-		species: 'Dunsparce', ability: 'Wonder Guard', item: 'Leftovers', gender: 'M',
+		species: 'Dunsparce', ability: 'Wonder Guard', item: 'Shell Bell', gender: 'M',
 		moves: ['Psych Up', 'King\'s Shield', ['Poison Gas', 'Corrosive Gas', 'Magic Powder', 'Speed Swap', 'Spite', 'Decorate', 'Screech', 'Trick Room', 'Heal Block', 'Geomancy']],
 		signatureMove: 'Kevin',
 		evs: {hp: 252, atk: 252, spd: 4}, nature: 'Adamant',
@@ -112,6 +136,12 @@ export const ssbSets: SSBSets = {
 		moves: ['Quiver Dance', 'Roost', 'Will-O-Wisp'],
 		signatureMove: 'Never Lucky',
 		evs: {hp: 248, def: 36, spe: 224}, ivs: {atk: 0}, nature: 'Timid',
+	},
+	Celine: {
+		species: 'Lucario', ability: 'Guardian Armor', item: 'Leftovers', gender: 'F',
+		moves: ['Wish', 'Teleport', 'Drain Punch'],
+		signatureMove: 'Status Guard',
+		evs: {hp: 248, def: 252, spd: 8}, nature: 'Impish',
 	},
 	Chloe: {
 		species: 'Delphox', ability: 'No Guard', item: 'Heavy-Duty Boots', gender: 'F',
@@ -205,6 +235,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Steroid Anaphylaxia',
 		evs: {def: 4, spa: 252, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	Hydro: {
+		species: 'Pichu', ability: 'Hydrostatic', item: 'Eviolite', gender: 'M',
+		moves: ['Hydro Pump', 'Thunder', 'Ice Beam'],
+		signatureMove: 'Hydrostatics',
+		evs: {def: 4, spa: 252, spe: 252}, nature: 'Modest',
+	},
 	Inactive: {
 		species: 'Gyarados', ability: 'Dragon Scale', item: 'Gyaradosite', gender: '',
 		moves: ['Dragon Dance', 'Earthquake', 'Crabhammer'],
@@ -217,9 +253,9 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Patrona Attack',
 		evs: {def: 4, spa: 252, spe: 252}, nature: 'Timid', shiny: true,
 	},
-	'Jett x_x': {
+	'Jett x~x': {
 		species: 'Sneasel', ability: 'Deceiver', item: 'Heavy Duty Boots', gender: 'M',
-		moves: ['Knock Off', 'Icicle Crash', 'Counter'],
+		moves: ['Knock Off', 'Triple Axel', 'Counter'],
 		signatureMove: 'The Hunt is On!',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
 	},
@@ -228,6 +264,13 @@ export const ssbSets: SSBSets = {
 		moves: ['Nasty Plot', 'Overdrive', 'Volt Switch'],
 		signatureMove: 'Genre Change',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+	},
+	'Jho-Low-Key': {
+		species: 'Toxtricity-Low-Key', ability: 'Venomize', item: 'Throat Spray', gender: 'M',
+		moves: ['Aura Sphere', 'Boomburst', 'Volt Switch'],
+		signatureMove: 'Genre Change',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+		skip: true,
 	},
 	Jordy: {
 		species: 'Archeops', ability: 'Divine Sandstorm', item: 'Life Orb', gender: 'M',
@@ -240,6 +283,18 @@ export const ssbSets: SSBSets = {
 		moves: ['Return', 'Play Rough', ['Drain Punch', 'High Jump Kick']],
 		signatureMove: 'Cozy Cuddle',
 		evs: {atk: 252, spd: 4, spe: 252}, nature: 'Jolly', shiny: 1,
+	},
+	Kalalokki: {
+		species: 'Wingull', ability: 'Magic Guard', item: 'Kalalokkium Z', gender: 'M',
+		moves: ['Tailwind', 'Encore', 'Healing Wish'],
+		signatureMove: 'Blackbird',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+	},
+	KennedyLFC: {
+		species: 'Cinderace', ability: 'False Nine', item: 'Choice Band', gender: 'M',
+		moves: ['High Jump Kick', 'Triple Axel', 'U-turn'],
+		signatureMove: 'Top Bins',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Adamant',
 	},
 	Kingbaruk: {
 		species: 'Stonjourner', ability: 'Sturdy', item: 'Heavy Duty Boots', gender: 'M',
@@ -272,6 +327,12 @@ export const ssbSets: SSBSets = {
 		moves: ['Strange Steam', ['Toxic Spikes', 'Haze'], 'Recover'],
 		signatureMove: 'Corrosive Cloud',
 		evs: {hp: 252, def: 252, spd: 4}, nature: 'Bold',
+	},
+	Marshmallon: {
+		species: 'Munchlax', ability: 'Stubbornness', item: 'Eviolite', gender: 'M',
+		moves: ['Head Charge', 'Flare Blitz', 'Wood Hammer', 'Head Smash'],
+		signatureMove: 'RAWWWR',
+		evs: {hp: 248, def: 252, spd: 8}, ivs: {spe: 0}, nature: 'Relaxed',
 	},
 	Mitsuki: {
 		species: 'Leafeon', ability: 'Photosynthesis', item: ['Life Orb', 'Miracle Seed'], gender: 'M',
@@ -441,6 +502,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Right. On. Cue!',
 		evs: {hp: 128, def: 144, spd: 236}, ivs: {atk: 0}, nature: 'Bold',
 	},
+	trace: {
+		species: 'Jirachi', ability: 'Trace', item: 'Leftovers', gender: '',
+		moves: ['Wish', 'Protect', 'Psychic'],
+		signatureMove: 'Hero Creation',
+		evs: {hp: 248, def: 8, spd: 252}, ivs: {atk: 0}, nature: 'Calm',
+	},
 	Trickster: {
 		species: 'Shiinotic', ability: 'Trillionage Roots', item: 'Leftovers', gender: '',
 		moves: ['Strength Sap', 'Cosmic Power', 'Knock Off'],
@@ -478,14 +545,14 @@ export const ssbSets: SSBSets = {
 		evs: {hp: 4, spa: 252, spe: 252}, ivs: {atk: 0},
 		skip: true,
 	},
-	'yuki-Ninja': {
+	'yuki-Dancer': {
 		species: 'Pikachu-Pop-Star', ability: 'Dancer', item: 'Light Ball', gender: 'F',
 		moves: ['Fiery Dance', 'Revelation Dance', 'Lunar Dance'],
 		signatureMove: 'Class Change',
 		evs: {hp: 4, spa: 252, spe: 252}, ivs: {atk: 0},
 		skip: true,
 	},
-	'yuki-Dancer': {
+	'yuki-Ninja': {
 		species: 'Pikachu-Libre', ability: 'White Smoke', item: 'Light Ball', gender: 'F',
 		moves: ['Water Shuriken', 'Acrobatics', 'Toxic'],
 		signatureMove: 'Class Change',
@@ -583,6 +650,11 @@ export class RandomStaffBrosTeams extends RandomTeams {
 
 			// Any set specific tweaks occur here.
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
+			if (set.name === 'aegii' && this.randomChance(1, 2)) {
+				set.moves[set.moves.indexOf('Shadow Claw')] = 'Shadow Ball';
+				set.moves[set.moves.indexOf('Iron Head')] = 'Flash Cannon';
+			}
+			if (set.name === 'Marshmallon' && !set.moves.includes('Head Charge')) set.moves[this.random(3)] = 'Head Charge';
 
 			team.push(set);
 

@@ -1,7 +1,7 @@
 import {getName} from './conditions';
 // Used for grimAuxiliatrix's move
 import {ssbSets} from "./random-teams";
-import {changeSet} from "./abilities";
+import {changeSet, changeMoves} from "./abilities";
 
 export const Moves: {[k: string]: ModdedMoveData} = {
 	/*
@@ -96,6 +96,87 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		secondary: null,
 		target: "normal",
 		type: "Flying",
+	},
+
+	// aegii
+	kshield: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "King's Shield; except reduces Special Attack or Attack by 2 according to the move used by the opponent. Boosts Attack or Special Attack of user according to its set.",
+		shortDesc: "King's Shield; reduces SpA or Atk by 2 based on move category; Boost users Atk or SpA according to user's set.",
+		name: "K-Shield",
+		pp: 10,
+		priority: 4,
+		flags: {},
+		stallingMove: true,
+		volatileStatus: 'kshield',
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this .add('-anim', source, 'Petal Dance', target);
+			this .add('-anim', source, 'King\'s Shield', source);
+		},
+		onTryHit(pokemon) {
+			return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
+		},
+		onHit(pokemon) {
+			pokemon.addVolatile('stall');
+		},
+		condition: {
+			duration: 1,
+			onStart(target) {
+				this.add('-singleturn', target, 'Protect');
+			},
+			onTryHitPriority: 3,
+			onTryHit(target, source, move) {
+				if (!move.flags['protect'] || move.category === 'Status') {
+					if (move.isZ || (move.isMax && !move.breaksProtect)) target.getMoveHitData(move).zBrokeProtect = true;
+					return;
+				}
+				if (move.smartTarget) {
+					move.smartTarget = false;
+				} else {
+					this.add('-activate', target, 'move: Protect');
+				}
+				const lockedmove = source.getVolatile('lockedmove');
+				if (lockedmove) {
+					// Outrage counter is reset
+					if (source.volatiles['lockedmove'].duration === 2) {
+						delete source.volatiles['lockedmove'];
+					}
+				}
+				if (move.category === "Special") {
+					this.boost({spa: -2}, source, target, this.dex.getActiveMove("K-Shield"));
+				} else {
+					this.boost({atk: -2}, source, target, this.dex.getActiveMove("K-Shield"));
+				}
+				let specCount = 0;
+				let physCount = 0;
+				for (const moveSlot of target.moveSlots) {
+					const moveid = moveSlot.id;
+					const theMove = this.dex.getMove(moveid);
+					if (theMove.category === "Special") {
+						specCount++;
+					} else if (theMove.category === "Physical") {
+						physCount++;
+					}
+				}
+				const boost: {[key: string]: number} = {};
+				if (specCount > physCount) {
+					boost['spa'] = 1;
+				} else {
+					boost['atk'] = 1;
+				}
+				this.boost(boost, target);
+				return this.NOT_FAIL;
+			},
+		},
+		secondary: null,
+		target: "self",
+		type: "Steel",
 	},
 
 	// Aelita
@@ -259,10 +340,61 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', target, 'Subzero Slammer', target);
 			this.add('-anim', source, 'Subzero Slammer', source);
 		},
+		isZ: "caioniumz",
 		secondary: null,
 		weather: 'heavyhailstorm',
 		target: "all",
 		type: "Ice",
+	},
+
+	// Annika
+	refactor: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Raises Special Attack by 1 stage and regenerates user and foe movesets, restoring PP.",
+		shortDesc: "Regenerates user, foe movesets; +1 Sp. Atk.",
+		name: "Refactor",
+		pp: 5,
+		flags: {authentic: 1},
+		priority: -7,
+		onHit(target, source, move) {
+			for (const pokemon of this.getAllActive()) {
+				const newMoves = changeMoves(this, pokemon, ssbSets[pokemon.name].moves.concat(ssbSets[pokemon.name].signatureMove));
+				pokemon.moveSlots = newMoves;
+				// @ts-ignore
+				pokemon.baseMoveSlots = newMoves;
+				this.add('-message', `${source.name} refactored ${pokemon === target ? `themselves` : `the opposing ${pokemon.name}`}!`);
+			}
+		},
+		target: "self",
+		type: "Psychic",
+	},
+
+	// A Quag To The Past
+	bountyplace: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Puts a bounty on the target. If the target is KOed by a direct attack, the attacker will gain +1 Attack, Defense, Special Attack, Special Defense, and Speed. If the target has a major status condition, it cannot have a bounty placed on it.",
+		shortDesc: "Puts a bounty on the target.",
+		name: "Bounty Place",
+		pp: 1,
+		priority: 0,
+		flags: {},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Pay Day', target);
+			this.add('-anim', source, 'Block', target);
+		},
+		status: "bounty",
+		isZ: "quagniumz",
+		secondary: null,
+		target: "normal",
+		type: "Ground",
 	},
 
 	// a random duck
@@ -402,6 +534,51 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Bug",
 	},
 
+	// biggie
+	juggernautpunch: {
+		accuracy: 100,
+		basePower: 150,
+		category: "Physical",
+		desc: "The user loses its focus and does nothing if it is hit by a damaging attack this turn before it can execute the move.",
+		shortDesc: "Fails if the user takes damage before it hits.",
+		name: "Juggernaut Punch",
+		pp: 20,
+		priority: -3,
+		flags: {contact: 1, protect: 1, punch: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Focus Punch', target);
+		},
+		beforeTurnCallback(pokemon) {
+			pokemon.addVolatile('juggernautpunch');
+		},
+		beforeMoveCallback(pokemon) {
+			if (pokemon.volatiles['juggernautpunch'] && pokemon.volatiles['juggernautpunch'].lostFocus) {
+				this.add('cant', pokemon, 'Juggernaut Punch', 'Juggernaut Punch');
+				return true;
+			}
+		},
+		condition: {
+			duration: 1,
+			onStart(pokemon) {
+				this.add('-singleturn', pokemon, 'move: Juggernaut Punch');
+			},
+			onDamagePriority: -101,
+			onDamage(damage, target, source, effect) {
+				if (effect.effectType !== 'Move') return;
+				if (damage > target.baseMaxhp / 5) {
+					target.volatiles['juggernautpunch'].lostFocus = true;
+				}
+			},
+		},
+		secondary: null,
+		target: "normal",
+		type: "Fighting",
+	},
+
 	// Cake
 	kevin: {
 		accuracy: true,
@@ -490,6 +667,77 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Fire",
 	},
 
+	// Celine
+	statusguard: {
+		accuracy: 100,
+		basePower: 0,
+		category: "Status",
+		desc: "Protects from physical moves. If hit by physical move, opponent is either badly poisoned, burned, or paralyzed at random and is forced out. Special attacks and status moves go through this protect.",
+		shortDesc: "Protected from physical attacks. Contact: burn, par, or tox.",
+		name: "Status Guard",
+		pp: 10,
+		priority: 4,
+		flags: {protect: 1},
+		stallingMove: true,
+		volatileStatus: 'statusguard',
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onHit(pokemon) {
+			pokemon.addVolatile('stall');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Protect', source);
+		},
+		onTryHit(pokemon) {
+			return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
+		},
+		condition: {
+			duration: 1,
+			onStart(target) {
+				this.add('-singleturn', target, 'move: Protect');
+			},
+			onTryHitPriority: 3,
+			onTryHit(target, source, move) {
+				if (!move.flags['protect']) {
+					if (move.isZ || (move.isMax && !move.breaksProtect)) target.getMoveHitData(move).zBrokeProtect = true;
+					return;
+				}
+				if (move.category === 'Special' || move.category === 'Status') {
+					return;
+				} else if (move.smartTarget) {
+					move.smartTarget = false;
+				} else {
+					this.add('-activate', target, 'move: Protect');
+				}
+				const lockedmove = source.getVolatile('lockedmove');
+				if (lockedmove) {
+					// Outrage counter is reset
+					if (source.volatiles['lockedmove'].duration === 2) {
+						delete source.volatiles['lockedmove'];
+					}
+				}
+				if (move.category === 'Physical') {
+					const statuses = ['brn', 'par', 'tox'];
+					source.trySetStatus(this.sample(statuses), target);
+					source.forceSwitchFlag = true;
+				}
+				return this.NOT_FAIL;
+			},
+			onHit(target, source, move) {
+				if (move.category === 'Physical') {
+					const statuses = ['brn', 'par', 'tox'];
+					source.trySetStatus(this.sample(statuses), target);
+					source.forceSwitchFlag = true;
+				}
+			},
+		},
+		secondary: null,
+		target: "self",
+		type: "Normal",
+	},
+
 	// Chloe
 	vsni: {
 		accuracy: 55,
@@ -560,15 +808,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Psywave', target);
 		},
-		onModifyMove(move, source, target) {
-			let species = target.species;
-			if (species.isMega) species = this.dex.getSpecies(species.baseSpecies);
-			const isSingleStage = (species.nfe && !species.prevo) || (!species.nfe && !species.prevo);
-			if (!isSingleStage) {
-				move.category = 'Status';
-			}
-		},
-		onBasePower(basePower, source, target) {
+		onBasePower(damage, source, target) {
 			let species = target.species;
 			if (species.isMega) species = this.dex.getSpecies(species.baseSpecies);
 			const isSingleStage = (species.nfe && !species.prevo) || (!species.nfe && !species.prevo);
@@ -586,7 +826,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				if (this.dex.getSpecies(prevo).prevo) {
 					prevo = this.dex.getSpecies(prevo).prevo;
 				}
-				target.formeChange(prevo, this.effect, true);
+				target.formeChange(prevo, this.effect);
 				target.canMegaEvo = null;
 				target.setAbility(ability);
 			}
@@ -1040,6 +1280,45 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Poison",
 	},
 
+	// Hydro
+	hydrostatics: {
+		accuracy: 100,
+		basePower: 50,
+		category: "Special",
+		desc: "Has a 70% chance to raise the user's Special Attack by 1 stage and a 50% chance to paralyze the target. This move combines Water in its type effectiveness against the target.",
+		shortDesc: "70% boost SpA;50% para;Combine Water in typeeff.",
+		name: "Hydrostatics",
+		pp: 10,
+		priority: 2,
+		flags: {protect: 1, mirror: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Origin Pulse', target);
+			this.add('-anim', source, 'Crarge Beam', target);
+		},
+		secondaries: [
+			{
+				chance: 70,
+				self: {
+					boosts: {
+						spa: 1,
+					},
+				},
+			}, {
+				chance: 50,
+				status: 'par',
+			},
+		],
+		onEffectiveness(typeMod, target, type, move) {
+			return typeMod + this.dex.getEffectiveness('Water', type);
+		},
+		target: "normal",
+		type: "Electric",
+	},
+
 	// Inactive
 	paranoia: {
 		accuracy: 90,
@@ -1087,7 +1366,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Ghost",
 	},
 
-	// Jett x_x
+	// Jett x~x
 	thehuntison: {
 		accuracy: 100,
 		basePower: 55,
@@ -1100,8 +1379,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			return move.basePower;
 		},
 		category: "Physical",
-		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn. Raises the user's Attack by 2 stages if this move KOes the target.",
-		shortDesc: "Foe: 2x power when switching. +2 Atk if KO.",
+		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn.",
+		shortDesc: "Foe: 2x power when switching.",
 		name: "The Hunt is On!",
 		pp: 15,
 		priority: 0,
@@ -1132,8 +1411,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		onAfterMoveSecondarySelf(pokemon, target, move) {
 			if (!target || target.fainted || target.hp <= 0) {
-				this.boost({atk: 2}, pokemon, pokemon, move);
-				this.add(`c|${getName('Jett xx')}|Gotcha!`);
+				this.add(`c|${getName('Jett xx')}|Owned!`);
 			}
 		},
 		condition: {
@@ -1198,17 +1476,115 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Fairy",
 	},
 
+	// Kalalokki
+	blackbird: {
+		accuracy: 100,
+		basePower: 70,
+		category: "Special",
+		desc: "If this move is successful and the user has not fainted, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if there are no unfainted party members, or if the target switched out using an Eject Button or through the effect of the Emergency Exit or Wimp Out Abilities.",
+		shortDesc: "User switches out after damaging the target.",
+		name: "Blackbird",
+		pp: 20,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		selfSwitch: true,
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Gust', target);
+			this.add('-anim', source, 'Parting Shot', target);
+		},
+		secondary: null,
+		target: "normal",
+		type: "Flying",
+	},
+	gaelstrom: {
+		accuracy: true,
+		basePower: 140,
+		category: "Special",
+		desc: "Hits foe and phazes them out, phaze the next one out and then another one, set a random entry hazard at the end of the move.",
+		shortDesc: "Forces the target to switch to a random ally; this happens two more times; and finally sets up a random entry hazard.",
+		name: "Gaelstrom",
+		pp: 1,
+		priority: 0,
+		flags: {},
+		isZ: "kalalokkiumz",
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Hurricane', target);
+		},
+		sideCondition: 'gaelstrom',
+		condition: {
+			duration: 1,
+			onSwitchIn(pokemon) {
+				if (!this.effectData.count) this.effectData.count = 1;
+				if (this.effectData.count < 3) {
+					pokemon.forceSwitchFlag = true;
+					this.effectData.count++;
+					return;
+				}
+				pokemon.side.removeSideCondition('gaelstrom');
+			},
+			onStart(side) {
+				side.addSideCondition(['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'][this.random(4)]);
+			},
+		},
+		forceSwitch: true,
+		target: "normal",
+		type: "Flying",
+	},
+
+	// KennedyLFC
+	topbins: {
+		accuracy: 70,
+		basePower: 130,
+		category: "Physical",
+		desc: "Has a 20% chance to burn the target and a 10% chance to flinch it.",
+		shortDesc: "20% chance to burn. 10% chance to flinch.",
+		name: "Top Bins",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Pyro Ball', target);
+			this.add('-anim', source, 'Blaze Kick', target);
+		},
+		secondaries: [
+			{
+				chance: 20,
+				status: 'brn',
+			}, {
+				chance: 10,
+				volatileStatus: 'flinch',
+			},
+		],
+		target: "normal",
+		type: "Fire",
+	},
+
 	// Kingbaruk
 	leaveittotheteam: {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
 		desc: "The user faints and the Pokemon brought out to replace it gets healing wish effects, 1 boost to attack, defense, special attack and special defense.",
-		shortDesc: "User faints. Replacement Healing Wish Effects, gets +1 Attack, +1 Defense, +1 Special Attack and +1 Special Defense.",
+		shortDesc: "User faints. Replacement gets healed & +1 Atk/Def/SpA/SpD.",
 		name: "Leave it to the team!",
 		pp: 5,
 		priority: 0,
 		flags: {snatch: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
 		onTryHit(pokemon, target, move) {
 			if (!this.canSwitch(pokemon.side)) {
 				delete move.selfdestruct;
@@ -1220,7 +1596,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		condition: {
 			duration: 2,
 			onStart(side, source) {
-				this.debug('Leave it to the team started on ' + side.name);
+				this.debug('Leave it to the team! started on ' + side.name);
 				this.effectData.positions = [];
 				for (const i of side.active.keys()) {
 					this.effectData.positions[i] = false;
@@ -1243,7 +1619,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					for (const moveSlot of target.moveSlots) {
 						moveSlot.pp = moveSlot.maxpp;
 					}
-					this.add('-heal', target, target.getHealth, '[from] move: Leave it to the team');
+					this.add('-heal', target, target.getHealth, '[from] move: Leave it to the team!');
 					positions[target.position] = false;
 				}
 				if (!positions.some(affected => affected === true)) {
@@ -1262,11 +1638,15 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		basePower: 90,
 		category: "Physical",
 		desc: "If this move is successful, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user restores 1/8 of its maximum HP, rounded half up. Target can't use status moves its next 3 turns. Lowers the target's Attack by 1 stages.",
-		shortDesc: "Deals damage, heals 1/8, taunts, lowers Atk, and switches out.",
+		shortDesc: "Heals 1/8, taunts, lowers Atk, switches out.",
 		name: "Clash of Pangoros",
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, heal: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Black Hole Eclipse', target);
 		},
@@ -1291,7 +1671,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		basePower: 120,
 		category: "Special",
 		desc: "The user loses 33% of the damage dealt by this attack. Resets the field by clearing all hazards, terrains, walls, and weather.",
-		shortDesc: "33% recoil; resets field's hazards, weather, screens and terrains.",
+		shortDesc: "33% recoil; removes hazards/weather/terrain.",
 		name: "Big Bang",
 		pp: 5,
 		priority: 0,
@@ -1360,50 +1740,9 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		onHit(pokemon) {
 			if (pokemon.species.forme === 'Low-Key') {
-				pokemon.formeChange(`toxtricity`, this.effect);
-				pokemon.moveSlots = pokemon.moveSlots.map(slot => {
-					const newMoves: {[k: string]: string} = {
-						boomburst: 'overdrive',
-						aurasphere: 'nastyplot',
-					};
-					if (slot.id in newMoves) {
-						const move = this.dex.getMove(newMoves[slot.id]);
-						const newSlot = {
-							id: move.id,
-							move: move.name,
-							// Luckily, both slots have the same number of PP
-							pp: slot.pp,
-							maxpp: move.pp * 8 / 5,
-							disabled: slot.disabled,
-							used: false,
-						};
-						return newSlot;
-					}
-					return slot;
-				});
+				changeSet(this, pokemon, ssbSets['Jho'], true);
 			} else {
-				pokemon.formeChange(`toxtricitylowkey`, this.effect);
-				pokemon.setAbility('venomize');
-				pokemon.moveSlots = pokemon.moveSlots.map(slot => {
-					const newMoves: {[k: string]: string} = {
-						overdrive: 'boomburst',
-						nastyplot: 'aurasphere',
-					};
-					if (slot.id in newMoves) {
-						const move = this.dex.getMove(newMoves[slot.id]);
-						const newSlot = {
-							id: move.id,
-							move: move.name,
-							// Luckily, both slots have the same number of PP
-							pp: slot.pp,
-							maxpp: move.pp * 8 / 5,
-							disabled: slot.disabled,
-							used: false,
-						};
-						return newSlot;
-					}
-					return slot;
-				});
+				changeSet(this, pokemon, ssbSets['Jho-Low-Key'], true);
 			}
 		},
 		boosts: {
@@ -1564,6 +1903,35 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		target: "normal",
 		type: "Poison",
+	},
+
+	// Marshmallon
+	rawwwr: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Heals the user by 50% of its max HP. Forces the target to switch to a random ally. User switches out after.",
+		shortDesc: "Heals the user by 50% of its max HP. Forces the target to switch to a random ally. User switches out after.",
+		name: "RAWWWR",
+		pp: 10,
+		priority: 0,
+		flags: {reflectable: 1, mirror: 1, sound: 1, authentic: 1, heal: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Slack Off', source);
+			this.add('-anim', source, 'Roar of Time', target);
+			this.add('-anim', source, 'Roar', target);
+		},
+		onAfterMoveSecondarySelf(pokemon, target, move) {
+			this.heal(pokemon.maxhp / 2, pokemon, pokemon, move);
+		},
+		forceSwitch: true,
+		selfSwitch: true,
+		secondary: null,
+		target: "normal",
+		type: "Dark",
 	},
 
 	// Mitsuki
@@ -2245,6 +2613,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		onTry(source, target) {
 			if (!target.side.addSlotCondition(target, 'futuremove')) {
 				source.switchFlag = 'disconnect' as ID;
+				return false;
 			} else {
 				Object.assign(target.side.slotConditions[target.position]['futuremove'], {
 					move: 'disconnect',
@@ -2303,7 +2672,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	// Struchni
 	veto: {
 		accuracy: 100,
-		basePower: 120,
+		basePower: 70,
 		category: "Physical",
 		desc: "Struchni only. Move's base power and priority depends on effectiveness of previous move.",
 		shortDesc: "Struchni: Move BP and prio depends on eff of prev move.",
@@ -2508,6 +2877,49 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Normal",
 	},
 
+	// trace
+	herocreation: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "The user switches out and raises the incoming Pokémon attack and special attack stat by one stage.",
+		shortDesc: "The user switches out and raises the incoming Pokémon attack and special attack stat by one stage.",
+		name: "Hero Creation",
+		pp: 10,
+		priority: -6,
+		flags: {snatch: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Teleport', source);
+			this.add('-anim', source, 'Work Up', source);
+		},
+		selfSwitch: true,
+		sideCondition: 'herocreation',
+		condition: {
+			duration: 1,
+			onStart(side, source) {
+				this.debug('Hero Creation started on ' + side.name);
+				this.effectData.positions = [];
+				for (const i of side.active.keys()) {
+					this.effectData.positions[i] = false;
+				}
+				this.effectData.positions[source.position] = true;
+			},
+			onRestart(side, source) {
+				this.effectData.positions[source.position] = true;
+			},
+			onSwitchInPriority: 1,
+			onSwitchIn(target) {
+				this.boost({atk: 1, spa: 1}, target);
+			},
+		},
+		secondary: null,
+		target: "self",
+		type: "Psychic",
+	},
+
 	// Trickster
 	soulshatteringstare: {
 		accuracy: true,
@@ -2612,7 +3024,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		onHit(target, source, move) {
 			if (target.trySetStatus('brn', source, move)) {
-				source.heal(source.baseMaxhp / 3);
+				this.heal(source.baseMaxhp * 0.33, source);
 				return;
 			}
 			return false;
@@ -2635,8 +3047,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		priority: 0,
 		flags: {protect: 1},
 		onTryMovePriority: 100,
-		onTryMove() {
+		onTryMove(source) {
 			this.attrLastMove('[still]');
+			if (source.name !== 'yuki') {
+				this.add('-fail', source);
+				this.hint("Only yuki can use Class Change.");
+				return null;
+			}
 		},
 		onPrepareHit(foe, source, move) {
 			let animation: string;
@@ -2673,27 +3090,27 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				if (target.boosts.atk === -6) return false;
 				const atk = target.getStat('atk', false, true);
 				const success = this.boost({atk: -1}, target, source, null, false, true);
-				changeSet(this, target, ssbSets['yuki-Cleric']);
+				changeSet(this, source, ssbSets['yuki-Cleric']);
 				this.add('-message', 'yuki patches up her wounds!');
 				return !!(this.heal(atk, source, target) || success);
 			case 'Ninja':
 				target.addVolatile('confusion');
-				changeSet(this, target, ssbSets['yuki-Ninja']);
+				changeSet(this, source, ssbSets['yuki-Ninja']);
 				this.add('-message', `yuki's fast movements confuse ${target.name}!`);
 				return;
 			case 'Dancer':
 				this.boost({atk: -2}, target, source, this.effect, false, true);
-				changeSet(this, target, ssbSets['yuki-Dancer']);
+				changeSet(this, source, ssbSets['yuki-Dancer']);
 				this.add('-message', `yuki dazzles ${target.name} with her moves!`);
 				return;
 			case 'Songstress':
 				target.trySetStatus('slp');
-				changeSet(this, target, ssbSets['yuki-Songstress']);
+				changeSet(this, source, ssbSets['yuki-Songstress']);
 				this.add('-message', `yuki sang an entrancing melody!`);
 				return;
 			case 'Jester':
 				this.boost({atk: -2}, target, source, this.effect, false, true);
-				changeSet(this, target, ssbSets['yuki-Jester']);
+				changeSet(this, source, ssbSets['yuki-Jester']);
 				this.add('-message', `yuki tries her best to impress ${target.name}!`);
 				return;
 			default:

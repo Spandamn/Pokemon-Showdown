@@ -5,7 +5,7 @@ import {SSBSet, ssbSets} from "./random-teams";
  * @param pokemon the Pokemon to assign the set to
  * @param newSet the SSBSet to assign
  */
-export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet) {
+export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet, changeAbility = false) {
 	// For some reason EVs and IVs in an SSBSet can be undefined...
 	const evs: StatsTable = {
 		hp: newSet.evs?.hp || 0,
@@ -27,6 +27,7 @@ export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet) {
 	pokemon.set.ivs = ivs;
 	if (newSet.nature) pokemon.set.nature = Array.isArray(newSet.nature) ? context.sample(newSet.nature) : newSet.nature;
 	pokemon.formeChange(newSet.species, context.effect, true);
+	if (changeAbility) pokemon.setAbility(newSet.ability as string);
 
 	pokemon.baseMaxhp = Math.floor(Math.floor(
 		2 * pokemon.species.baseStats.hp + pokemon.set.ivs.hp + Math.floor(pokemon.set.evs.hp / 4) + 100
@@ -37,18 +38,28 @@ export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet) {
 	let item = newSet.item;
 	if (typeof item !== 'string') item = item[Math.floor(Math.random() * item.length)];
 	pokemon.setItem(item);
+	const newMoves = changeMoves(context, pokemon, newSet.moves.concat(newSet.signatureMove));
+	pokemon.moveSlots = newMoves;
+	// @ts-ignore Necessary so Robb576 doesn't get 8 moves
+	pokemon.baseMoveSlots = newMoves;
+}
 
+/**
+ * Assigns new moves to a Pokemon
+ * @param pokemon The Pokemon whose moveset is to be modified
+ * @param newSet The set whose moves should be assigned
+ */
+export function changeMoves(context: Battle, pokemon: Pokemon, newMoves: (string | string[])[]) {
 	const carryOver = pokemon.moveSlots.slice().map(m => m.pp / m.maxpp);
 	// In case there are ever less than 4 moves
 	while (carryOver.length < 4) {
 		carryOver.push(1);
 	}
-	pokemon.moveSlots = [];
-	// @ts-ignore hack to prevent 8-move Robb
-	pokemon.baseMoveSlots = [];
+	const result = [];
 	let slot = 0;
-	for (const newMove of newSet.moves.concat(newSet.signatureMove)) {
-		const move = pokemon.battle.dex.getMove(toID(newMove));
+	for (const newMove of newMoves) {
+		const moveName = Array.isArray(newMove) ? newMove[context.random(newMove.length)] : newMove;
+		const move = pokemon.battle.dex.getMove(context.toID(moveName));
 		if (!move.id) continue;
 		const moveSlot = {
 			move: move.name,
@@ -60,10 +71,10 @@ export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet) {
 			disabledSource: '',
 			used: false,
 		};
-		pokemon.baseMoveSlots.push(moveSlot);
-		pokemon.moveSlots.push(moveSlot);
+		result.push(moveSlot);
 		slot++;
 	}
+	return result;
 }
 
 export const Abilities: {[k: string]: ModdedAbilityData} = {
@@ -131,6 +142,25 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			pokemon.maxhp = newMaxHP;
 			this.add('-heal', pokemon, pokemon.getHealth, '[silent]');
 		},
+	},
+
+	// aegii
+	newstage: {
+		desc: "Stance Change; Haze, Heal Bell and Embargo start on switch in.",
+		shortDesc: "Stance Change; Haze, Heal Bell and Embargo start on switch in.",
+		onBeforeMovePriority: 0.5,
+		onBeforeMove(attacker, defender, move) {
+			if (attacker.species.baseSpecies !== 'Aegislash' || attacker.transformed) return;
+			if (move.category === 'Status' && move.id !== 'kingsshield' && move.id !== 'kshield') return;
+			const targetForme = (move.id === 'kingsshield' || move.id === 'kshield' ? 'Aegislash' : 'Aegislash-Blade');
+			if (attacker.species.name !== targetForme) attacker.formeChange(targetForme);
+		},
+		onStart(pokemon) {
+			this.useMove('Haze', pokemon);
+			this.useMove('Heal Bell', pokemon);
+			this.useMove('Embargo', pokemon);
+		},
+		name: "New Stage",
 	},
 
 	// Aeonic
@@ -213,6 +243,61 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		name: "Fortifications",
 	},
 
+	// Annika
+	overprotective: {
+		desc: "If this Pokemon is the last unfainted team member, its Speed is raised by 1 stage.",
+		shortDesc: "+1 Speed on switch-in if all other team members have fainted.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side.pokemonLeft === 1) this.boost({spe: 1});
+		},
+		name: "Overprotective",
+	},
+
+	// A Quag To The Past
+	carefree: {
+		shortDesc: "Magic Bounce + Unaware.",
+		onAnyModifyBoost(boosts, pokemon) {
+			const unawareUser = this.effectData.target;
+			if (unawareUser === pokemon) return;
+			if (unawareUser === this.activePokemon && pokemon === this.activeTarget) {
+				boosts['def'] = 0;
+				boosts['spd'] = 0;
+				boosts['evasion'] = 0;
+			}
+			if (pokemon === this.activePokemon && unawareUser === this.activeTarget) {
+				boosts['atk'] = 0;
+				boosts['def'] = 0;
+				boosts['spa'] = 0;
+				boosts['accuracy'] = 0;
+			}
+		},
+		onTryHitPriority: 1,
+		onTryHit(target, source, move) {
+			if (target === source || move.hasBounced || !move.flags['reflectable']) {
+				return;
+			}
+			const newMove = this.dex.getActiveMove(move.id);
+			newMove.hasBounced = true;
+			newMove.pranksterBoosted = false;
+			this.useMove(newMove, target, source);
+			return null;
+		},
+		onAllyTryHitSide(target, source, move) {
+			if (target.side === source.side || move.hasBounced || !move.flags['reflectable']) {
+				return;
+			}
+			const newMove = this.dex.getActiveMove(move.id);
+			newMove.hasBounced = true;
+			newMove.pranksterBoosted = false;
+			this.useMove(newMove, this.effectData.target, source);
+			return null;
+		},
+		condition: {
+			duration: 1,
+		},
+		name: "Carefree",
+	},
+
 	// a random duck
 	galewingsv1: {
 		desc: "If this Pokemon is at full HP, its Flying-type moves have their priority increased by 1.",
@@ -274,6 +359,17 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// biggie
+	superarmor: {
+		shortDesc: "Reduces damage taken from physical moves by 25% if the user has not yet attacked.",
+		onSourceModifyDamage(damage, source, target, move) {
+			if (this.queue.willMove(target) && move.category === 'Physical') {
+				return this.chainModify(0.75);
+			}
+		},
+		name: "Super Armor",
+	},
+
 	// cant say
 	ragequit: {
 		desc: "If Pokemon with this ability uses a move that misses or fails it faints and gives -2 Atk / -2 SpA to foe",
@@ -287,6 +383,16 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 					this.boost({atk: -2, spa: -2}, pokemon.side.foe.active[0], pokemon);
 				}
 			}
+		},
+	},
+
+	// Celine
+	guardianarmor: {
+		desc: "Raises Defense and Special Defense by two stages upon switch in.",
+		shortDesc: "+2 Def and SpD on switch in.",
+		name: "Guardian Armor",
+		onStart(pokemon) {
+			this.boost({def: 2, spd: 2}, pokemon);
 		},
 	},
 
@@ -553,6 +659,40 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// Hydro
+	hydrostatic: {
+		desc: "This Pokemon is immune to Water- and Electric-type moves and raises its Special Attack by 1 stage when hit by a Water- or Electric-type move. If this Pokemon is not the target of a single-target Water- or Electric-type move used by another Pokemon, this Pokemon redirects that move to itself if it is within the range of that move. This Pokemon's Water- and Electric-type moves have their accuracy multiplied by 1.3.",
+		shortDesc: "Storm Drain + Lightning Rod. Water/Electric moves used by this Pokemon have 1.3x acc.",
+		onSourceModifyAccuracyPriority: 9,
+		onSourceModifyAccuracy(accuracy, source, target, move) {
+			if (typeof accuracy !== 'number') return;
+			if (!['Water', 'Electric'].includes(move.type)) return;
+			this.debug('hydrostatic - enhancing accuracy');
+			return accuracy * 1.3;
+		},
+		onTryHit(target, source, move) {
+			if (target !== source && ['Water', 'Electric'].includes(move.type)) {
+				if (!this.boost({spa: 1})) {
+					this.add('-immune', target, '[from] ability: Hydrostatic');
+				}
+				return null;
+			}
+		},
+		onAnyRedirectTarget(target, source, source2, move) {
+			if (!['Water', 'Electric'].includes(move.type) ||
+				['firepledge', 'grasspledge', 'waterpledge'].includes(move.id)) return;
+			const redirectTarget = ['randomNormal', 'adjacentFoe'].includes(move.target) ? 'normal' : move.target;
+			if (this.validTarget(this.effectData.target, source, redirectTarget)) {
+				if (move.smartTarget) move.smartTarget = false;
+				if (this.effectData.target !== target) {
+					this.add('-activate', this.effectData.target, 'ability: Hydrostatic');
+				}
+				return this.effectData.target;
+			}
+		},
+		name: "Hydrostatic",
+	},
+
 	// Inactive
 	dragonscale: {
 		shortDesc: "If this Pokemon gets statused, its Def is 1.5x and it restores 25% HP.",
@@ -609,13 +749,10 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
-	// Jett x_x
+	// Jett x~x
 	deceiver: {
-		desc: "This Pokemon's moves that match one of its types have a same-type attack bonus of 2 instead of 1.5. If this Pokemon is at full HP, it survives one hit with at least 1 HP. Upon switching in, this Pokemon's Speed is raised by 1 stage.",
-		shortDesc: "Adaptability + Sturdy. +1 Speed on switch in.",
-		onStart() {
-			this.boost({spe: 1}); // User has asked to remove this if its too strong in playtesting
-		},
+		desc: "This Pokemon's moves that match one of its types have a same-type attack bonus of 2 instead of 1.5. If this Pokemon is at full HP, it survives one hit with at least 1 HP.",
+		shortDesc: "Adaptability + Sturdy.",
 		onModifyMove(move) {
 			move.stab = 2;
 		},
@@ -677,6 +814,24 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// KennedyLFC
+	falsenine: {
+		desc: "This Pokemon's type changes to match the type of the move it is about to use. This effect comes after all effects that change a move's type. This Pokemon's critical hit ratio is raised by 1 stage.",
+		shortDesc: "Pokemon's type changes to match the type of the move it's about to use. +1 crit ratio.",
+		onPrepareHit(source, target, move) {
+			if (move.hasBounced) return;
+			const type = move.type;
+			if (type && type !== '???' && source.getTypes().join() !== type) {
+				if (!source.setType(type)) return;
+				this.add('-start', source, 'typechange', type, '[from] ability: Libero');
+			}
+		},
+		onModifyCritRatio(critRatio) {
+			return critRatio + 1;
+		},
+		name: "False Nine",
+	},
+
 	// KingSwordYT
 	bambookingdom: {
 		desc: "On switch-in, this Pokemon's Defense and Special Defense are raised by 1 stage. Pokemon using physical moves against this Pokemon lose 1/8 of their maximum HP. Pokemon using special moves against this Pokemon lose 1/16 of their maximum HP. Attacking moves have their priority set to -7.",
@@ -709,7 +864,6 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			pokemon.addVolatile('tension');
 		},
 		condition: {
-			duration: 1,
 			onStart(pokemon, source, effect) {
 				if (effect && (['imposter', 'psychup', 'transform'].includes(effect.id))) {
 					this.add('-start', pokemon, 'move: Tension', '[silent]');
@@ -720,16 +874,57 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			onModifyCritRatio(critRatio) {
 				return 5;
 			},
-			onSourceInvulnerabilityPriority: 1,
-			onSourceInvulnerability(target, source, move) {
-				if (move && source === this.effectData.target && target === this.effectData.source) return 0;
+			onAnyInvulnerability(target, source, move) {
+				if (move && (source === this.effectData.target || target === this.effectData.target)) return 0;
 			},
-			onSourceAccuracy(accuracy, target, source, move) {
-				if (move && source === this.effectData.target && target === this.effectData.source) return true;
+			onAnyAccuracy(accuracy, target, source, move) {
+				if (move && (source === this.effectData.target || target === this.effectData.target)) {
+					return true;
+				}
+				return accuracy;
+			},
+			onAfterMove(pokemon, source) {
+				pokemon.removeVolatile('tension');
 			},
 			onEnd(pokemon) {
 				this.add('-end', pokemon, 'move: Tension', '[silent]');
 			},
+		},
+	},
+
+	// Marshmallon
+	stubbornness: {
+		desc: "this Pokemon does not take recoil damage; its Atk, Def, and SpD are immediately raised by 1 at the first instance that an opponent's stat is raised; after this, each time an opponent's has its stats boosted, the user gains +1 Atk.",
+		shortDesc: "Rock Head + boosts its Atk, Def, SpD by 1 on opponents first stat boost; after which with every of opponent's stat boost it raises its Atk by 1.",
+		name: "Stubbornness",
+		onDamage(damage, target, source, effect) {
+			if (effect.id === 'recoil') {
+				if (!this.activeMove) throw new Error("Battle.activeMove is null");
+				if (this.activeMove.id !== 'struggle') return null;
+			}
+		},
+		onSwitchOut(pokemon) {
+			if (pokemon.m.happened) delete pokemon.m.happened;
+		},
+		onFoeAfterBoost(boost, target, source, effect) {
+			const pokemon = source.side.foe.active[0];
+			let success = false;
+			let i: BoostName;
+			for (i in boost) {
+				if (boost[i]! > 0) {
+					success = true;
+				}
+			}
+			// Infinite Loop preventer
+			if (effect.id === 'stubbornness') return;
+			if (success) {
+				if (!pokemon.m.happened) {
+					this.boost({atk: 1, def: 1, spd: 1}, pokemon);
+					pokemon.m.happened = true;
+				} else {
+					this.boost({atk: 1}, pokemon);
+				}
+			}
 		},
 	},
 

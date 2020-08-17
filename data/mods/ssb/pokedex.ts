@@ -11,6 +11,15 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 		inherit: true,
 		abilities: {0: 'Scyphozoa'},
 	},
+	// aegii
+	aegislash: {
+		inherit: true,
+		abilities: {0: 'New Stage'},
+	},
+	aegislashblade: {
+		inherit: true,
+		abilities: {0: 'New Stage'},
+	},
 	// Aeonic
 	nosepass: {
 		inherit: true,
@@ -20,6 +29,11 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 	lotad: {
 		inherit: true,
 		baseStats: {hp: 40, atk: 70, def: 70, spa: 80, spd: 90, spe: 70},
+	},
+	// A Quag To The Past
+	quagsire: {
+		inherit: true,
+		baseStats: {hp: 95, atk: 65, def: 85, spa: 65, spd: 85, spe: 35},
 	},
 	// a random duck
 	ducklett: {
@@ -62,6 +76,12 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 		eggGroups: ["Bug"],
 		requiredItem: "Ice Stone",
 	},
+	// Hydro
+	pichu: {
+		inherit: true,
+		types: ["Electric", "Water"],
+		baseStats: {hp: 20, atk: 80, def: 55, spa: 75, spd: 75, spe: 100},
+	},
 	// Kaiju Bunny
 	lopunnymega: {
 		inherit: true,
@@ -79,11 +99,6 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 	banette: {
 		inherit: true,
 		types: ["Ghost", "Normal"],
-	},
-	// OM~!
-	magneton: {
-		inherit: true,
-		types: ['Electric', 'Steel', 'Flying'],
 	},
 	// Overneat
 	absolmega: {

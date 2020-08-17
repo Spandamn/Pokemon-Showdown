@@ -925,15 +925,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 		onFoeAfterBoost(boost, target, source, effect) {
 			const pokemon = target.side.foe.active[0];
-			let success = false;
-			let i: BoostName;
-			for (i in boost) {
-				if (boost[i]! > 0) {
-					success = true;
-				}
-			}
 			// Infinite Loop preventer
-			if (effect.id === 'stubbornness' || effect.id === 'speedcontrol') return;
+			if (effect.id === 'speedcontrol' || effect.id === 'stubbornness') return;
 			if (success) {
 				if (!pokemon.m.happened) {
 					this.boost({atk: 1, def: 1, spd: 1}, pokemon);

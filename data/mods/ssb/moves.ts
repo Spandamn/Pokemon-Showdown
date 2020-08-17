@@ -2,7 +2,6 @@ import {getName} from './conditions';
 // Used for grimAuxiliatrix's move
 import {ssbSets} from "./random-teams";
 import {changeSet, changeMoves} from "./abilities";
-import { PokemonSources } from '../../../sim/team-validator';
 
 export const Moves: {[k: string]: ModdedMoveData} = {
 	/*

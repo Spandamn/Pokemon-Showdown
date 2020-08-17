@@ -99,7 +99,7 @@ export const ssbSets: SSBSets = {
 		species: 'Tapu Fini', ability: 'Misty Surge', item: 'Misty Seed', gender: '',
 		moves: ['Heal Order', 'Sparkling Aria', ['Clear Smog', 'Moonblast']],
 		signatureMove: 'Radiant Burst',
-		evs: {hp: 252, def: 252, spe: 4}, ivs: {atk: 0}, nature: 'Jolly',
+		evs: {hp: 252, def: 252, spe: 4}, ivs: {atk: 0}, nature: 'Bold',
 	},
 	ArchasTL: {
 		species: 'Naviathan', ability: 'Indomitable', item: 'Iron Plate', gender: 'F',

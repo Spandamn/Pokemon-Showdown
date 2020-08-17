@@ -456,7 +456,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		accuracy: true,
 		basePower: 10,
 		category: "Special",
-		desc: "Move causes Tapu Fini to become Briilliant if not, and vice versa. Move Mode depends on whether Tapu Fini is Briilliant or not.",
+		desc: "Move causes Tapu Fini to become Brilliant if not, and vice versa. Move Mode depends on whether Tapu Fini is Brilliant or not.",
 		shortDesc: "Move's Mode depends on whether Tapu Fini has the Brilliant condition or not.",
 		name: "Radiant Burst",
 		pp: 16,

@@ -137,6 +137,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Never Lucky',
 		evs: {hp: 248, def: 36, spe: 224}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	Celestial: {
+		species: 'Dragonite', ability: 'Speed Control', item: 'Metal Coat', gender: '',
+		moves: ['Swords Dance', 'Thousand Arrows', 'Double Iron Bash'],
+		signatureMove: 'Pandora\'s Box',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
+	},
 	Celine: {
 		species: 'Lucario', ability: 'Guardian Armor', item: 'Leftovers', gender: 'F',
 		moves: ['Wish', 'Teleport', 'Drain Punch'],
@@ -643,6 +649,7 @@ export class RandomStaffBrosTeams extends RandomTeams {
 			set.moves.push(ssbSet.signatureMove);
 
 			// Any set specific tweaks occur here.
+			if (set.name === 'Celestial' && this.random(2) === 0) set.shiny = true;
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
 			if (set.name === 'aegii' && this.randomChance(1, 2)) {
 				set.moves[set.moves.indexOf('Shadow Claw')] = 'Shadow Ball';

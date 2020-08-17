@@ -386,6 +386,23 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// Celestial
+	speedcontrol: {
+		desc: "Any time any stat is changed (increased or decreased by any number of stages), this pokemon's speed is raised by 1 stage.",
+		shortDesc: "Any time any stat is changed, this pokemon's speed is raised by 1 stage.",
+		name: "Speed Control",
+		onAfterBoost(boost, target, source, effect) {
+			if (effect.id === 'speedcontrol') return;
+			this.boost({spe: 1});
+		},
+		onFoeAfterBoost(boost, target, source, effect) {
+			const pokemon = source.side.foe.active[0];
+			// Infinite Loop preventer
+			if (effect.id === 'speedcontrol') return;
+			this.boost({spe: 1}, pokemon);
+		},
+	},
+
 	// Celine
 	guardianarmor: {
 		desc: "Raises Defense and Special Defense by two stages upon switch in.",

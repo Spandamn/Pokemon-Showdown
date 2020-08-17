@@ -396,9 +396,9 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.boost({spe: 1});
 		},
 		onFoeAfterBoost(boost, target, source, effect) {
-			const pokemon = source.side.foe.active[0];
+			const pokemon = target.side.foe.active[0];
 			// Infinite Loop preventer
-			if (effect.id === 'speedcontrol') return;
+			if (effect.id === 'speedcontrol' || effect.id === 'stubbornness') return;
 			this.boost({spe: 1}, pokemon);
 		},
 	},
@@ -924,7 +924,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (pokemon.m.happened) delete pokemon.m.happened;
 		},
 		onFoeAfterBoost(boost, target, source, effect) {
-			const pokemon = source.side.foe.active[0];
+			const pokemon = target.side.foe.active[0];
 			let success = false;
 			let i: BoostName;
 			for (i in boost) {
@@ -933,7 +933,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				}
 			}
 			// Infinite Loop preventer
-			if (effect.id === 'stubbornness') return;
+			if (effect.id === 'stubbornness' || effect.id === 'speedcontrol') return;
 			if (success) {
 				if (!pokemon.m.happened) {
 					this.boost({atk: 1, def: 1, spd: 1}, pokemon);

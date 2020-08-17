@@ -703,7 +703,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				};
 				const foe = target.side.foe;
 				const types = [foe.pokemon[this.random(foe.pokemon.length)].types[0]];
-				for (let pokemon of foe.pokemon) {
+				for (const pokemon of foe.pokemon) {
 					if (!types.includes(pokemon.types[0])) {
 						types.push(pokemon.types[0]);
 						break;
@@ -712,8 +712,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				const moves = [typeMovePair[types[0]], typeMovePair[types[1]]];
 				target.m.replacedMoves = [typeMovePair[types[0]], typeMovePair[types[1]]];
 				this.effectData.moveToUse = moves[this.random(2)];
-				for (let i in target.moveSlots) {
-					const moveSlot = target.moveSlots[i];
+				for (const moveSlot of target.moveSlots) {
 					if (!(moveSlot.id === 'swordsdance' || moveSlot.id === 'pandorasbox')) continue;
 					if (!target.m.backupMoves) {
 						target.m.backupMoves = [this.dex.deepClone(moveSlot)];
@@ -722,7 +721,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					}
 					const moveData = this.dex.getMove(this.toID(moves.pop()));
 					if (!moveData.id) continue;
-					target.moveSlots[i] = {
+					target.moveSlots[target.moveSlots.indexOf(moveSlot)] = {
 						move: moveData.name,
 						id: moveData.id,
 						pp: ((moveData.noPPBoosts || moveData.isZ) ? Math.floor(moveData.pp * (moveSlot.pp / moveSlot.maxpp)) : moveData.pp * 8 / 5),
@@ -742,16 +741,15 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				}
 			},
 			onEnd(pokemon) {
-				if(!pokemon.m.backupMoves) return;
-				for (const i in pokemon.moveSlots) {
-					const moveSlot = pokemon.moveSlots[i];
+				if (!pokemon.m.backupMoves) return;
+				for (const moveSlot of pokemon.moveSlots) {
 					if (!(pokemon.m.replacedMoves.includes(moveSlot.move))) continue;
-					pokemon.moveSlots[i] = pokemon.m.backupMoves.shift();
-					pokemon.moveSlots[i].pp = Math.floor(pokemon.moveSlots[i].maxpp * (moveSlot.pp / moveSlot.maxpp));
+					pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)] = pokemon.m.backupMoves.shift();
+					pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)].pp = Math.floor(pokemon.moveSlots[pokemon.moveSlots.indexOf(moveSlot)].maxpp * (moveSlot.pp / moveSlot.maxpp));
 				}
 				delete pokemon.m.backupMoves;
 				delete pokemon.m.replacedMoves;
-			}
+			},
 		},
 		target: "self",
 		type: "Dragon",

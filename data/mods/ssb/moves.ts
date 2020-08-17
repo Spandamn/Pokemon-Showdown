@@ -724,7 +724,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					target.moveSlots[target.moveSlots.indexOf(moveSlot)] = {
 						move: moveData.name,
 						id: moveData.id,
-						pp: ((moveData.noPPBoosts || moveData.isZ) ? Math.floor(moveData.pp * (moveSlot.pp / moveSlot.maxpp)) : moveData.pp * 8 / 5),
+						pp: Math.floor(moveData.pp * (moveSlot.pp / moveSlot.maxpp)),
 						maxpp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
 						target: moveData.target,
 						disabled: false,

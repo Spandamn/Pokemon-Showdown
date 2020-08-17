@@ -486,10 +486,14 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			if (source.volatiles['brilliant']) return 0;
 		},
 		onHit(target, pokemon) {
-			if (!pokemon.volatiles['brilliant']) pokemon.addVolatile('brilliant');
+			if (!pokemon.volatiles['brilliant']) {
+				pokemon.addVolatile('brilliant');
+			} else {
+				this.add(`c|${getName('Arcticblast')}|YEET`);
+			}
 		},
 		onAfterMove(pokemon, target, move) {
-			if (pokemon.volatiles['brilliant']) pokemon.removeVolatile('briilliant');
+			if (pokemon.volatiles['brilliant']) pokemon.removeVolatile('brilliant');
 		},
 		secondary: null,
 		infiltrates: true,

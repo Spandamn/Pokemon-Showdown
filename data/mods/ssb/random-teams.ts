@@ -649,7 +649,7 @@ export class RandomStaffBrosTeams extends RandomTeams {
 			set.moves.push(ssbSet.signatureMove);
 
 			// Any set specific tweaks occur here.
-			if (set.name === 'Celestial' && this.randomChance(1,2)) set.shiny = true;
+			if (set.name === 'Celestial' && this.randomChance(1, 2)) set.shiny = true;
 			if (set.name === 'quadrophenic') set.moves[this.random(2) + 1] = 'Conversion';
 			if (set.name === 'aegii' && this.randomChance(1, 2)) {
 				set.moves[set.moves.indexOf('Shadow Claw')] = 'Shadow Ball';

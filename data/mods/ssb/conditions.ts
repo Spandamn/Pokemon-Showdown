@@ -172,6 +172,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			if (!pokemon.m.indomitableActivated) pokemon.m.indomitableActivated = false;
 		},
 	},
+	arcticblast: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Arcticblast')}|words are difficult`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Arcticblast')}|oh no`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Arcticblast')}|single battles are bad anyway, why am I here?`);
+		},
+	},
 	arsenal: {
 		noCopy: true,
 		onStart(pokemon) {
@@ -1192,6 +1204,42 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			if (pokemon.m.bigstormcoming) {
 				return this.chainModify([0x4CC, 0x1000]);
 			}
+		},
+	},
+	// Brilliant Condition for Arcticblast
+	brilliant: {
+		name: 'Brilliant',
+		duration: 5,
+		onStart(pokemon) {
+			pokemon.addVolatile("ingrain");
+		},
+		onModifyAtk(atk, pokemon) {
+			return this.chainModify(1.5);
+		},
+		onModifyDef(def, pokemon) {
+			return this.chainModify(1.5);
+		},
+		onModifySpA(spa, pokemon) {
+			return this.chainModify(1.5);
+		},
+		onModifySpD(spd, pokemon) {
+			return this.chainModify(1.5);
+		},
+		onModifySpe(spe, pokemon) {
+			return this.chainModify(1.5);
+		},
+		onUpdate(pokemon) {
+			if (pokemon.status === 'brilliant') {
+				this.add('-activate', pokemon, 'ability: Brilliant');
+				pokemon.removeVolatile('perishsong');
+			}
+		},
+		onTryAddVolatile(status, pokemon) {
+			if (status.id === 'perishsong') return null;
+			if (this.dex.getEffect(status.id).onDisableMove) return null;
+		},
+		onEnd(pokemon) {
+			pokemon.removeVolatile('ingrain');
 		},
 	},
 	// Heavy Hailstorm status support for Alpha

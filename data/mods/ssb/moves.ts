@@ -2,6 +2,7 @@ import {getName} from './conditions';
 // Used for grimAuxiliatrix's move
 import {ssbSets} from "./random-teams";
 import {changeSet, changeMoves} from "./abilities";
+import { PokemonSources } from '../../../sim/team-validator';
 
 export const Moves: {[k: string]: ModdedMoveData} = {
 	/*
@@ -449,6 +450,51 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		secondary: null,
 		target: "normal",
 		type: "Steel",
+	},
+
+	// Arcticblast
+	radiantburst: {
+		accuracy: true,
+		basePower: 10,
+		category: "Special",
+		desc: "Move causes Tapu Fini to become Briilliant if not, and vice versa. Move Mode depends on whether Tapu Fini is Briilliant or not.",
+		shortDesc: "Move's Mode depends on whether Tapu Fini has the Brilliant condition or not.",
+		name: "Radiant Burst",
+		pp: 16,
+		priority: 0,
+		flags: {protect: 1},
+		onTryMovePriority: 100,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			if (source.volatiles['brilliant']) {
+				this.add('-anim', target, 'Recover', target);
+			} else {
+				this.add('-anim', source, 'Diamond Storm', target);
+			}
+		},
+		onModifyMove(move, pokemon) {
+			if (pokemon.volatiles['brilliant']) {
+				move.basePower = 180;
+				move.accuracy = 100;
+				move.type = "Fairy";
+				delete move.infiltrates;
+			}
+		},
+		onModifyPriority(priority, source, target, move) {
+			if (source.volatiles['brilliant']) return 0;
+		},
+		onHit(target, pokemon) {
+			if (!pokemon.volatiles['brilliant']) pokemon.addVolatile('brilliant');
+		},
+		onAfterMove(pokemon, target, move) {
+			if (pokemon.volatiles['brilliant']) pokemon.removeVolatile('briilliant');
+		},
+		secondary: null,
+		infiltrates: true,
+		target: "normal",
+		type: "???",
 	},
 
 	// Arsenal

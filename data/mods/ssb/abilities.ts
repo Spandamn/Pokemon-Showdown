@@ -609,6 +609,30 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
+	// GMars
+	capsulearmor: {
+		desc: "On switch-in, this Pokemon's Attack or Special Attack is raised by 1 stage based on the weaker combined defensive stat of all opposing Pokemon. Attack is raised if their Defense is lower, and Special Attack is raised if their Special Defense is the same or lower.",
+		shortDesc: "On switch-in, Attack or Sp. Atk is raised 1 stage based on the foes' weaker Defense.",
+		name: "Capsule Armor",
+		onCriticalHit: false,
+		onSetStatus(status, target, source, effect) {
+			if (target.species.id !== 'miniormeteor' || target.transformed) return;
+			if ((effect as Move)?.status) {
+				this.add('-immune', target, '[from] ability: Capsule Armor');
+			}
+			return false;
+		},
+		onTryAddVolatile(status, target) {
+			if (target.species.id !== 'miniormeteor' || target.transformed) return;
+			if (status.id !== 'yawn') return;
+			this.add('-immune', target, '[from] ability: Capsule Armor');
+			return null;
+		},
+		onAnyTryMove(source, target, move) {
+			move.ignoreAbility = false;
+		},
+	},
+
 	// GXS
 	virusupload: {
 		desc: "On switch-in, this Pokemon's Attack or Special Attack is raised by 1 stage based on the weaker combined defensive stat of all opposing Pokemon. Attack is raised if their Defense is lower, and Special Attack is raised if their Special Defense is the same or lower.",

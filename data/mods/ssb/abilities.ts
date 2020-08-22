@@ -703,6 +703,8 @@ export const Abilities: {[k: string]: ModdedAbilityData & {gen?: number}} = {
 				return false;
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// GMars

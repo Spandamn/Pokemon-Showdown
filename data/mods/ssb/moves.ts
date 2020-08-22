@@ -480,7 +480,6 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 		pp: 16,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},

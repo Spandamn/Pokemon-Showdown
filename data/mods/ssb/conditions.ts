@@ -1488,7 +1488,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onTrapPokemon(pokemon) {
 			pokemon.tryTrap();
-		},	
+		},
 		onDragOut(pokemon) {
 			this.add('-activate', pokemon, 'move: Ingrain');
 			return null;

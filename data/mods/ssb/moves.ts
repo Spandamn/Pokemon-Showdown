@@ -3,7 +3,7 @@ import {getName} from './conditions';
 import {ssbSets} from "./random-teams";
 import {changeSet, changeMoves} from "./abilities";
 
-export const Moves: {[k: string]: ModdedMoveData} = {
+export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 	/*
 	// Example
 	moveid: {
@@ -13,10 +13,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "", // long description
 		shortDesc: "", // short description, shows up in /dt
 		name: "Move Name",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10, // unboosted PP count
 		priority: 0, // move priority, -6 -> 6
 		flags: {}, // Move flags https://github.com/smogon/pokemon-showdown/blob/master/data/moves.js#L1-L27
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]'); // For custom animations
 		},
@@ -50,10 +51,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If this move is successful and the user has not fainted, the effects of Leech Seed and binding moves end for the user, and all hazards are removed from the user's side of the field. Raises the user's Speed by 1 stage.",
 		shortDesc: "Free user from hazards/bind/Leech Seed; +1 Spe.",
 		name: "Skystriker",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 30,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -106,12 +108,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "King's Shield; except reduces Special Attack or Attack by 2 according to the move used by the opponent. Boosts Attack or Special Attack of user according to its set.",
 		shortDesc: "King's Shield; reduces SpA or Atk by 2 based on move category; Boost users Atk or SpA according to user's set.",
 		name: "K-Shield",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 4,
 		flags: {},
 		stallingMove: true,
 		volatileStatus: 'kshield',
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -190,10 +193,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Power is equal to 20+(X*20), where X is the user's total stat stage changes that are greater than 0. User raises a random stat if it has less than 5 positive stat changes.",
 		shortDesc: "+ 20 power for each of the user's stat boosts. Boosts a random stat if below 5 boosts.",
 		name: "XANA's Keys To Lyoko",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 40,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -232,11 +236,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Sets up Stealth Rock on the opposing side of the field and boosts the user's Attack by 2 stages. Can only be used once per the user's time on the field.",
 		shortDesc: "1 use per switchin. +2 Atk + Stealth Rock.",
 		name: "Looking Cool",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {},
 		volatileStatus: 'lookingcool',
-		onTryMovePriority: 100,
 		onTryMove(target) {
 			if (target.volatiles['lookingcool']) return false;
 			this.attrLastMove('[still]');
@@ -272,10 +277,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Power is equal to 60 + (Number of Raindrops collected * 20). Whether or not this move is successful, the user's Defense and Special Defense decrease by as many stages as Raindrop had increased them, and the user's Raindrop count resets to 0.",
 		shortDesc: "More power with more collected Raindrops.",
 		name: "Lilypad Overflow",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -299,10 +305,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Heals 50% of the user's max HP; Sets up Light Screen for 5 turns on the user's side.",
 		shortDesc: "Heals 50% of the user's max HP; Sets up Light Screen for 5 turns on the user's side.",
 		name: "Ravelin",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -328,10 +335,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "On switch-in, the weather becomes extremely heavy hailstorm lasts for 3 turns that prevents damaging Steel-type moves from executing, causes Ice-type moves to be 50% stronger, causes all non-Ice-type Pokemon on the opposing side to take 1/8 damage from hail, and causes all moves to have a 10% chance to freeze. This weather bypasses Magic Guard and Overcoat. This weather remains in effect until the 3 turns are up, or the weather is changed by Delta Stream, Desolate Land, or Primordial Sea.",
 		shortDesc: "3 Turns. Heavy Hailstorm. Steel fail. 1.5x Ice.",
 		name: "Blistering Ice Age",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 1,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -355,6 +363,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Raises Special Attack by 1 stage and regenerates user and foe movesets, restoring PP.",
 		shortDesc: "Regenerates user, foe movesets; +1 Sp. Atk.",
 		name: "Refactor",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		flags: {authentic: 1},
 		priority: -7,
@@ -379,10 +389,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Puts a bounty on the target. If the target is KOed by a direct attack, the attacker will gain +1 Attack, Defense, Special Attack, Special Defense, and Speed. If the target has a major status condition, it cannot have a bounty placed on it.",
 		shortDesc: "Puts a bounty on the target.",
 		name: "Bounty Place",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 1,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -405,20 +416,26 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Restores 50% HP, 50% Chance to boost Attack OR Speed 1 stage",
 		shortDesc: "Restores 50% HP, 50% Chance to boost Attack OR Speed 1 stage,",
 		name: "Grapes",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {heal: 1},
 		heal: [1, 2],
-		secondary: {
-			chance: 50,
-			self: {
-				onHit(target, source, move) {
-					const boostName: string[] = ['atk', 'spe'];
-					const boost: {[key: string]: number} = {};
-					boost[boostName[this.random(2)]] = 1;
-					this.boost(boost, target);
-				},
-			},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Splash', source);
+			this.add('-anim', source, 'Dragon Dance', source);
+			this.add('-anim', source, 'Roost', source);
+		},
+		onHit(target, source, move) {
+			if (!this.randomChance(1, 2)) return;
+			const boostName: string[] = ['atk', 'spe'];
+			const boost: {[key: string]: number} = {};
+			boost[boostName[this.random(2)]] = 1;
+			this.boost(boost, target);
 		},
 		target: "self",
 		type: "Flying",
@@ -431,10 +448,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		category: "Physical",
 		shortDesc: "Hits 4 times. Super effective on Steel.",
 		name: "Broadside Barrage",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -500,34 +518,48 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "???",
 	},
 
-	// Arsenal
-	vorpalwings: {
+	// Averardo
+	hatofwisdom: {
 		accuracy: 100,
-		basePower: 75,
-		category: "Physical",
-		desc: "Has a 100% chance to raise the user's Speed by 1 stage.",
-		shortDesc: "100% chance to raises the user's Speed by 1.",
-		name: "Vorpal Wings",
-		pp: 20,
+		basePower: 110,
+		category: "Special",
+		desc: "Deals damage two turns after this move is used. At the end of that turn, the damage is calculated at that time and dealt to the Pokemon at the position the target had when the move was used. If the user is no longer active at the time, damage is calculated based on the user's natural Special Attack stat, types, and level, with no boosts from its held item or Ability. Fails if this move or Doom Desire is already in effect for the target's position.",
+		shortDesc: "Hits 1 turn after being used. User switches.",
+		name: "Hat of Wisdom",
+		isNonstandard: "Custom",
+		gen: 8,
+		pp: 15,
 		priority: 0,
-		flags: {protect: 1, contact: 1},
-		onTryMovePriority: 100,
-		onTryMove() {
-			this.attrLastMove('[still]');
-		},
-		onPrepareHit(target, source) {
-			this.add('-anim', source, 'Max Steelspike', target);
-		},
-		secondary: {
-			chance: 100,
-			self: {
-				boosts: {
-					spe: 1,
+		flags: {},
+		ignoreImmunity: true,
+		isFutureMove: true,
+		onTry(source, target) {
+			if (!target.side.addSlotCondition(target, 'futuremove')) return false;
+			Object.assign(target.side.slotConditions[target.position]['futuremove'], {
+				duration: 2,
+				move: 'hatofwisdom',
+				source: source,
+				moveData: {
+					id: 'hatofwisdom',
+					name: "Hat of Wisdom",
+					accuracy: 100,
+					basePower: 110,
+					category: "Special",
+					priority: 0,
+					flags: {},
+					ignoreImmunity: false,
+					effectType: 'Move',
+					isFutureMove: true,
+					type: 'Psychic',
 				},
-			},
+			});
+			this.add('-start', source, 'move: Hat of Wisdom');
+			source.switchFlag = 'hatofwisdom' as ID;
+			return null;
 		},
+		secondary: null,
 		target: "normal",
-		type: "Steel",
+		type: "Psychic",
 	},
 
 	// awa
@@ -538,10 +570,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Sets up Sandstorm.",
 		shortDesc: "Sets up Sandstorm.",
 		name: "awa!",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -562,10 +595,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Gains the ability Compound Eyes and then switches out",
 		shortDesc: "Gains Compound Eyes and switches.",
 		name: "Buzz Inspection",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -591,10 +625,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user loses its focus and does nothing if it is hit by a damaging attack this turn before it can execute the move.",
 		shortDesc: "Fails if the user takes damage before it hits.",
 		name: "Juggernaut Punch",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: -3,
 		flags: {contact: 1, protect: 1, punch: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -636,6 +671,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move combines the user's current typing in its type effectiveness against the target.",
 		shortDesc: "Combines current types in its type effectiveness.",
 		name: "Kevin",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		flags: {protect: 1, mirror: 1},
 		onTryMove() {
@@ -684,10 +721,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Doubles base power if statused. Has a 10% chance to boost every stat 1 stage. High Crit Ratio.",
 		shortDesc: "Doubles base power if statused. Has a 10% chance to boost every stat 1 stage. High Crit Ratio.",
 		name: "Never Lucky",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -716,6 +754,102 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Fire",
 	},
 
+	// Celestial
+	pandorasbox: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Please refer to the guide for details on this move.",
+		shortDesc: "Please refer to the guide for details on this move.",
+		name: "Pandora's Box",
+		isNonstandard: "Custom",
+		gen: 8,
+		pp: 8,
+		priority: 1,
+		flags: {},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Teeter Dance', target);
+		},
+		volatileStatus: 'pandorasbox',
+		condition: {
+			onStart(target) {
+				const typeMovePair: {[key: string]: string} = {
+					'Normal': 'Body Slam',
+					'Fighting': 'Drain Punch',
+					'Flying': 'Floaty Fall',
+					'Poison': 'Baneful Banker',
+					'Ground': 'Shore Up',
+					'Rock': 'Stealth Rock',
+					'Bug': 'Sticky Web',
+					'Ghost': 'Shadow Sneak',
+					'Steel': 'Iron Defense',
+					'Fire': 'Fire Fang',
+					'Water': 'Life Dew',
+					'Grass': 'Synthesis',
+					'Electric': 'Thunder Fang',
+					'Psychic': 'Psychic Fangs',
+					'Ice': 'Icicle Crash',
+					'Dragon': 'Dragon Darts',
+					'Dark': 'Taunt',
+					'Fairy': 'Play Rough',
+				};
+				const foe = target.side.foe;
+				const types = [foe.pokemon[this.random(foe.pokemon.length)].types[0]];
+				for (const pokemon of foe.pokemon) {
+					if (!types.includes(pokemon.types[0])) {
+						types.push(pokemon.types[0]);
+						break;
+					}
+				}
+				const moves = [typeMovePair[types[0]], typeMovePair[types[1]]];
+				target.m.replacedMoves = [typeMovePair[types[0]], typeMovePair[types[1]]];
+				this.effectData.moveToUse = moves[this.random(2)];
+				for (const moveSlot of target.moveSlots) {
+					if (!(moveSlot.id === 'swordsdance' || moveSlot.id === 'pandorasbox')) continue;
+					if (!target.m.backupMoves) {
+						target.m.backupMoves = [this.dex.deepClone(moveSlot)];
+					} else {
+						target.m.backupMoves.push(this.dex.deepClone(moveSlot));
+					}
+					const moveData = this.dex.getMove(this.toID(moves.pop()));
+					if (!moveData.id) continue;
+					target.moveSlots[target.moveSlots.indexOf(moveSlot)] = {
+						move: moveData.name,
+						id: moveData.id,
+						pp: Math.floor(moveData.pp * (moveSlot.pp / moveSlot.maxpp)),
+						maxpp: ((moveData.noPPBoosts || moveData.isZ) ? moveData.pp : moveData.pp * 8 / 5),
+						target: moveData.target,
+						disabled: false,
+						disabledSource: '',
+						used: false,
+					};
+				}
+				target.setAbility('protean');
+			},
+			onResidual(pokemon) {
+				if (this.effectData.moveToUse) {
+					this.useMove(this.effectData.moveToUse, pokemon);
+					delete this.effectData.moveToUse;
+				}
+			},
+			onEnd(pokemon) {
+				if (!pokemon.m.backupMoves) return;
+				for (const [index, moveSlot] of pokemon.moveSlots.entries()) {
+					if (!(pokemon.m.replacedMoves.includes(moveSlot.move))) continue;
+					pokemon.moveSlots[index] = pokemon.m.backupMoves.shift();
+					pokemon.moveSlots[index].pp = Math.floor(pokemon.moveSlots[index].maxpp * (moveSlot.pp / moveSlot.maxpp));
+				}
+				delete pokemon.m.backupMoves;
+				delete pokemon.m.replacedMoves;
+			},
+		},
+		target: "self",
+		type: "Dragon",
+	},
+
 	// Celine
 	statusguard: {
 		accuracy: 100,
@@ -724,12 +858,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Protects from physical moves. If hit by physical move, opponent is either badly poisoned, burned, or paralyzed at random and is forced out. Special attacks and status moves go through this protect.",
 		shortDesc: "Protected from physical attacks. Contact: burn, par, or tox.",
 		name: "Status Guard",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 4,
-		flags: {protect: 1},
+		flags: {},
 		stallingMove: true,
 		volatileStatus: 'statusguard',
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -787,28 +922,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Normal",
 	},
 
-	// Chloe
-	vsni: {
-		accuracy: 55,
-		basePower: 100,
-		category: "Special",
-		desc: "No additional effect.",
-		shortDesc: "No additional effect.",
-		name: "Víðsýni",
-		pp: 5,
-		priority: 1,
-		flags: {protect: 1},
-		onTryMovePriority: 100,
-		onTryMove() {
-			this.attrLastMove('[still]');
-		},
-		onPrepareHit(target, source) {
-			this.add('-anim', source, 'Seed Flare', target);
-		},
-		target: "normal",
-		type: "Grass",
-	},
-
 	// c.kilgannon
 	deathwing: {
 		accuracy: 100,
@@ -817,10 +930,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Lowers the target's Attack by 1 stage. The user restores its HP equal to the target's Attack stat calculated with its stat stage before this move was used. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down. Fails if the target's Attack stat stage is -6.",
 		shortDesc: "User heals HP=target's Atk stat. Lowers Atk by 1.",
 		name: "Death Wing",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, heal: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -846,11 +960,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If the target Pokemon is evolved, this move will reduce the target to its first-stage form. If the target Pokemon is single-stage or is already in its first-stage form, this move deals damage and forces the target out. Hits Ghost types.",
 		shortDesc: "Devolves evolved mons; dmg+forces small mons out.",
 		name: "Devolution Beam",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1},
 		ignoreImmunity: {'Normal': true},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -893,6 +1008,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move type is always the user's secondary typing. If this move is successful, both the target and the user ar forced out, and the user's replacement gets 1/3 of its maximum health restored.",
 		shortDesc: "Type=2nd type,both mons switch,replacement: heal.",
 		name: "Archangel's Requiem",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: -5,
 		flags: {protect: 1, mirror: 1},
@@ -938,10 +1055,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If this move is successful and the user has not fainted, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if there are no unfainted party members, or if the target switched out using an Eject Button or through the effect of the Emergency Exit or Wimp Out Abilities.",
 		shortDesc: "User switches out after damaging the target.",
 		name: "GET OFF MY LAWN!",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: -6,
 		flags: {protect: 1, sound: 1, authentic: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -952,6 +1070,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add(`c|${getName('drampa\'s grandpa')}|GET OFF MY LAWN!!!`);
 		},
 		secondary: null,
+		forceSwitch: true,
 		selfSwitch: true,
 		target: "normal",
 		type: "Normal",
@@ -965,6 +1084,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Raises the user's Special Attack and Special Defense stats by 1 stage and prevents the target from switching out.",
 		shortDesc: "Raises user's SpA and SpD by 1 Prevents foe from switching.",
 		name: "Lock and Key",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
@@ -990,6 +1111,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move is super effective on Steel- and Poison-type Pokemon.",
 		shortDesc: "Super effective on Steel and Poison types.",
 		name: "Navi's Grace",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
@@ -1016,12 +1139,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user restores 1/2 of its maximum HP, rounded half up. For 5 turns, the evasiveness of all active Pokemon is multiplied by 0.6. At the time of use, Bounce, Fly, Magnet Rise, Sky Drop, and Telekinesis end immediately for all active Pokemon. During the effect, Bounce, Fly, Flying Press, High Jump Kick, Jump Kick, Magnet Rise, Sky Drop, Splash, and Telekinesis are prevented from being used by all active Pokemon. Ground-type attacks, Spikes, Toxic Spikes, Sticky Web, and the Arena Trap Ability can affect Flying types or Pokemon with the Levitate Ability. Fails if this move is already in effect.",
 		shortDesc: "Restore 50% HP + set Gravity.",
 		name: "Forced Landing",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {heal: 1},
 		heal: [1, 2],
 		pseudoWeather: 'gravity',
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1042,10 +1166,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Paralyzes target, and take 40% recoil. If the user is fire-type, it burns the target and take 33% recoil.",
 		shortDesc: "Paralyzes target + 40% recoil. Fire: burns target + 33% recoil.",
 		name: "Epic Rage",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1070,6 +1195,66 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Fire",
 	},
 
+	// estarossa
+	sandbalance: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Hippowdon uses Roar, then switches out after forcing out the opposing Pokemon.",
+		shortDesc: "Hippowdon uses Roar, switches out after.",
+		name: "Sand Balance",
+		isNonstandard: "Custom",
+		gen: 8,
+		pp: 10,
+		priority: -6,
+		flags: {authentic: 1, protect: 1, mirror: 1, sound: 1, refractable: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Roar', target);
+			this.add('-anim', source, 'Parting Shot', target);
+		},
+		forceSwitch: true,
+		selfSwitch: true,
+		secondary: null,
+		target: "normal",
+		type: "Ground",
+	},
+
+	// explodingdaisies
+	youhavenohope: {
+		accuracy: 100,
+		basePower: 0,
+		damageCallback(pokemon, target) {
+			return target.getUndynamaxedHP() - pokemon.hp;
+		},
+		onTryImmunity(target, pokemon) {
+			return pokemon.hp < target.hp;
+		},
+		category: "Physical",
+		desc: "Lowers the target's HP to the user's HP. Goes thru Substitute",
+		shortDesc: "Lowers the target's HP to the user's HP.",
+		name: "You Have No Hope!",
+		pp: 1,
+		priority: 0,
+		flags: {authentic: 1, contact: 1, protect: 1, mirror: 1},
+		isNonstandard: "Custom",
+		gen: 8,
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Endeavor', target);
+		},
+		onHit(target, source) {
+			this.add(`c|${getName('explodingdaisies')}|You have no hope ${target.name}!`);
+		},
+		secondary: null,
+		target: "normal",
+		type: "Normal",
+		noPPBoosts: true,
+	},
 	// fart
 	soupstealing7starstrikeredux: {
 		accuracy: 100,
@@ -1084,6 +1269,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move is either a Water, Fire, or Grass type move. The selected type is added to the user of this move. For every consecutive turn that this move is used by at least one Pokemon, this move's power is multiplied by the number of turns to pass, but not more than 5.",
 		shortDesc: "Changes user/move type to fire, water, or grass. Power increases when repeated.",
 		name: "Soup-Stealing 7-Star Strike: Redux",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -1138,6 +1325,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Inverts target's stat boosts if they have any; taunts otherwise. User then switches out.",
 		shortDesc: "Inverts target's stat boosts if they have any; taunts otherwise. User then switches out.",
 		name: "Rigged Dice",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, reflectable: 1, mirror: 1},
@@ -1175,11 +1364,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move and its effects ignore the Abilities of other Pokemon.",
 		shortDesc: "Ignores abilities. Hits adjacent opponents.",
 		name: "Frosty Wave",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, sound: 1, authentic: 1},
 		ignoreAbility: true,
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1200,10 +1390,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Randomly calls SSB and status moves.",
 		shortDesc: "Randomly calls SSB and status moves.",
 		name: "Do Not Steel",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove(target) {
 			this.attrLastMove('[still]');
 		},
@@ -1254,47 +1445,39 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Steel",
 	},
 
-	// GXS
-	datacorruption: {
-		accuracy: 90,
-		basePower: 110,
+	// HoeenHero
+	landfall: {
+		accuracy: 100,
 		category: "Special",
-		desc: "Has a 30% chance to randomly lower one of the target's stats by 1 stage.",
-		shortDesc: "30% chance to randomly lower a foe's stat.",
-		name: "Data Corruption",
+		basePower: 0,
+		basePowerCallback(target, source, move) {
+			const windSpeeds = [65, 85, 85, 95, 95, 95, 95, 115, 115, 140];
+			move.basePower = windSpeeds[this.random(0, 10)];
+			return move.basePower;
+		},
+		desc: "The foe is hit with a hurricane with a Base Power that varies based on the strength (category) of the hurricane. Category 1 is 65, category 2 is 85, category 3 is 95, category 4 is 115, and category 5 is 140. In addition, the target's side of the field is covered in a storm surge. Storm surge applies a 1/4 Speed multiplier to pokemon on that side of the field. Storm surge will last for as many turns as the hurricane's category (not including the turn Landfall was used).",
+		shortDesc: "Higher category = more damage, foe side speed 1/4.",
+		name: "Landfall",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
-			// No animation
+			this.add('-anim', source, 'Hurricane', target);
+			this.add('-anim', source, 'Surf', target);
 		},
-		secondary: {
-			chance: 30,
-			onHit(target) {
-				const stats: BoostName[] = [];
-				let stat: BoostName;
-				for (stat in target.boosts) {
-					if (stat === 'evasion' || stat === 'accuracy') continue;
-					if (target.boosts[stat] > -6) {
-						stats.push(stat);
-					}
-				}
-				if (stats.length) {
-					const randomStat = this.sample(stats);
-					const boost: SparseBoostsTable = {};
-					boost[randomStat] = -1;
-					this.boost(boost);
-				} else {
-					return false;
-				}
-			},
+		onHit(target, source, move) {
+			const windSpeeds = [65, 85, 95, 115, 140];
+			const category = windSpeeds.indexOf(move.basePower) + 1;
+			this.add('-message', `A category ${category} hurricane made landfall!`);
 		},
+		sideCondition: 'stormsurge', // Programmed in conditions.ts
 		target: "normal",
-		type: "Normal",
+		type: "Water",
 	},
 
 	// Hubriz
@@ -1304,10 +1487,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		category: "Status",
 		shortDesc: "Inverts the target's stat stages.",
 		name: "Steroid Anaphylaxia",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 1,
 		flags: {protect: 1, reflectable: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1337,16 +1521,17 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 70% chance to raise the user's Special Attack by 1 stage and a 50% chance to paralyze the target. This move combines Water in its type effectiveness against the target.",
 		shortDesc: "70% boost SpA;50% para;Combine Water in typeeff.",
 		name: "Hydrostatics",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 2,
 		flags: {protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Origin Pulse', target);
-			this.add('-anim', source, 'Crarge Beam', target);
+			this.add('-anim', source, 'Charge Beam', target);
 		},
 		secondaries: [
 			{
@@ -1375,10 +1560,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		category: "Physical",
 		shortDesc: "Has a 15% chance to burn the target.",
 		name: "Paranoia",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1400,10 +1586,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		category: "Special",
 		shortDesc: "No additional effect.",
 		name: "Patrona Attack",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 1,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1431,6 +1618,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Parting Shot, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn.",
 		shortDesc: "Foe: 2x power when switching.",
 		name: "The Hunt is On!",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {contact: 1, protect: 1},
@@ -1492,6 +1681,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Traps the target and lowers its Attack and Defense by two stages.",
 		shortDesc: "Target: trapped, Atk and Def lowered by 2.",
 		name: "Cozy Cuddle",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {},
@@ -1533,11 +1724,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If this move is successful and the user has not fainted, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if there are no unfainted party members, or if the target switched out using an Eject Button or through the effect of the Emergency Exit or Wimp Out Abilities.",
 		shortDesc: "User switches out after damaging the target.",
 		name: "Blackbird",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
 		selfSwitch: true,
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1556,6 +1748,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Hits foe and phazes them out, phaze the next one out and then another one, set a random entry hazard at the end of the move.",
 		shortDesc: "Forces the target to switch to a random ally; this happens two more times; and finally sets up a random entry hazard.",
 		name: "Gaelstrom",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 1,
 		priority: 0,
 		flags: {},
@@ -1595,10 +1789,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 20% chance to burn the target and a 10% chance to flinch it.",
 		shortDesc: "20% chance to burn. 10% chance to flinch.",
 		name: "Top Bins",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1627,10 +1822,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user faints and the Pokemon brought out to replace it gets healing wish effects, 1 boost to attack, defense, special attack and special defense.",
 		shortDesc: "User faints. Replacement gets healed & +1 Atk/Def/SpA/SpD.",
 		name: "Leave it to the team!",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {snatch: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1689,10 +1885,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If this move is successful, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user restores 1/8 of its maximum HP, rounded half up. Target can't use status moves its next 3 turns. Lowers the target's Attack by 1 stages.",
 		shortDesc: "Heals 1/8, taunts, lowers Atk, switches out.",
 		name: "Clash of Pangoros",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, heal: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -1722,6 +1919,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user loses 33% of the damage dealt by this attack. Resets the field by clearing all hazards, terrains, walls, and weather.",
 		shortDesc: "33% recoil; removes hazards/weather/terrain.",
 		name: "Big Bang",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -1771,6 +1970,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If the user is a Toxtricity, it changes into its Low-Key forme and Nasty Plot and Overdrive change to Aura Sphere and Boomburst, respectively. If the user is a Toxtricity in its Low-Key forme, it changes into its Amped forme and Aura Sphere and Boomburst turn into Nasty Plot and Overdrive, respectively. Raises the user's Speed by 1 stage.",
 		shortDesc: "Toxtricity: +1 Speed. Changes forme.",
 		name: "Genre Change",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {sound: 1},
@@ -1810,6 +2011,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Upon damaging the target, the user gains +1 Speed.",
 		shortDesc: "+1 Speed upon hit.",
 		name: "Archeops's Rage",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		flags: {protect: 1},
 		priority: 0,
@@ -1837,10 +2040,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user changes into a random Pokemon with a first name letter that matches the forme Unown is currently in (A -> Alakazam, etc) that has base stats that would benefit from Unown's EV/IV/Nature spread and moves. Using it while in a forme that is not Unown will make it revert back to the Unown forme it transformed in (If an Unown transforms into Alakazam, it'll transform back to Unown-A when used again). Light of Ruin becomes Strange Steam, Psystrike becomes Psyshock, Secret Sword becomes Aura Sphere, Mind Blown becomes Flamethrower, and Seed Flare becomes Apple Acid while in a non-Unown forme.",
 		shortDesc: "Transform into Unown. Unown: Transform into mon.",
 		name: "Alphabet Soup",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove(source) {
 			this.attrLastMove('[still]');
 			if (source.name !== 'Kris') {
@@ -1932,6 +2136,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 30% chance to burn the target. This move's type effectiveness against Steel is changed to be super effective no matter what this move's type is.",
 		shortDesc: "30% chance to burn. Super effective on Steel.",
 		name: "Corrosive Cloud",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -1962,6 +2168,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Heals the user by 50% of its max HP. Forces the target to switch to a random ally. User switches out after.",
 		shortDesc: "Heals the user by 50% of its max HP. Forces the target to switch to a random ally. User switches out after.",
 		name: "RAWWWR",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {reflectable: 1, mirror: 1, sound: 1, authentic: 1, heal: 1},
@@ -1991,10 +2199,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Upon use, this move sets up Stealth Rock on the target's side of the field, as well as setting up Grassy Terrain.",
 		shortDesc: "Sets up Grassy Terrain and Stealth Rock.",
 		name: "Terraforming",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2003,7 +2212,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Ingrain', target);
 			this.add('-anim', source, 'Stealth Rock', target);
 		},
-		terrain: 'grassyterrain',
 		sideCondition: 'stealthrock',
 		secondary: null,
 		target: "normal",
@@ -2018,10 +2226,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 50% chance to torment the opponent.",
 		shortDesc: "Has a 50% chance to torment the opponent.",
 		name: "OwO wuts dis?",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2044,6 +2253,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 100% chance to raise the user's Speed by 1 stage. If the user is a Hoopa in its Confined forme, this move is Psychic type, and Hoopa will change into its Unbound forme. If the user is a Hoopa in its Unbound forme, this move is Dark type, and Hoopa will change into its Confined forme. This move cannot be used successfully unless the user's current form, while considering Transform, is Confined or Unbound Hoopa.",
 		shortDesc: "Hoopa: Psychic; Unbound: Dark; 100% +1 Spe. Changes form.",
 		name: "Unbind",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
@@ -2084,10 +2295,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Raises the user's Defense, Special Attack, and Special Defense by 1 stage.",
 		shortDesc: "Raises the user's Defense, Sp. Atk, Sp. Def by 1.",
 		name: "Mad Hacks",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {snatch: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2112,11 +2324,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Heals 33% of damage dealt. 15% chance to raise Special Attack by 1 stage.",
 		shortDesc: "Heals 33% of damage dealt. 15% chance to raise SpA by 1.",
 		name: "MechOMnism",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, heal: 1},
 		drain: [1, 3],
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2147,9 +2360,10 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Heals foe 50% and eliminates any status problem but it lowers Defense and Special Defense stat by 1 stage, then proceeds to attack the foe.",
 		shortDesc: "Heals foe and gets rid of their status but the foe's Def and SpD by 1, attacks the foe.",
 		name: "Healing you?",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2174,10 +2388,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Removes hazards then user switches out after dealing damage",
 		shortDesc: "Removes hazards then switches out",
 		name: "Rapid Turn",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2221,10 +2436,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Does damage to foes on switch in.",
 		shortDesc: "Stealth Rock but even more complicated.",
 		name: "Shifting Rocks",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {reflectable: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2273,10 +2489,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Imprisons and traps the target, and then transforms into them.",
 		shortDesc: "Imprison + Mean Look + Transform.",
 		name: "Ghost of 1v1 Past",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 1,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2298,6 +2515,31 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Ghost",
 	},
 
+	// piloswine gripado
+	iciclespirits: {
+		accuracy: 100,
+		basePower: 90,
+		category: "Physical",
+		desc: "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
+		shortDesc: "User recovers 50% of the damage dealt.",
+		name: "Icicle Spirits",
+		isNonstandard: "Custom",
+		gen: 8,
+		pp: 10,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1, heal: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Horn Leech', target);
+		},
+		drain: [1, 2],
+		secondary: null,
+		target: "normal",
+		type: "Ice",
+	},
+
 	// PiraTe Princess
 	dungeonsdragons: {
 		accuracy: true,
@@ -2306,10 +2548,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Prevents the target from switching out and adds Dragon to the target's type. Has a 5% chance to either confuse the user or guarantee that the next attack is a critical hit, 15% chance to raise the user's Attack, Defense, Special Attack, Special Defense, or Speed by 1 stage, and a 15% chance to raise user's Special Attack and Speed by 1 stage.",
 		shortDesc: "Target: can't switch,+Dragon. Does other things.",
 		name: "Dungeons & Dragons",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2350,10 +2593,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Super effective against pokemon that are supereffective against it. 20% chance do a random effect depending on user's type.",
 		shortDesc: "20% chance to a different effect depending on type.",
 		name: "Extreme Ways",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2446,10 +2690,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 30% chance to boost the user's Speed by 1 stage.",
 		shortDesc: "30% chance to boost the user's Spe by 1.",
 		name: "Psycho Drive",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2466,6 +2711,36 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Psychic",
 	},
 
+	// Raj.Shoot
+	fanservice: {
+		accuracy: 100,
+		basePower: 90,
+		category: "Physical",
+		desc: "The user gets its Attack and Speed raised by 1 stage before using this move. If the user is a Swampert in its base form, it will Mega Evolve.",
+		shortDesc: "+1 Atk/Spe before moving. Mega evolves user.",
+		name: "Fan Service",
+		isNonstandard: "Custom",
+		gen: 8,
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Sacred Fire', target);
+		},
+		onHit(target, source) {
+			if (source.species.id === 'swampert') {
+				this.runMegaEvo(source);
+			}
+		},
+		// stat boosting implemented in custom status
+		secondary: null,
+		target: "normal",
+		type: "Fire",
+	},
+
 	// Ransei
 	ripsei: {
 		accuracy: 100,
@@ -2478,10 +2753,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Deals damage to the target equal to the user's current HP. If this move is successful, the user faints.",
 		shortDesc: "Does damage equal to the user's HP. User faints.",
 		name: "ripsei",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 1,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2506,6 +2782,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move becomes a physical attack if the user's Attack is greater than its Special Attack, including stat stage changes. This move and its effects ignore the Abilities of other Pokemon.",
 		shortDesc: "Physical if user's Atk > Sp. Atk. Ignores Abilities.",
 		name: "Integer Overflow",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 1,
 		priority: 0,
 		flags: {},
@@ -2532,10 +2810,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move hits three times. Every hit has a 20% chance to drop the target's SpD by 1 stage.", // long description
 		shortDesc: "Hits three times. Every hit has a 20% chance to drop the target's SpD by 1 stage.",
 		name: "Mode [5: Offensive]",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2561,11 +2840,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move cures the user's party of all status conditions, and then forces the target to switch to a random ally.",
 		shortDesc: "Cures the user's party of all status conditions; and then forces the target to switch to a random ally.",
 		name: "Mode [7: Defensive]",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0, // should be -6, waiting on QC
 		flags: {sound: 1, distance: 1, authentic: 1},
 		forceSwitch: true,
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2595,10 +2875,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
 		shortDesc: "Raises the Special Attack of the user, and either Defense or Special Defense randomly.",
 		name: "Homunculus's Vanity",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {snatch: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2631,11 +2912,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Deals damage two turns after this move is used. At the end of that turn, the damage is calculated at that time and dealt to the Pokemon at the position the target had when the move was used. If the user is no longer active at the time, damage is calculated based on the user's natural Special Attack stat, types, and level, with no boosts from its held item or Ability. Fails if this move, Doom Desire, or Future Sight is already in effect for the target's position. Switches the user out.",
 		shortDesc: "Hits 2 turns after use. User switches out.",
 		name: "Disconnect",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {},
 		isFutureMove: true,
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2653,6 +2935,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					moveData: {
 						id: 'disconnect',
 						name: "Disconnect",
+						isNonstandard: "Custom",
+						gen: 8,
 						accuracy: 100,
 						basePower: 150,
 						category: "Special",
@@ -2664,7 +2948,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 					},
 				});
 				this.add('-start', source, 'Disconnect');
-				this.add(`c|%Segmr|Lemme show you this`);
+				this.add(`c|${getName('Segmr')}|Lemme show you this`);
 				source.switchFlag = 'disconnect' as ID;
 				return null;
 			}
@@ -2682,6 +2966,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move ignores type effectiveness, substitutes, opposing side's Reflect, Light Screen, Safeguard, Mist and Aurora Veil.",
 		shortDesc: "Ignores type effectiveness, substitutes, opposing side's Reflect, Light Screen, Safeguard, Mist and Aurora Veil.",
 		name: "Shade Uppercut",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
@@ -2709,10 +2995,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Struchni only. Move's base power and priority depends on effectiveness of previous move.",
 		shortDesc: "Struchni: Move BP and prio depends on eff of prev move.",
 		name: "Veto",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove(source) {
 			this.attrLastMove('[still]');
 			if (source.name !== 'Struchni') {
@@ -2769,10 +3056,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "User takes 40% recoil damage.",
 		shortDesc: "Has 40% recoil.",
 		name: "One For All: Full Cowl - 100%",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 30,
 		priority: 0,
 		flags: {contact: 1, protect: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2792,6 +3080,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user restores 1/2 of its maximum HP, rounded half up. Raises the user's Special Attack by 1 stage.",
 		shortDesc: "Heals user by 50% and raises Sp. Atk 1 stage.",
 		name: "Ten",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {snatch: 1, heal: 1},
@@ -2811,6 +3101,34 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Psychic",
 	},
 
+	// tennisace
+	corgistampede: {
+		accuracy: 100,
+		basePower: 30,
+		category: "Physical",
+		desc: "This attack always hits 4 times in a row. Hits Ground-type Pokemon super-effectively.",
+		shortDesc: "Hits 4 times. Super effective on Ground.",
+		name: "Corgi Stampede",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', target, 'Rollout', target);
+			this.add('-anim', target, 'Thundershock', target);
+		},
+		onEffectiveness(typeMod, target, type) {
+			if (type === 'Ground') return 1;
+		},
+		ignoreImmunity: {Electric: true},
+		multihit: 4,
+		secondary: null,
+		target: "normal",
+		type: "Electric",
+	},
+
 	// Tenshi
 	stonykibbles: {
 		accuracy: 100,
@@ -2819,6 +3137,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "For 5 turns, the weather becomes Sandstorm. At the end of each turn except the last, all active Pokemon lose 1/16 of their maximum HP, rounded down, unless they are a Ground, Rock, or Steel type, or have the Magic Guard, Overcoat, Sand Force, Sand Rush, or Sand Veil Abilities. During the effect, the Special Defense of Rock-type Pokemon is multiplied by 1.5 when taking damage from a special attack. Lasts for 8 turns if the user is holding Smooth Rock. Fails if the current weather is Sandstorm.",
 		shortDesc: "For 5 turns, a sandstorm rages.",
 		name: "Stony Kibbles",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -2843,6 +3163,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Has a 100% chance to raise the user's Speed by 1 stage.",
 		shortDesc: "+1 Speed if successful.",
 		name: "Watt Up",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -2873,6 +3195,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "25% chance of setting up a layer of spikes. 25% chance of using Heal Bell. 25% chance of using Leech Seed. 25% chance of using Tailwind. 25% chance of using Octolock.",
 		shortDesc: "5 independent chances of rolling different effects.",
 		name: "Right. On. Cue!",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
@@ -2917,6 +3241,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "The user switches out and raises the incoming Pokémon attack and special attack stat by one stage.",
 		shortDesc: "The user switches out and raises the incoming Pokémon attack and special attack stat by one stage.",
 		name: "Hero Creation",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: -6,
 		flags: {snatch: 1},
@@ -2960,6 +3286,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Curses the opponent and blocks it from healing.",
 		shortDesc: "Curses the opponent and blocks it from healing.",
 		name: "Soul-Shattering Stare",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: -7,
 		flags: {protect: 1, authentic: 1, reflectable: 1},
@@ -2988,6 +3316,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This move's type effectiveness against Water is changed to be super effective no matter what this move's type is.",
 		shortDesc: "Super effective on Water.",
 		name: "DRIP BAYLESS",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
@@ -3014,10 +3344,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Lowers the target's Attack and Special Attack by 2 stage. If this move is successful, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if the target's Attack and Special Attack stat stages were both unchanged, or if there are no unfainted party members.",
 		shortDesc: "Lowers target's Attack and Sp. Atk by 2. User switches.",
 		name: "Panda Express",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 20,
 		priority: 0,
 		flags: {protect: 1, reflectable: 1, mirror: 1, sound: 1, authentic: 1},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -3044,6 +3375,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "This pokemon heals 33% of their health if this move burns this pokemon.",
 		shortDesc: "Heals 33% of their health if this move burns.",
 		name: "Burn Bone",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 1,
 		flags: {protect: 1, reflectable: 1},
@@ -3074,11 +3407,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "If the user is a cosplay Pikachu forme, it randomly changes forme and effect.",
 		shortDesc: "Pikachu: Random forme and effect.",
 		name: "Class Change",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 6,
 		noPPBoosts: true,
 		priority: 0,
 		flags: {protect: 1},
-		onTryMovePriority: 100,
 		onTryMove(source) {
 			this.attrLastMove('[still]');
 			if (source.name !== 'yuki') {
@@ -3162,6 +3496,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Heals 50% if foe is holding an item. Removes item and enables Belch.",
 		shortDesc: "If foe has item: Heal 50% and remove it.",
 		name: "Ingredient Foraging",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
@@ -3192,6 +3528,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "+1 Special Attack and transforms into Meloetta-P/A with their accompanying moveset regardless of the outcome of the move. The move becomes fighting if Meloetta-P uses the move.",
 		shortDesc: "+1 Special Attack. Meloetta transforms. If Meloetta-Pirouette, type becomes Fighting.",
 		name: "Relic Dance",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, dance: 1},
@@ -3257,12 +3595,16 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		desc: "Uses Hurricane, Thunder, Blizzard, and Weather Ball at 30% power.",
 		shortDesc: "30% power: Hurricane, Thunder, Blizzard, Weather Ball.",
 		name: "Big Storm Coming",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 0,
 		flags: {},
-		onTryMovePriority: 100,
 		onTryMove() {
 			this.attrLastMove('[still]');
+		},
+		onPrepareHit() {
+			this.add(`c|${getName('Zodiax')}|There is a hail no storm okayyyyyy`);
 		},
 		onTry(pokemon, target) {
 			pokemon.m.bigstormcoming = true;

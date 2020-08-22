@@ -1,6 +1,9 @@
 import {FS} from '../../../lib/fs';
 import {toID} from '../../../sim/dex-data';
 
+// Used in many abilities, placed here to reduce the number of updates needed and to reduce the chance of errors
+const STRONG_WEATHERS = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm', 'winterhail'];
+
 // Similar to User.usergroups. Cannot import here due to users.ts requiring Chat
 // This also acts as a cache, meaning ranks will only update when a hotpatch/restart occurs
 const usergroups: {[userid: string]: string} = {};
@@ -184,19 +187,16 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Arcticblast')}|single battles are bad anyway, why am I here?`);
 		},
 	},
-	arsenal: {
+	averardo: {
 		noCopy: true,
-		onStart(pokemon) {
-			this.add(`c|${getName('Arsenal')}|Wenger Out`);
-			// Innate
-			if (pokemon.illusion) return;
-			this.boost({atk: 1}, pokemon);
+		onStart() {
+			this.add(`c|${getName('Averardo')}|o bella`);
 		},
 		onSwitchOut() {
-			this.add(`c|${getName('Arsenal')}|Wait.. Wenger is gone?? STAN OUT`);
+			this.add(`c|${getName('Averardo')}|Condivido schermo cosi' guardiamo i tre porcellini?`);
 		},
 		onFaint() {
-			this.add(`c|${getName('Arsenal')}|Next Year...`);
+			this.add(`c|${getName('Averardo')}|BE... Ok mejo chiudere gioco... vedo documentario su Bibbia`);
 		},
 	},
 	awauser: {
@@ -319,18 +319,6 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('Celine')}|'Tis only a flesh wound!`); // escape the quote?
 		},
 	},
-	chloe: {
-		noCopy: true,
-		onStart() {
-			this.add(`c|${getName('Chloe')}|hlelo`);
-		},
-		onSwitchOut() {
-			this.add(`c|${getName('Chloe')}|bubye`);
-		},
-		onFaint() {
-			this.add(`c|${getName('Chloe')}|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`);
-		},
-	},
 	ckilgannon: {
 		noCopy: true,
 		onStart() {
@@ -420,6 +408,30 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('EpicNikolai')}|I like to keep a positive attitude even though it is hard sometimes <('o'<)~*/`);
 		},
 	},
+	estarossa: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('estarossa')}|honestly best pairing for hazard coverage wtih molt is like molt + tsareena/dhelmise`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('estarossa')}|sand balance <333`);
+		},
+		onFaint() {
+			this.add(`c|${getName('estarossa')}|*eurgh*`);
+		},
+	},
+	explodingdaisies: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('explodingdaisies')}|Turn and run now, and I will mercifully pretend this never happened.`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('explodingdaisies')}|You are beneath me, and it shows.`);
+		},
+		onFaint() {
+			this.add(`c|${getName('explodingdaisies')}|Unacceptable!`);
+		},
+	},
 	fart: {
 		noCopy: true,
 		onStart(source) {
@@ -491,16 +503,16 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('grimAuxiliatrix')}|${['NOT LIKE THIS', 'HALT - MODULE CORE HEMORRHAGE', 'AAAAAAAAAAAAAAAAAAA'][this.random(3)]}`);
 		},
 	},
-	gxs: {
+	hoeenhero: {
 		noCopy: true,
 		onStart() {
-			this.add(`c|${getName('GXS')}|Upl0ad1ng V1ru$ BzZT!!`);
+			this.add(`c|${getName('HoeenHero')}|A storm is brewing...`);
 		},
 		onSwitchOut() {
-			this.add(`c|${getName('GXS')}|Buff3r1ng BzZT!!`);
+			this.add(`c|${getName('HoeenHero')}|The eye of the hurricane provides a brief respite from the storm.`);
 		},
 		onFaint() {
-			this.add(`c|${getName('GXS')}|A Critical Error Has Occurred. Would You Like To Send A Report? Sending Report.`);
+			this.add(`c|${getName('HoeenHero')}|All storms eventually disipate.`);
 		},
 	},
 	hubriz: {
@@ -750,7 +762,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('MajorBowman')}|Never loved ya.`);
 		},
 	},
-	marashmallon: {
+	marshmallon: {
 		noCopy: true,
 		onStart() {
 			this.add(`c|${getName('Marshmallon')}|I'm hungry. Are you edible? c:`);
@@ -897,6 +909,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			this.add(`c|${getName('phiwings99')}|I'm boated.`);
 		},
 	},
+	piloswinegripado: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('piloswine gripado')}|Suave?`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('piloswine gripado')}|cya frend :)`);
+		},
+		onFaint() {
+			this.add(`c|${getName('piloswine gripado')}|This was lame :/`);
+		},
+	},
 	pirateprincess: {
 		noCopy: true,
 		onStart() {
@@ -928,6 +952,23 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('Rabia')}|im top 500 in relevant tiers and lead gp, i have 8 badges, im fine, gg`);
+		},
+	},
+	rajshoot: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('Raj.Shoot')}|Plaza Power!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('Raj.Shoot')}|We'll be back!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('Raj.Shoot')}|You'll join me in the shadow realm soon....`);
+		},
+		onBeforeMove(source, target, move) {
+			if (move.id === 'fanservice') {
+				this.boost({atk: 1, spe: 1}, source, source, move);
+			}
 		},
 	},
 	ransei: {
@@ -1048,6 +1089,19 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onFaint() {
 			this.add(`c|${getName('Teclis')}|Magic never dies. It merely fades away.`);
+		},
+	},
+	tennisace: {
+		noCopy: true,
+		// TODO: Replace text with corgi images, contact Hoeen about uploading some images for ssb
+		onStart() {
+			// this.add(`c|${getName('tennisace')}|Hi`);
+		},
+		onSwitchOut() {
+			// this.add(`c|${getName('tennisace')}|Mmph`);
+		},
+		onFaint() {
+			// this.add(`c|${getName('tennisace')}|Bye`);
 		},
 	},
 	tenshi: {
@@ -1187,17 +1241,12 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onStart() {
 			this.add(`c|${getName('Zodiax')}|Zodiax is here to Zodihax`);
 		},
-		onSwitchOut(pokemon) {
+		onSwitchOut() {
 			this.add(`c|${getName('Zodiax')}|Don't worry I'll be back again`);
 		},
 		onFaint(pokemon) {
 			const name = pokemon.side.foe.name;
 			this.add(`c|${getName('Zodiax')}|${name}, Why would you hurt this poor little pompombirb :(`);
-		},
-		onPrepareHit(source, target, move) {
-			if (move.name === 'Big Storm Coming') {
-				this.add(`c|${getName('Zodiax')}|There is a hail no storm okayyyyyy`);
-			}
 		},
 		// Big Storm Coming base power reduction effect
 		onBasePower(basePower, pokemon, target, move) {
@@ -1281,8 +1330,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			}
 		},
 		onAnySetWeather(target, source, weather) {
-			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'snowstorm', 'heavyhailstorm'];
-			if (this.field.getWeather().id === 'heavyhailstorm' && !strongWeathers.includes(weather.id)) return false;
+			if (this.field.getWeather().id === 'heavyhailstorm' && !STRONG_WEATHERS.includes(weather.id)) return false;
 		},
 		onResidualOrder: 1,
 		onResidual() {
@@ -1291,11 +1339,39 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		},
 		onWeather(target, source, effect) {
 			if (target.side === this.effectData.source.side) return;
-			// Hail is strongerfrom Heavy Hailstormnone
+			// Hail is stronger from Heavy Hailstorm
 			if (!target.hasType('Ice')) this.damage(target.baseMaxhp / 8);
 		},
 		onEnd() {
 			this.add('-end', 'Heavy Hailstorm');
+		},
+	},
+	// Forever Winter Hail support for piloswine gripado
+	winterhail: {
+		name: 'Winter Hail',
+		effectType: 'Weather',
+		duration: 0,
+		onStart(battle, source, effect) {
+			if (effect?.effectType === 'Ability') {
+				this.add('-weather', 'Hail', '[from] ability: ' + effect, '[of] ' + source);
+			} else {
+				this.add('-weather', 'Hail');
+			}
+		},
+		onModifySpe(spe, pokemon) {
+			if (!pokemon.hasType('Ice')) return this.chainModify(0.5);
+		},
+		onResidualOrder: 1,
+		onResidual() {
+			this.add('-weather', 'Hail', '[upkeep]');
+			if (this.field.isWeather('winterhail')) this.eachEvent('Weather');
+		},
+		onWeather(target) {
+			if (target.hasType('Ice')) return;
+			this.damage(target.baseMaxhp / 8);
+		},
+		onEnd() {
+			this.add('-weather', 'none');
 		},
 	},
 	// Modified futuremove support for Segmr's move (Disconnect)
@@ -1411,6 +1487,26 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 				this.add('-activate', target, 'ability: Bounty');
 				this.boost({atk: 1, def: 1, spa: 1, spd: 1, spe: 1}, source, target, effect);
 			}
+		},
+	},
+	// Custom status for HoeenHero's move
+	stormsurge: {
+		name: "Storm Surge",
+		duration: 2,
+		durationCallback(target, source, effect) {
+			const windSpeeds = [65, 85, 95, 115, 140];
+			return windSpeeds.indexOf((effect as ActiveMove).basePower) + 2;
+		},
+		onStart(targetSide) {
+			this.add('-sidestart', targetSide, 'Storm Surge');
+			this.add('-message', `Storm Surge flooded the afflicted side of the battlefield!`);
+		},
+		onEnd(targetSide) {
+			this.add('-sideend', targetSide, 'Storm Surge');
+			this.add('-message', 'The Storm Surge receded.');
+		},
+		onModifySpe(spe, pokemon) {
+			return this.chainModify(0.25);
 		},
 	},
 };

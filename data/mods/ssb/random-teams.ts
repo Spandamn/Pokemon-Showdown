@@ -101,11 +101,11 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Broadside Barrage',
 		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 	},
-	Arsenal: {
-		species: 'Corvisquire', ability: 'Royal Privilege', item: 'Eviolite', gender: '',
-		moves: ['Sky Attack', 'High Jump Kick', 'Earthquake'],
-		signatureMove: 'Vorpal Wings',
-		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
+	Averardo: {
+		species: 'Hattrem', ability: 'Magic Hat', item: 'Eviolite', gender: 'M',
+		moves: ['Nuzzle', 'Flamethrower', 'Healing Wish'],
+		signatureMove: 'Hat of Wisdom',
+		evs: {hp: 252, def: 4, spd: 252}, ivs: {atk: 0}, nature: 'Sassy',
 	},
 	'awa!': {
 		species: 'Lycanroc', ability: 'Sand Rush', item: 'Life Orb', gender: 'F',
@@ -127,7 +127,7 @@ export const ssbSets: SSBSets = {
 	},
 	Cake: {
 		species: 'Dunsparce', ability: 'Wonder Guard', item: 'Shell Bell', gender: 'M',
-		moves: ['Psych Up', 'King\'s Shield', ['Poison Gas', 'Corrosive Gas', 'Magic Powder', 'Speed Swap', 'Spite', 'Decorate', 'Screech', 'Trick Room', 'Heal Block', 'Geomancy']],
+		moves: ['Psych Up', 'Ingrain', ['Poison Gas', 'Corrosive Gas', 'Magic Powder', 'Speed Swap', 'Spite', 'Decorate', 'Screech', 'Trick Room', 'Heal Block', 'Geomancy']],
 		signatureMove: 'Kevin',
 		evs: {hp: 252, atk: 252, spd: 4}, nature: 'Adamant',
 	},
@@ -137,17 +137,17 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Never Lucky',
 		evs: {hp: 248, def: 36, spe: 224}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	Celestial: {
+		species: 'Dragonite', ability: 'Speed Control', item: 'Metal Coat', gender: '',
+		moves: ['Swords Dance', 'Thousand Arrows', 'Double Iron Bash'],
+		signatureMove: 'Pandora\'s Box',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly', shiny: 2,
+	},
 	Celine: {
 		species: 'Lucario', ability: 'Guardian Armor', item: 'Leftovers', gender: 'F',
 		moves: ['Wish', 'Teleport', 'Drain Punch'],
 		signatureMove: 'Status Guard',
 		evs: {hp: 248, def: 252, spd: 8}, nature: 'Impish',
-	},
-	Chloe: {
-		species: 'Delphox', ability: 'No Guard', item: 'Heavy-Duty Boots', gender: 'F',
-		moves: ['Nasty Plot', 'Inferno', 'Psystrike'],
-		signatureMove: 'Víðsýni',
-		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 	},
 	'c.kilgannon': {
 		species: 'Yveltal', ability: 'Infiltrator', item: 'Choice Scarf', gender: 'N',
@@ -193,11 +193,23 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Forced Landing',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	estarossa: {
+		species: 'Hippowdon', ability: 'Sands of Time', item: 'Leftovers', gender: 'M',
+		moves: ['Earthquake', 'Stone Edge', 'Slack Off'],
+		signatureMove: 'Sand Balance',
+		evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
+	},
 	EpicNikolai: {
 		species: 'Garchomp', ability: 'Dragon Heart', item: 'Garchompite', gender: 'M',
 		moves: ['Outrage', 'Earthquake', 'Swords Dance'],
 		signatureMove: 'Epic Rage',
 		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
+	},
+	explodingdaisies: {
+		species: 'Shedinja', ability: 'Wonder Guard', item: 'Heavy-Duty Boots', gender: 'M',
+		moves: ['Swords Dance', 'X-Scissor', 'Shadow Sneak'],
+		signatureMove: 'You Have No Hope!',
+		evs: {atk: 252, spd: 4, spe: 252}, nature: 'Adamant',
 	},
 	fart: {
 		species: 'Kartana', ability: 'Bipolar', item: 'Metronome', gender: 'M',
@@ -229,11 +241,11 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Do Not Steel',
 		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 	},
-	GXS: {
-		species: 'Porygon-Z', ability: 'Virus Upload', item: 'Life Orb', gender: 'N',
-		moves: ['Nasty Plot', 'Aura Sphere', 'Thunderbolt'],
-		signatureMove: 'Data Corruption',
-		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
+	HoeenHero: {
+		species: 'Ludicolo', ability: 'Tropical Cyclone', item: 'Life Orb', gender: 'M',
+		moves: ['Scald', 'Giga Drain', 'Hurricane'],
+		signatureMove: 'Landfall',
+		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Modest',
 	},
 	Hubriz: {
 		species: 'Roserade', ability: 'Stakeout', item: 'Rose Incense', gender: 'F',
@@ -342,7 +354,7 @@ export const ssbSets: SSBSets = {
 	},
 	Mitsuki: {
 		species: 'Leafeon', ability: 'Photosynthesis', item: ['Life Orb', 'Miracle Seed'], gender: 'M',
-		moves: ['Solar Blade', 'Attack Order', 'Thousand Arrows'],
+		moves: ['Leaf Blade', 'Attack Order', 'Thousand Arrows'],
 		signatureMove: 'Terraforming',
 		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 	},
@@ -383,7 +395,7 @@ export const ssbSets: SSBSets = {
 		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 	},
 	'Perish Song': {
-		species: 'Rhydon', ability: 'Soup Sipper', item: 'Eviolite', gender: 'M',
+		species: 'Rhydon', ability: 'Soup Sipper', item: 'Rocky Helmet', gender: 'M',
 		moves: ['Swords Dance', 'Rock Blast', 'Earthquake'],
 		signatureMove: 'Shifting Rocks',
 		evs: {hp: 252, atk: 4, def: 252}, nature: 'Impish',
@@ -393,6 +405,12 @@ export const ssbSets: SSBSets = {
 		moves: ['Destiny Bond', 'Ice Beam', 'Haze'],
 		signatureMove: 'Moongeist Beam',
 		evs: {spa: 252, spd: 4, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
+	},
+	'piloswine gripado': {
+		species: 'Piloswine', ability: 'Forever Winter Nights', item: 'Eviolite', gender: 'M',
+		moves: ['Earthquake', 'Bulk Up', 'refresh'],
+		signatureMove: 'Icicle Spirits',
+		evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
 	},
 	'PiraTe Princess': {
 		species: 'Polteageist', ability: 'Wild Magic Surge', item: 'Expert Belt', gender: 'F',
@@ -427,6 +445,12 @@ export const ssbSets: SSBSets = {
 		moves: ['Trick', 'Recover', 'Spectral Thief'],
 		signatureMove: 'ripsei',
 		evs: {hp: 252, atk: 4, spe: 252}, nature: 'Jolly',
+	},
+	'Raj.Shoot': {
+		species: 'Swampert', ability: 'Sap Sipper', item: 'Life Orb', gender: 'N',
+		moves: ['Earthquake', 'Waterfall', 'Ice Punch'],
+		signatureMove: 'Fan Service',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly',
 	},
 	Robb576: {
 		species: 'Necrozma-Dawn-Wings', ability: 'The Numbers Game', item: 'Metronome', gender: 'M',
@@ -484,6 +508,12 @@ export const ssbSets: SSBSets = {
 		signatureMove: 'Ten',
 		evs: {def: 4, spa: 252, spe: 252}, ivs: {atk: 0}, nature: 'Timid',
 	},
+	tennisace: {
+		species: 'Yamper', ability: 'Stout Build', item: 'Eviolite', gender: 'M',
+		moves: ['Crunch', 'Play Rough', 'Slack Off'],
+		signatureMove: 'Corgi Stampede',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Jolly', shiny: true,
+	},
 	Tenshi: {
 		species: 'Stoutland', ability: 'Royal Coat', item: 'Leftovers', gender: 'M',
 		moves: ['Knock Off', 'Thousand Waves', ['Play Rough', 'Power Whip']],
@@ -521,7 +551,7 @@ export const ssbSets: SSBSets = {
 		evs: {hp: 252, spa: 252, def: 4}, ivs: {atk: 0}, nature: 'Modest',
 	},
 	vooper: {
-		species: 'Pancham', ability: 'Qui-Gong', item: 'Eviolite', gender: 'M',
+		species: 'Pancham', ability: 'Qi-Gong', item: 'Eviolite', gender: 'M',
 		moves: ['Drain Punch', 'Knock Off', 'Swords Dance'],
 		signatureMove: 'Panda Express',
 		evs: {hp: 252, atk: 252, spd: 4}, ivs: {atk: 0}, nature: 'Adamant',

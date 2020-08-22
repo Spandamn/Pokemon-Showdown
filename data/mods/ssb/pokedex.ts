@@ -30,6 +30,11 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 		inherit: true,
 		baseStats: {hp: 40, atk: 70, def: 70, spa: 80, spd: 90, spe: 70},
 	},
+	// Annika
+	mewtwomegay: {
+		inherit: true,
+		abilities: {0: "Overprotective"},
+	},
 	// A Quag To The Past
 	quagsire: {
 		inherit: true,
@@ -140,6 +145,11 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 		inherit: true,
 		baseStats: {hp: 85, atk: 80, def: 90, spa: 105, spd: 95, spe: 60},
 	},
+	// Raj.Shoot
+	swampertmega: {
+		inherit: true,
+		abilities: {0: "Sap Sipper"},
+	},
 	// Robb576
 	necrozmadawnwings: {
 		inherit: true,
@@ -162,6 +172,11 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 	charizardmegax: {
 		inherit: true,
 		abilities: {0: "One For All"},
+	},
+	// tennisace
+	yamper: {
+		inherit: true,
+		baseStats: {hp: 69, atk: 125, def: 75, spa: 45, spd: 75, spe: 101},
 	},
 	// yuki
 	pikachucosplay: {

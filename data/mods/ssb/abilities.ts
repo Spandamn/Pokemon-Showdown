@@ -1,5 +1,9 @@
 import {SSBSet, ssbSets} from "./random-teams";
 
+// Used in many abilities, placed here to reduce the number of updates needed and to reduce the chance of errors
+const STRONG_WEATHERS = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm', 'winterhail'];
+const HEAVY_RAIN_ABILITIES = ['primordialsea', 'tropicalcyclone', 'rainyseason'];
+
 /**
  * Assigns a new set to a Pokémon
  * @param pokemon the Pokemon to assign the set to
@@ -37,7 +41,7 @@ export function changeSet(context: Battle, pokemon: Pokemon, newSet: SSBSet, cha
 	pokemon.maxhp = newMaxHP;
 	let item = newSet.item;
 	if (typeof item !== 'string') item = item[Math.floor(Math.random() * item.length)];
-	pokemon.setItem(item);
+	if (context.toID(item) !== (pokemon.item || pokemon.lastItem)) pokemon.setItem(item);
 	const newMoves = changeMoves(context, pokemon, newSet.moves.concat(newSet.signatureMove));
 	pokemon.moveSlots = newMoves;
 	// @ts-ignore Necessary so Robb576 doesn't get 8 moves
@@ -77,7 +81,7 @@ export function changeMoves(context: Battle, pokemon: Pokemon, newMoves: (string
 	return result;
 }
 
-export const Abilities: {[k: string]: ModdedAbilityData} = {
+export const Abilities: {[k: string]: ModdedAbilityData & {gen?: number}} = {
 	/*
 	// Example
 	"abilityid": {
@@ -142,6 +146,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			pokemon.maxhp = newMaxHP;
 			this.add('-heal', pokemon, pokemon.getHealth, '[silent]');
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// aegii
@@ -161,6 +167,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.useMove('Embargo', pokemon);
 		},
 		name: "New Stage",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Aeonic
@@ -176,9 +184,11 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				return this.chainModify(2);
 			}
 		},
-		onImmunity(type, pokemon) {
+		onImmunity(type) {
 			if (type === 'sandstorm') return false;
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Aethernum
@@ -190,14 +200,13 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.field.setWeather('primordialsea');
 		},
 		onAnySetWeather(target, source, weather) {
-			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm'];
-			if (this.field.getWeather().id === 'primordialsea' && !strongWeathers.includes(weather.id)) return false;
+			if (this.field.getWeather().id === 'primordialsea' && !STRONG_WEATHERS.includes(weather.id)) return false;
 		},
 		onEnd(pokemon) {
 			if (this.field.weatherData.source !== pokemon) return;
 			for (const target of this.getAllActive()) {
 				if (target === pokemon) continue;
-				if (target.hasAbility('primordialsea')) {
+				if (target.hasAbility(HEAVY_RAIN_ABILITIES)) {
 					this.field.weatherData.source = target;
 					return;
 				}
@@ -220,6 +229,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				return this.chainModify(2);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Akir
@@ -241,6 +252,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.heal(pokemon.baseMaxhp / 16);
 		},
 		name: "Fortifications",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Annika
@@ -251,6 +264,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (pokemon.side.pokemonLeft === 1) this.boost({spe: 1});
 		},
 		name: "Overprotective",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// A Quag To The Past
@@ -296,6 +311,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			duration: 1,
 		},
 		name: "Carefree",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// a random duck
@@ -306,6 +323,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (move && move.type === 'Flying') return priority + 1;
 		},
 		name: "Gale Wings v1",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// ArchasTL
@@ -332,31 +351,47 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Indomitable",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
-	// Arsenal
-	royalprivilege: {
-		desc: "This Pokemon is not affected by the secondary effect of another Pokemon's attack. This Pokemon can only be damaged by direct attacks. Attacks that need to charge do not charge and execute in 1 turnThis Pokemon is not affected by the secondary effect of another Pokemon's attack. This Pokemon can only be damaged by direct attacks. Attacks that need to charge do not charge and execute in 1 turn.",
-		shortDesc: "Magic Guard + Shield Dust + Power Herb",
-		name: "Royal Privilege",
+	// Averardo
+	magichat: {
+		shortDesc: "Magic Guard + Magic Bounce.",
 		onDamage(damage, target, source, effect) {
+			if (effect.id === 'heavyhailstorm') return;
 			if (effect.effectType !== 'Move') {
 				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
 				return false;
 			}
 		},
-		onModifySecondaries(secondaries) {
-			this.debug('Shield Dust prevent secondary');
-			return secondaries.filter(effect => !!(effect.self || effect.dustproof));
-		},
-		onChargeMove(pokemon, target, move) {
-			if (pokemon.useItem()) {
-				this.debug('power herb - remove charge turn for ' + move.id);
-				this.attrLastMove('[still]');
-				this.addMove('-anim', pokemon, move.name, target);
-				return false; // skip charge turn
+		onTryHitPriority: 1,
+		onTryHit(target, source, move) {
+			if (target === source || move.hasBounced || !move.flags['reflectable']) {
+				return;
 			}
+			const newMove = this.dex.getActiveMove(move.id);
+			newMove.hasBounced = true;
+			newMove.pranksterBoosted = false;
+			this.useMove(newMove, target, source);
+			return null;
 		},
+		onAllyTryHitSide(target, source, move) {
+			if (target.side === source.side || move.hasBounced || !move.flags['reflectable']) {
+				return;
+			}
+			const newMove = this.dex.getActiveMove(move.id);
+			newMove.hasBounced = true;
+			newMove.pranksterBoosted = false;
+			this.useMove(newMove, this.effectData.target, source);
+			return null;
+		},
+		condition: {
+			duration: 1,
+		},
+		name: "Magic Hat",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// biggie
@@ -368,6 +403,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Super Armor",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// cant say
@@ -384,6 +421,27 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				}
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
+	// Celestial
+	speedcontrol: {
+		desc: "Any time any stat is changed (increased or decreased by any number of stages), this pokemon's speed is raised by 1 stage.",
+		shortDesc: "Any time any stat is changed, this pokemon's speed is raised by 1 stage.",
+		name: "Speed Control",
+		onAfterBoost(boost, target, source, effect) {
+			if (effect.id === 'speedcontrol') return;
+			this.boost({spe: 1});
+		},
+		onFoeAfterBoost(boost, target, source, effect) {
+			const pokemon = target.side.foe.active[0];
+			// Infinite Loop preventer
+			if (effect.id === 'speedcontrol' || effect.id === 'stubbornness') return;
+			this.boost({spe: 1}, pokemon);
+		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Celine
@@ -394,12 +452,14 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onStart(pokemon) {
 			this.boost({def: 2, spd: 2}, pokemon);
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Darth
 	guardianangel: {
 		desc: "This Pokemon restores 1/3 of its maximum HP, rounded down, when it switches out. When switching in, this Pokemon's types are changed to resist the weakness of the last and stats Pokemon in before it.",
-		shortDesc: "Switching out: Regenerator. Switching in: Resists Weaknesses of last Pokemon.",
+		shortDesc: "Switching out: Regenerator. Switching in: Resists weaknesses of last Pokemon.",
 		name: "Guardian Angel",
 		onSwitchOut(pokemon) {
 			pokemon.heal(pokemon.baseMaxhp / 3);
@@ -431,6 +491,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (!pokemon.setType(newTypes)) return;
 			this.add('-start', pokemon, 'typechange', newTypes.join('/'));
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// drampa's grandpa
@@ -469,6 +531,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onStart(pokemon) {
 			this.boost({def: 1, spd: 1});
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// dream
@@ -503,11 +567,14 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		onDamage(damage, target, source, effect) {
+			if (effect.id === 'heavyhailstorm') return;
 			if (effect.effectType !== 'Move') {
 				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
 				return false;
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Emeri
@@ -517,10 +584,12 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		name: "Draco Voice",
 		onModifyTypePriority: -1,
 		onModifyType(move, pokemon) {
-			if (move.flags['sound'] && !pokemon.volatiles.dynamax) { // hardcode
+			if (move.flags['sound'] && !pokemon.volatiles['dynamax']) { // hardcode
 				move.type = 'Dragon';
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// EpicNikolai
@@ -528,13 +597,37 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		desc: "Once per battle, at 25% or lower this pokemon heals 50% hp.",
 		shortDesc: "Heals 50% when 25% or lower once per battle.",
 		name: "Dragon Heart",
-		onDamage(damage, target, source, move) {
-			if (target.m.heartless) return;
-			if (target.hp <= target.maxhp / 4) {
-				this.heal(target.baseMaxhp / 2);
-				target.m.heartless = true;
+		onDamagingHit(damage, target, source, move) {
+			if (move && target.hp > 0 && target.hp < target.maxhp / 4 && !target.m.dragonheart) {
+				target.m.dragonheart = true;
+				this.heal(target.maxhp / 2);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
+	// estarossa
+	sandsoftime: {
+		desc: "On switch-in, this Pokemon summons Sandstorm. This Pokemon's Ground/Rock/Steel type moves do x1.3 damage under Sandstorm. This Pokemon takes no damage from Sandstorm.",
+		shortDesc: "Sand Stream + Sand Force.",
+		name: "Sands of Time",
+		onStart(source) {
+			this.field.setWeather('sandstorm');
+		},
+		onImmunity(type, pokemon) {
+			if (type === 'sandstorm') return false;
+		},
+		onBasePower(basePower, attacker, defender, move) {
+			if (this.field.isWeather('sandstorm')) {
+				if (move.type === 'Rock' || move.type === 'Ground' || move.type === 'Steel') {
+					this.debug('Sand Force boost');
+					return this.chainModify([0x14CD, 0x1000]);
+				}
+			}
+		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// fart
@@ -589,12 +682,14 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				virtual: true,
 			};
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Frostyicelad
 	iceshield: {
 		desc: "This Pokemon receives 1/2 damage from special attacks. This Pokemon can only be damaged by direct attacks. Curse and Substitute on use, Belly Drum, Pain Split, Struggle recoil, and confusion damage are considered direct damage.",
-		shortDesc: "Receives 1/2 dmg from SpAtks. This Pokemon can only be damaged by direct attacks.",
+		shortDesc: "Receives 1/2 damage from Special Attacks and can only be damaged by direct attacks.",
 		name: "Ice Shield",
 		onSourceModifyDamage(damage, source, target, move) {
 			if (move.category === 'Special') {
@@ -602,6 +697,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		onDamage(damage, target, source, effect) {
+			if (effect.id === 'heavyhailstorm') return;
 			if (effect.effectType !== 'Move') {
 				if (effect.effectType === 'Ability') this.add('-activate', source, 'ability: ' + effect.name);
 				return false;
@@ -633,31 +729,6 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
-	// GXS
-	virusupload: {
-		desc: "On switch-in, this Pokemon's Attack or Special Attack is raised by 1 stage based on the weaker combined defensive stat of all opposing Pokemon. Attack is raised if their Defense is lower, and Special Attack is raised if their Special Defense is the same or lower.",
-		shortDesc: "On switch-in, Attack or Sp. Atk is raised 1 stage based on the foes' weaker Defense.",
-		name: "Virus Upload",
-		onStart(pokemon) {
-			let totalatk = 0;
-			let totalspa = 0;
-			let targ;
-			for (const target of pokemon.side.foe.active) {
-				if (!target || target.fainted) continue;
-				targ = target;
-				totalatk += target.getStat('atk', false, true);
-				totalspa += target.getStat('spa', false, true);
-			}
-			if (targ) {
-				if (totalatk && totalatk >= totalspa) {
-					this.boost({atk: -1}, targ, pokemon);
-				} else if (totalspa) {
-					this.boost({spa: -1}, targ, pokemon);
-				}
-			}
-		},
-	},
-
 	// grimAuxiliatrix
 	biosteel: {
 		desc: "This Pokemon restores 1/3 of its maximum HP, rounded down, when it switches out and prevents other Pokemon from lowering this Pokemon's stat stages.",
@@ -681,6 +752,41 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.add("-fail", target, "unboost", "[from] ability: Bio-steel", "[of] " + target);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
+	// HoeenHero
+	tropicalcyclone: {
+		desc: "On switch-in, the weather becomes heavy rain that prevents damaging Fire-type moves from executing, in addition to all the effects of Rain Dance. This weather remains in effect until this Ability is no longer active for any Pokemon, or the weather is changed by Delta Stream or Desolate Land. In addition, if Rain Dance or Heavy Rain is active and this Pokemon is not holding Utility Umbrella, this Pokemon's Speed is doubled.",
+		shortDesc: "Summons Heavy Rain that is active until this Pokemon switches out. 2x Speed while rain is active.",
+		name: "Tropical Cyclone",
+		onStart(source) {
+			this.field.setWeather('primordialsea');
+			this.add('-message', 'A tropical cyclone covered the battlefield.');
+		},
+		onAnySetWeather(target, source, weather) {
+			if (this.field.getWeather().id === 'primordialsea' && !STRONG_WEATHERS.includes(weather.id)) return false;
+		},
+		onModifySpe(spe, pokemon) {
+			if (['raindance', 'primordialsea'].includes(pokemon.effectiveWeather())) {
+				return this.chainModify(2);
+			}
+		},
+		onEnd(pokemon) {
+			if (this.field.weatherData.source !== pokemon) return;
+			for (const target of this.getAllActive()) {
+				if (target === pokemon) continue;
+				if (target.hasAbility(HEAVY_RAIN_ABILITIES)) {
+					this.field.weatherData.source = target;
+					return;
+				}
+			}
+			this.field.clearWeather();
+			this.add('-message', 'The tropical cyclone disipated.');
+		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Hydro
@@ -715,6 +821,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Hydrostatic",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Inactive
@@ -730,6 +838,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			target.heal(target.baseMaxhp / 4);
 		},
 		name: "Dragon Scale",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Iyarito
@@ -771,6 +881,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onEnd(pokemon) {
 			pokemon.abilityData.choiceLock = "";
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Jett x~x
@@ -794,6 +906,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Deceiver",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Jho
@@ -807,6 +921,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Venomize",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Jordy
@@ -823,6 +939,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onStart(pokemon) {
 			this.field.setWeather('sandstorm');
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Kaiju Bunny
@@ -836,6 +954,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.heal(target.maxhp / 2);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// KennedyLFC
@@ -854,6 +974,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			return critRatio + 1;
 		},
 		name: "False Nine",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// KingSwordYT
@@ -875,6 +997,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.damage(source.baseMaxhp / 16, source, target);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Lionyx
@@ -914,6 +1038,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.add('-end', pokemon, 'move: Tension', '[silent]');
 			},
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Marshmallon
@@ -931,7 +1057,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (pokemon.m.happened) delete pokemon.m.happened;
 		},
 		onFoeAfterBoost(boost, target, source, effect) {
-			const pokemon = source.side.foe.active[0];
+			const pokemon = target.side.foe.active[0];
 			let success = false;
 			let i: BoostName;
 			for (i in boost) {
@@ -940,7 +1066,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				}
 			}
 			// Infinite Loop preventer
-			if (effect.id === 'stubbornness') return;
+			if (effect.id === 'speedcontrol' || effect.id === 'stubbornness') return;
 			if (success) {
 				if (!pokemon.m.happened) {
 					this.boost({atk: 1, def: 1, spd: 1}, pokemon);
@@ -950,6 +1076,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				}
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Mitsuki
@@ -980,6 +1108,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.damage(target.baseMaxhp / 8, target, target);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// n10siT
@@ -999,6 +1129,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.add('-item', source, yourItem, '[from] ability: Greedy Magician', '[of] ' + target);
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Nolali
@@ -1021,6 +1153,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Burning Soul",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Overneat
@@ -1038,14 +1172,16 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onModifyDef(def) {
 			return this.chainModify(2);
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Perish Song
 	soupsipper: {
-		desc: "This Pokemon is immune to Water-type moves, restores 1/4 of its maximum HP, rounded down, when hit by a Water-type move, and boosts its Attack by 1 stage when hit by a Water-type move.",
-		shortDesc: "Heals 1/4 of its max HP and gains +1 Atk when hit by Water moves; Water immunity.",
+		desc: "This Pokemon is immune to Grass- and Water-type moves, restores 1/4 of its maximum HP, rounded down, when hit by these types, and boosts its Attack by 1 stage when hit by these types.",
+		shortDesc: "Heals 1/4 of its max HP and gains +1 Atk when hit by Water and Grass moves; Water and Grass immunity.",
 		onTryHit(target, source, move) {
-			if (target !== source && move.type === 'Water') {
+			if (target !== source && ['Water', 'Grass'].includes(move.type)) {
 				if (!this.heal(target.baseMaxhp / 4) || !this.boost({atk: 1})) {
 					this.add('-immune', target, '[from] ability: Soup Sipper');
 				}
@@ -1053,6 +1189,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Soup Sipper",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// phiwings99
@@ -1081,6 +1219,33 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				return priority + 1;
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
+	// piloswine gripado
+	foreverwinternights: {
+		shortDesc: "On switch-in, this Pokemon summons Winter Hail.",
+		onStart(source) {
+			this.field.setWeather('winterhail');
+		},
+		onAnySetWeather(target, source, weather) {
+			if (this.field.getWeather().id === 'winterhail' && !STRONG_WEATHERS.includes(weather.id)) return false;
+		},
+		onEnd(pokemon) {
+			if (this.field.weatherData.source !== pokemon) return;
+			for (const target of this.getAllActive()) {
+				if (target === pokemon) continue;
+				if (target.hasAbility('winterhail')) {
+					this.field.weatherData.source = target;
+					return;
+				}
+			}
+			this.field.clearWeather();
+		},
+		name: "Forever Winter Nights",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// PiraTe Princess
@@ -1104,6 +1269,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 			this.add('-start', pokemon, 'typechange', type);
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Robb576
@@ -1123,6 +1290,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 			target.m.flag1 = true;
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Segmr
@@ -1134,6 +1303,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			if (pokemon.side.getSideCondition('auroraveil')) return;
 			pokemon.side.addSideCondition('auroraveil');
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Shadecession
@@ -1174,6 +1345,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			},
 		},
 		name: "Shady Deal",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Struchni
@@ -1217,6 +1390,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				this.add('-start', target, 'typechange', sameType.join('/'));
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Sunny
@@ -1232,6 +1407,27 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 		onSourceAfterFaint(length, target, source, effect) {
 			if (effect && effect.effectType === 'Move' && !!effect.recoil) this.heal(source.baseMaxhp / 4, source);
+		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
+	// tennisace
+	stoutbuild: {
+		desc: "If a Pokemon uses a Ground-type attack against this Pokemon, that Pokemon's attacking stat is halved when calculating the damage to this Pokemon.",
+		shortDesc: "Ground moves do half damage to this Pokemon.",
+		name: "Stout Build",
+		onSourceModifyAtkPriority: 6,
+		onSourceModifyAtk(atk, attacker, defender, move) {
+			if (move.type === 'Ground') {
+				return this.chainModify(0.5);
+			}
+		},
+		onSourceModifySpAPriority: 5,
+		onSourceModifySpA(atk, attacker, defender, move) {
+			if (move.type === 'Ground') {
+				return this.chainModify(0.5);
+			}
 		},
 	},
 
@@ -1253,6 +1449,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onImmunity(type, pokemon) {
 			if (type === 'sandstorm') return false;
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// tiki
@@ -1280,6 +1478,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				boosts['accuracy'] = 0;
 			}
 		},
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// Trickster
@@ -1306,6 +1506,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Trillionage Roots",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// vooper
@@ -1321,6 +1523,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 		},
 		name: "Qi-Gong",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 
 	// yuki
@@ -1371,6 +1575,8 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			return 0;
 		},
 		name: "Combat Training",
+		isNonstandard: "Custom",
+		gen: 8,
 	},
 	// Modified Illusion to support SSB volatiles
 	illusion: {
@@ -1399,14 +1605,13 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 	},
 
-	// Modified various abilities to support Alpha's move
+	// Modified various abilities to support Alpha's move & pilo's abiility
 	deltastream: {
 		inherit: true,
 		desc: "On switch-in, the weather becomes strong winds that remove the weaknesses of the Flying type from Flying-type Pokemon. This weather remains in effect until this Ability is no longer active for any Pokemon, or the weather is changed by Desolate Land, Heavy Hailstorm, or Primordial Sea.",
 		shortDesc: "On switch-in, strong winds begin until this Ability is not active in battle.",
 		onAnySetWeather(target, source, weather) {
-			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm'];
-			if (this.field.getWeather().id === 'deltastream' && !strongWeathers.includes(weather.id)) return false;
+			if (this.field.getWeather().id === 'deltastream' && !STRONG_WEATHERS.includes(weather.id)) return false;
 		},
 	},
 	desolateland: {
@@ -1414,8 +1619,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		desc: "On switch-in, the weather becomes extremely harsh sunlight that prevents damaging Water-type moves from executing, in addition to all the effects of Sunny Day. This weather remains in effect until this Ability is no longer active for any Pokemon, or the weather is changed by Delta Stream, Heavy Hailstorm, or Primordial Sea.",
 		shortDesc: "On switch-in, extremely harsh sunlight begins until this Ability is not active in battle.",
 		onAnySetWeather(target, source, weather) {
-			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm'];
-			if (this.field.getWeather().id === 'desolateland' && !strongWeathers.includes(weather.id)) return false;
+			if (this.field.getWeather().id === 'desolateland' && !STRONG_WEATHERS.includes(weather.id)) return false;
 		},
 	},
 	forecast: {
@@ -1432,6 +1636,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			case 'primordialsea':
 				if (pokemon.species.id !== 'castformrainy') forme = 'Castform-Rainy';
 				break;
+			case 'winterhail':
 			case 'heavyhailstorm':
 			case 'hail':
 				if (pokemon.species.id !== 'castformsnowy') forme = 'Castform-Snowy';
@@ -1450,12 +1655,12 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		desc: "If Hail or Heavy Hailstorm is active, this Pokemon restores 1/16 of its maximum HP, rounded down, at the end of each turn. This Pokemon takes no damage from Hail or Heavy Hailstorm.",
 		shortDesc: "Hail-like weather active: heals 1/16 max HP each turn; immunity to Hail-like weather.",
 		onWeather(target, source, effect) {
-			if (['heavyhailstorm', 'hail'].includes(effect.id)) {
+			if (['heavyhailstorm', 'hail', 'winterhail'].includes(effect.id)) {
 				this.heal(target.baseMaxhp / 16);
 			}
 		},
 		onImmunity(type, pokemon) {
-			if (['heavyhailstorm', 'hail'].includes(type)) return false;
+			if (['heavyhailstorm', 'hail', 'winterhail'].includes(type)) return false;
 		},
 	},
 	iceface: {
@@ -1463,7 +1668,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		desc: "If this Pokemon is an Eiscue, the first physical hit it takes in battle deals 0 neutral damage. Its ice face is then broken and it changes forme to Noice Face. Eiscue regains its Ice Face forme when Hail or Heavy Hailstorm begins or when Eiscue switches in while Hail or Heavy Hailstorm is active. Confusion damage also breaks the ice face.",
 		shortDesc: "If Eiscue, first physical hit taken deals 0 damage. Effect is restored in Hail-like weather.",
 		onStart(pokemon) {
-			if (this.field.isWeather(['heavyhailstorm', 'hail']) &&
+			if (this.field.isWeather(['heavyhailstorm', 'hail', 'winterhail']) &&
 				pokemon.species.id === 'eiscuenoice' && !pokemon.transformed) {
 				this.add('-activate', pokemon, 'ability: Ice Face');
 				this.effectData.busted = false;
@@ -1472,7 +1677,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		},
 		onAnyWeatherStart() {
 			const pokemon = this.effectData.target;
-			if (this.field.isWeather(['heavyhailstorm', 'hail']) &&
+			if (this.field.isWeather(['heavyhailstorm', 'hail', 'winterhail']) &&
 				pokemon.species.id === 'eiscuenoice' && !pokemon.transformed) {
 				this.add('-activate', pokemon, 'ability: Ice Face');
 				this.effectData.busted = false;
@@ -1488,29 +1693,28 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.field.setWeather('primordialsea');
 		},
 		onAnySetWeather(target, source, weather) {
-			const strongWeathers = ['desolateland', 'primordialsea', 'deltastream', 'heavyhailstorm'];
-			if (this.field.getWeather().id === 'primordialsea' && !strongWeathers.includes(weather.id)) return false;
+			if (this.field.getWeather().id === 'primordialsea' && !STRONG_WEATHERS.includes(weather.id)) return false;
 		},
 	},
 	slushrush: {
 		inherit: true,
 		shortDesc: "If a Hail-like weather is active, this Pokemon's Speed is doubled.",
 		onModifySpe(spe, pokemon) {
-			if (this.field.isWeather(['heavyhailstorm', 'hail'])) {
+			if (this.field.isWeather(['heavyhailstorm', 'hail', 'winterhail'])) {
 				return this.chainModify(2);
 			}
 		},
 	},
 	snowcloak: {
 		inherit: true,
-		desc: "If Heavy Hailstorm or Hail is active, this Pokemon's evasiveness is multiplied by 1.25. This Pokemon takes no damage from Heavy Hailstorm or Hail.",
+		desc: "If Heavy Hailstorm, Winter Hail, or Hail is active, this Pokemon's evasiveness is multiplied by 1.25. This Pokemon takes no damage from Heavy Hailstorm or Hail.",
 		shortDesc: "If a Hail-like weather is active, 1.25x evasion; immunity to Hail-like weathers.",
 		onImmunity(type, pokemon) {
-			if (['heavyhailstorm', 'hail'].includes(type)) return false;
+			if (['heavyhailstorm', 'hail', 'winterhail'].includes(type)) return false;
 		},
 		onModifyAccuracy(accuracy) {
 			if (typeof accuracy !== 'number') return;
-			if (this.field.isWeather(['heavyhailstorm', 'hail'])) {
+			if (this.field.isWeather(['heavyhailstorm', 'hail', 'winterhail'])) {
 				this.debug('Snow Cloak - decreasing accuracy');
 				return accuracy * 0.8;
 			}

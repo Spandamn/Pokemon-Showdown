@@ -1384,7 +1384,7 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 				forme = "Minior";
 			}
 			target.formeChange(forme, move, true);
-			this.add(`c|${getName('GMars')}|${message}`);
+			if (message) this.add(`c|${getName('GMars')}|${message}`);
 			target.setAbility('capsulearmor');
 			target.baseAbility = target.ability;
 			if (forme === 'Minior-Indigo') {

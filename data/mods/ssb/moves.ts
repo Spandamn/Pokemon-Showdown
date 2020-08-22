@@ -471,42 +471,40 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 
 	// Arcticblast
 	radiantburst: {
-		accuracy: true,
-		basePower: 10,
+		accuracy: 100,
+		basePower: 180,
 		category: "Special",
 		desc: "Move causes Tapu Fini to become Brilliant if not, and vice versa. Move Mode depends on whether Tapu Fini is Brilliant or not.",
 		shortDesc: "Move's Mode depends on whether Tapu Fini has the Brilliant condition or not.",
 		name: "Radiant Burst",
-		pp: 16,
-		priority: 0,
+		pp: 10,
+		priority: 1,
 		flags: {protect: 1},
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
-		onPrepareHit(target, source) {
-			if (source.volatiles['brilliant']) {
-				this.add('-anim', target, 'Recover', target);
-			} else {
-				this.add('-anim', source, 'Diamond Storm', target);
-			}
+		onTry(source, target) {
+			if (!source.volatiles['brilliant']) {
+				this.add('-anim', source, 'Recover', source);
+				source.addVolatile('brilliant');
+				return null;
+			},
 		},
-		onModifyMove(move, pokemon) {
-			if (pokemon.volatiles['brilliant']) {
-				move.basePower = 180;
-				move.accuracy = 100;
-				move.type = "Fairy";
-				delete move.infiltrates;
-			}
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Diamond Storm', target);
 		},
 		onModifyPriority(priority, source, target, move) {
 			if (source.volatiles['brilliant']) return 0;
 		},
-		onHit(target, pokemon) {
-			if (!pokemon.volatiles['brilliant']) {
-				pokemon.addVolatile('brilliant');
-			} else {
-				this.add(`c|${getName('Arcticblast')}|YEET`);
+		onModifyMove(move, source) {
+			if (!source.volatiles['brilliant']) {
+				move.accuracy = true;
+				move.target = "self";
+				move.flags.protect = 0;
 			}
+		},
+		onHit(target, pokemon) {
+			this.add(`c|${getName('Arcticblast')}|YEET`);
 		},
 		onAfterMove(pokemon, target, move) {
 			if (pokemon.volatiles['brilliant']) pokemon.removeVolatile('brilliant');
@@ -514,7 +512,7 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 		secondary: null,
 		infiltrates: true,
 		target: "normal",
-		type: "???",
+		type: "Fairy",
 	},
 
 	// Averardo

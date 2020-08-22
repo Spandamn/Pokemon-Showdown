@@ -488,7 +488,7 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 				this.add('-anim', source, 'Recover', source);
 				source.addVolatile('brilliant');
 				return null;
-			},
+			}
 		},
 		onPrepareHit(target, source) {
 			this.add('-anim', source, 'Diamond Storm', target);

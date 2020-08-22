@@ -477,6 +477,8 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 		desc: "Move causes Tapu Fini to become Brilliant if not, and vice versa. Move Mode depends on whether Tapu Fini is Brilliant or not.",
 		shortDesc: "Move's Mode depends on whether Tapu Fini has the Brilliant condition or not.",
 		name: "Radiant Burst",
+		isNonstandard: "Custom",
+		gen: 8,
 		pp: 10,
 		priority: 1,
 		flags: {protect: 1},

@@ -110,6 +110,10 @@ export const Pokedex: {[k: string]: ModdedSpeciesData} = {
 		inherit: true,
 		abilities: {0: "Capsule Armor"},
 	},
+	miniormeteor: {
+		inherit: true,
+		abilities: {0: "Capsule Armor"},
+	},
 	// Hydro
 	pichu: {
 		inherit: true,

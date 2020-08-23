@@ -727,9 +727,6 @@ export const Abilities: {[k: string]: ModdedAbilityData & {gen?: number}} = {
 			this.add('-immune', target, '[from] ability: Capsule Armor');
 			return null;
 		},
-		onAnyTryMove(source, target, move) {
-			move.ignoreAbility = false;
-		},
 	},
 
 	// grimAuxiliatrix

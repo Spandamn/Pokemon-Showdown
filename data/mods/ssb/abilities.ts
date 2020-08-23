@@ -709,8 +709,8 @@ export const Abilities: {[k: string]: ModdedAbilityData & {gen?: number}} = {
 
 	// GMars
 	capsulearmor: {
-		desc: "On switch-in, this Pokemon's Attack or Special Attack is raised by 1 stage based on the weaker combined defensive stat of all opposing Pokemon. Attack is raised if their Defense is lower, and Special Attack is raised if their Special Defense is the same or lower.",
-		shortDesc: "On switch-in, Attack or Sp. Atk is raised 1 stage based on the foes' weaker Defense.",
+		desc: "While in Minior-Meteor forme, this Pokemon cannot be affected by major status conditions and is immune to critical hits. This ability cannot be ignored by Moongeist Beam, Sunsteel Strike, Mold Breaker, Teravolt, or Turboblaze.",
+		shortDesc: "Minior-Meteor: Immune to crits and status",
 		name: "Capsule Armor",
 		onCriticalHit: false,
 		onSetStatus(status, target, source, effect) {

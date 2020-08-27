@@ -1464,6 +1464,27 @@ export const Abilities: {[k: string]: ModdedAbilityData & {gen?: number}} = {
 		gen: 8,
 	},
 
+	//Spandan
+	hackedcorrosion: {
+		shortDesc: "Unaware + Corrosion.",
+		onAnyModifyBoost(boosts, pokemon) {
+			const unawareUser = this.effectData.target;
+			if (unawareUser === pokemon) return;
+			if (unawareUser === this.activePokemon && pokemon === this.activeTarget) {
+				boosts['def'] = 0;
+				boosts['spd'] = 0;
+				boosts['evasion'] = 0;
+			}
+			if (pokemon === this.activePokemon && unawareUser === this.activeTarget) {
+				boosts['atk'] = 0;
+				boosts['def'] = 0;
+				boosts['spa'] = 0;
+				boosts['accuracy'] = 0;
+			}
+		},
+		name: "Hacked Corrosion",
+	},
+
 	// Struchni
 	overaskedclause: {
 		desc: "When switching in, become a random type that resists the last move the opponent used. If no move was used or if it's the first turn, pick a random type. If hit by a move that is not very effective, become Aggron-Mega (but keep the same type).",

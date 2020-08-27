@@ -675,7 +675,7 @@ export const Scripts: ModdedBattleScriptsData = {
 		// Calculate damage modifiers separately (order differs between generations)
 		return this.modifyDamage(baseDamage, pokemon, target, move, suppressMessages);
 	},
- 
+
 	pokemon: {
 		isGrounded(negateImmunity) {
 			if ('gravity' in this.battle.field.pseudoWeather) return true;

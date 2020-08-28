@@ -3476,9 +3476,6 @@ export const Moves: {[k: string]: ModdedMoveData & {gen?: number}} = {
 			this.add('-anim', source, 'Sludge Bomb', target);
 			this.add('-anim', source, 'Sludge Wave', target);
 		},
-		onEffectiveness(typeMod, target, type) {
-			return 0;
-		},
 		ignoreImmunity: {
 			'Steel': true,
 		},

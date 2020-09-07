@@ -2433,7 +2433,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		},
 		secondary: null,
 		target: "self",
-		type: "Normal",
+		type: "Fighting",
 	},
 
 	// Kris

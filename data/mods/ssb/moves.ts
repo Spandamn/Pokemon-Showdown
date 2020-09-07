@@ -1577,6 +1577,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			}
 			source.m.changeForme(this.random(3) + 1);
 		},
+		ignoreAbility: true,
 		secondary: null,
 		target: "normal",
 		type: "Poison",

@@ -1567,6 +1567,8 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			selfBoost[boosts[this.random(5)]] = 1;
 			const oppBoost: SparseBoostsTable = {};
 			oppBoost[boosts[this.random(5)]] = 1;
+			this.boost(selfBoost, source);
+			this.boost(oppBoost, target);
 			const formes = ['Alcremie-Lemon-Cream', 'Alcremie-Ruby-Swirl', 'Alcremie-Mint-Cream'];
 			if (formes.includes(source.species.name)) {
 				let formenum = formes.indexOf(source.species.name) + 1;

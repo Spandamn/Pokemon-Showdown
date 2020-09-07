@@ -2390,7 +2390,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Dark",
 	},
 
-	// Kipluif
+	// Kipkluif
 	kipup: {
 		accuracy: true,
 		basePower: 0,
@@ -2413,7 +2413,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			onHit(pokemon, source, move) {
 				if (this.effectData.gotHit) return;
 				if (pokemon.side !== source.side && move.category !== 'Status') {
-					pokemon.volatiles['kipup'].gotHit = true;
+					this.effectData.gotHit = true;
 					this.add('-message', 'Gossifleur was prepared for the impact!');
 					const boosts: {[k: string]: number} = {def: 2, spd: 2};
 					if (pokemon.boosts.def >= 1) boosts.def--;

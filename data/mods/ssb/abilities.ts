@@ -1146,6 +1146,9 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			}
 			data.sources.push(pokemon);
 		},
+		onEnd(pokemon) {
+			pokemon.side.foe.removeSideCondition('degenerator');
+		},
 		condition: {
 			onBeforeSwitchOut(pokemon) {
 				let alreadyAdded = false;

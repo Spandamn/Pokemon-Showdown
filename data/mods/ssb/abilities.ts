@@ -269,14 +269,15 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		condition: {
 			onModifySpA(spa, pokemon) {
 				if (!this.effectData.clones) return;
-				return this.chainModify(Math.pow(1.1, this.effectData.clones));
+				return this.chainModify(1 + (this.effectData.clones / 10));
 			},
 			onModifySpe(spa, pokemon) {
 				if (!this.effectData.clones) return;
-				return this.chainModify(Math.pow(1.1, this.effectData.clones));
+				return this.chainModify(1 + (this.effectData.clones / 10));
 			},
 			onHit(target, source, move) {
 				if (move.category === 'Status' || move.selfdestruct) return;
+				if (pokemon.m.squadup) return;
 				this.effectData.clones += 2;
 				this.add("-message", `Venomoth uses its Koga training to create 2 ninja clones!`);
 			},

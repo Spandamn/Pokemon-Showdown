@@ -1549,11 +1549,11 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			let result = 0;
 			const pokemon = this.getAllActive();
 			for (const poke of pokemon) {
-				result += Object.values(poke.boosts).reduce((total, x) => {return total + x;});
+				result += Object.values(poke.boosts).reduce((total, x) => { return total + x; });
 			}
 			if (result < 8) return;
 			this.add('-ability', source, 'Supernova');
-			pokemon.map((x) => {
+			pokemon.forEach((x) => {
 				this.add('-anim', x, 'Explosion', x);
 				x.faint();
 			}, this);

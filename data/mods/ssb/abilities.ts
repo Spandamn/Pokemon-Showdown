@@ -293,7 +293,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			onBeforeMove(source, target, move) {
 				if (move.category === 'Status' || !this.effectData.clones) return;
 				this.add('-message', `Venomoth's ${this.effectData.clones} will attack!`);
-				let cloneMove = Object.assign({}, this.dex.getActiveMove("Clone Move"));
+				const cloneMove = Object.assign({}, this.dex.getActiveMove("Clone Move"));
 				cloneMove.type = move.type;
 				cloneMove.category = move.category;
 				if (!move.secondary) return;

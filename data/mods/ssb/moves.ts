@@ -1607,7 +1607,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		category: "Physical",
 		desc: "Power doubles if the user moves before the target.",
 		shortDesc: "Power doubles if user moves before the target.",
-		name: "Just Chillin\'",
+		name: "Just Chillin'",
 		pp: 10,
 		priority: 0,
 		flags: {bite: 1, contact: 1, protect: 1, mirror: 1},

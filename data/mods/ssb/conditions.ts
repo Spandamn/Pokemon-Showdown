@@ -600,7 +600,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 						used: false,
 					});
 					slot++;
-				};
+				}
 			};
 		},
 		onSwitchOut() {

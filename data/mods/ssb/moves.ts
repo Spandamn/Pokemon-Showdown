@@ -354,7 +354,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		flags: {},
 		stallingMove: true,
 		volatileStatus: 'protect',
-		sideCondition: 'craftyshield',
 		onPrepareHit(pokemon) {
 			this.add('-anim', pokemon, 'Spotlight', pokemon);
 			this.add('-anim', pokemon, 'Double Team', pokemon);

@@ -679,6 +679,10 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 		onFaint() {
 			this.add(`c|${getName('Gimmick')}|I did nothing wrong (but I got on the blacklist)`);
 		},
+		// Innate Leviatate
+		onImmunity(type) {
+			if (type === 'Ground') return false;
+		},
 	},
 	gmars: {
 		noCopy: true,

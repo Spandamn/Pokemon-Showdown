@@ -532,7 +532,7 @@ export const ssbSets: SSBSets = {
 		species: 'Palpitoad', ability: 'Swampy Surge', item: 'Eviolite', gender: 'M',
 		moves: ['Recover', 'Refresh', ['Sludge Bomb', 'Sludge Wave']],
 		signatureMove: 'Croak',
-		evs: {hp: 248, def: 8, spe: 252}, ivs: {atk: 0}, nature: 'Calm',
+		evs: {hp: 248, def: 8, spd: 252}, ivs: {atk: 0}, nature: 'Calm',
 	},
 	quadrophenic: {
 		species: 'Porygon', ability: 'Adaptability', item: 'Eviolite', gender: 'N',

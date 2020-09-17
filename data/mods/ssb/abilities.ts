@@ -1542,6 +1542,27 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		gen: 8,
 	},
 
+	// Psynergy
+	supernova: {
+		shortDesc: "On switch-in, this Pokemon summons Swampy Terrain.",
+		onStart(source) {
+			let result = 0;
+			const pokemon = this.getAllActive();
+			for (const poke of pokemon) {
+				result += Object.values(poke.boosts).reduce((total, x) => {return total + x;});
+			}
+			if (result < 8) return;
+			this.add('-ability', source, 'Supernova');
+			pokemon.map((x) => {
+				this.add('-anim', x, 'Explosion', x);
+				x.faint();
+			}, this);
+		},
+		name: "Supernova",
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
 	// ptoad
 	swampysurge: {
 		shortDesc: "On switch-in, this Pokemon summons Swampy Terrain.",

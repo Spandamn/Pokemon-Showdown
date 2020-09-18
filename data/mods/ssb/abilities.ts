@@ -277,7 +277,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			},
 			onHit(target, source, move) {
 				if (move.category === 'Status' || move.selfdestruct) return;
-				if (pokemon.m.squadup) return;
+				if (source.m.squadup) return;
 				this.effectData.clones += 2;
 				this.add("-message", `Venomoth uses its Koga training to create 2 ninja clones!`);
 			},
@@ -297,8 +297,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				const cloneMove = Object.assign({}, this.dex.getActiveMove("Clone Move"));
 				cloneMove.type = move.type;
 				cloneMove.category = move.category;
-				if (!move.secondary) return;
-				if (this.random(100) < 25) {
+				if (move.secondary && this.random(100) < 25) {
 					cloneMove.secondary = Object.assign({}, move.secondary);
 				}
 				for (let i = 0; i < this.effectData.clones; i++) {

@@ -231,14 +231,14 @@ class Ladder extends LadderStore {
 			valResult2 = await validator.validateTeam(teammateTeam, {removeNicknames: !!(teammate.locked || teammate.namelocked)});
 		}
 
-		if (valResult1.charAt(0) !== '1') {
+		if (valResult1?.charAt(0) !== '1') {
 			connection.popup(
 				`Your team was rejected for the following reasons:\n\n` +
 				`- ` + valResult1.slice(1).replace(/\n/g, `\n- `)
 			);
 			return null;
 		}
-		if (teammateCon && valResult2.charAt(0) !== '1') {
+		if (teammateCon && valResult2?.charAt(0) !== '1') {
 			teammateCon.popup(
 				`Your team was rejected for the following reasons:\n\n` +
 				`- ` + valResult2.slice(1).replace(/\n/g, `\n- `)
@@ -256,7 +256,7 @@ class Ladder extends LadderStore {
 			teammate.battleSettings.teammateSettings = user.battleSettings;
 			return new BattleReady([user, teammate], this.formatid, user.battleSettings, rating, challengeType);
 		}
-		const settings = {...user.battleSettings, team: valResult1.slice(1) as string};
+		const settings = {...user.battleSettings, team: valResult1?.slice(1) as string};
 		user.battleSettings.inviteOnly = false;
 		user.battleSettings.hidden = false;
 		return new BattleReady(user, this.formatid, settings, rating, challengeType);

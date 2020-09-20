@@ -1,3 +1,4 @@
+import { consoleips } from '../../config/config-example';
 /**
  * Core commands
  * Pokemon Showdown - http://pokemonshowdown.com/
@@ -1356,12 +1357,11 @@ export const commands: ChatCommands = {
 			return this.popupReply(this.tr`You must choose a username before you challenge someone.`);
 		}
 		const sep: string[] = target.split(',');
-		let teammate: User | null, isMulti: boolean;
-		if (Dex.getFormat(sep[1]).gameType === 'multi' && target.includes('&')) {
+		let teammate = Users.get(sep.splice(-1)[0]), isMulti: boolean;
+		if (Dex.getFormat(target.substring(0, target.lastIndexOf(","))).gameType === 'multi' && teammate) {
 			isMulti = true;
-			teammate = Users.get(target.substring(target.indexOf("&") + 1));
 			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf("&") + 1)}' was not found.`);
-			target = target.substring(0, target.indexOf("&"));
+			target = target.substring(0, target.lastIndexOf(","));
 			return Ladders(target).makeChallenge(connection, targetUser, teammate);
 		}
 		if (Config.pmmodchat && !user.hasSysopAccess() && !Users.globalAuth.atLeast(user, Config.pmmodchat as GroupSymbol)) {

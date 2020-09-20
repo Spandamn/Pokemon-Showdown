@@ -21,7 +21,7 @@ import * as RoomGames from "./room-game";
 
 type ChannelIndex = 0 | 1 | 2 | 3 | 4;
 type PlayerIndex = 1 | 2 | 3 | 4;
-export type ChallengeType = 'rated' | 'unrated' | 'challenge' | 'tour';
+export type ChallengeType = 'rated' | 'unrated' | 'challenge' | 'tour' | 'multi';
 
 interface BattleRequestTracker {
 	rqid: number;

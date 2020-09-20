@@ -1355,6 +1355,15 @@ export const commands: ChatCommands = {
 		if (!user.named) {
 			return this.popupReply(this.tr`You must choose a username before you challenge someone.`);
 		}
+		const sep: string[] = target.split(',');
+		let teammate: User | null, isMulti: boolean;
+		if (Dex.getFormat(sep[1]).gameType === 'multi' && target.includes('|')) {
+			isMulti = true;
+			teammate = Users.get(target.substring(target.indexOf("|") + 1));
+			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf("|") + 1)}' was not found.`);
+			target = target.substring(0, target.indexOf("|"));
+			return Ladders(target).makeChallenge(connection, targetUser, teammate);
+		}
 		if (Config.pmmodchat && !user.hasSysopAccess() && !Users.globalAuth.atLeast(user, Config.pmmodchat as GroupSymbol)) {
 			const groupName = Config.groups[Config.pmmodchat].name || Config.pmmodchat;
 			this.popupReply(this.tr`This server requires you to be rank ${groupName} or higher to challenge users.`);
@@ -1396,11 +1405,16 @@ export const commands: ChatCommands = {
 
 	accept(target, room, user, connection) {
 		target = this.splitTarget(target);
-		if (target) return this.popupReply(this.tr`This command does not support specifying multiple users`);
+		let hasthirdPlayer = false;
+		let teammate = null;
+		if (target) {
+			teammate = Users.get(target);
+			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target}' was not found.`);
+		}
 		const targetUser = this.targetUser || this.pmTarget;
 		const targetUsername = this.targetUsername;
 		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		return Ladders.acceptChallenge(connection, targetUser);
+		return Ladders.acceptChallenge(connection, targetUser, !!teammate);
 	},
 
 	reject(target, room, user) {

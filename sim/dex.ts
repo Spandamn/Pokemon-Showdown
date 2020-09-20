@@ -47,6 +47,7 @@ import * as path from 'path';
 import * as Data from './dex-data';
 import {PRNG, PRNGSeed} from './prng';
 import {Utils} from '../lib/utils';
+import { customavatars } from '../config/config-example';
 
 const BASE_MOD = 'gen8' as ID;
 const DEFAULT_MOD = BASE_MOD;
@@ -674,8 +675,10 @@ export class ModdedDex {
 	 * Returns a sanitized format ID if valid, or throws if invalid.
 	 */
 	validateFormat(name: string) {
-		const [formatName, customRulesString] = name.split('@@@', 2);
+		let [formatName, customRulesString] = name.split('@@@', 2);
 		const format = this.getFormat(formatName);
+		const p3 = customRulesString.split('|')[1];
+		customRulesString = customRulesString.split('|')[0];
 		if (!format.exists) throw new Error(`Unrecognized format "${formatName}"`);
 		if (!customRulesString) return format.id;
 		const ruleTable = this.getRuleTable(format);

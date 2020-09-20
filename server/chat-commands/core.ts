@@ -1357,11 +1357,11 @@ export const commands: ChatCommands = {
 		}
 		const sep: string[] = target.split(',');
 		let teammate: User | null, isMulti: boolean;
-		if (Dex.getFormat(sep[1]).gameType === 'multi' && target.includes('|')) {
+		if (Dex.getFormat(sep[1]).gameType === 'multi' && target.includes('&')) {
 			isMulti = true;
-			teammate = Users.get(target.substring(target.indexOf("|") + 1));
-			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf("|") + 1)}' was not found.`);
-			target = target.substring(0, target.indexOf("|"));
+			teammate = Users.get(target.substring(target.indexOf("&") + 1));
+			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf("&") + 1)}' was not found.`);
+			target = target.substring(0, target.indexOf("&"));
 			return Ladders(target).makeChallenge(connection, targetUser, teammate);
 		}
 		if (Config.pmmodchat && !user.hasSysopAccess() && !Users.globalAuth.atLeast(user, Config.pmmodchat as GroupSymbol)) {

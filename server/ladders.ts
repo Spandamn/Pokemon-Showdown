@@ -434,7 +434,7 @@ class Ladder extends LadderStore {
 		}
 		if (chall && Dex.getFormat(chall.formatid).gameType === "multi" && teammate && teammate !== connection.user) {
 			const ready = await this.prepBattle(connection, "multi");
-			const teammateReady = await this.prepBattle(teammate.connections[0], "multi")
+			const teammateReady = /*await*/ this.prepBattle(teammate.connections[0], "multi")
 			if (!ready || !teammateReady) return false;
 			Ladder.addChallenge(new Challenge([ready, teammateReady], targetUser));
 			user.lastChallenge = Date.now();
@@ -479,7 +479,7 @@ class Ladder extends LadderStore {
 		console.log(chall + " " + chall.ready)
 		if (teammate && chall && Dex.getFormat(chall.formatid).gameType === 'multi') {
 			const ready1 = await ladder.prepBattle(connection, 'multi');
-			const ready2 = await ladder.prepBattle(teammate.connections[0], 'multi');
+			const ready2 = /*await*/ ladder.prepBattle(teammate.connections[0], 'multi');
 			if (!ready1 || !ready2) return;
 			if (Array.isArray(chall.ready)) {
 				chall.ready.push(ready1);
@@ -766,7 +766,7 @@ class Ladder extends LadderStore {
 	}
 
 	static match(ready1: BattleReady | BattleReady[], ready2: BattleReady | BattleReady[]) {
-		console.log(`${ready1}\n${ready2}\n${ready1[0].challengeType === 'multi'}\n`)
+		// console.log(`${ready1}\n${ready2}\n${ready1[0].challengeType === 'multi'}\n`)
 		if (Array.isArray(ready1) && Array.isArray(ready2) && ready1[0].challengeType === "multi" && ready2[0].challengeType === "multi") {
 			const team1 = [ready1[0].user, ready1[1].user];
 			const team2 = [ready2[0].user, ready2[1].user];

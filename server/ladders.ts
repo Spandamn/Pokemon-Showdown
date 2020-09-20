@@ -437,7 +437,7 @@ class Ladder extends LadderStore {
 			connection.popup(`You challenged less than 10 seconds after your last challenge! It's cancelled in case it's a misclick.`);
 			return false;
 		}
-		if (chall && Dex.getFormat(chall.formatid).gameType === "multi" && teammate && teammate !== connection.user) {
+		if (teammate && teammate !== connection.user) {
 			const ready = await this.prepBattle(connection, "multi", null, false, teammate);
 			if (!ready) return false;
 			Ladder.addChallenge(new Challenge(ready, targetUser));
@@ -481,10 +481,16 @@ class Ladder extends LadderStore {
 			return false;
 		}
 		const ladder = Ladders(chall.formatid);
-		const ready = await ladder.prepBattle(connection, 'challenge', null, false, teammate);
 		if (Dex.getFormat(chall.formatid).gameType === 'multi') {
+			const ready = await ladder.prepBattle(connection, 'multi', null, false, teammate);
 			chall.p4 = teammate;
+			if (!ready) return false;
+			if (Ladder.removeChallenge(chall)) {
+				Ladders.match(chall.ready, ready);
+			}
+			return true;
 		}
+		const ready = await ladder.prepBattle(connection, 'challenge');
 		if (!ready) return false;
 		if (Ladder.removeChallenge(chall)) {
 			Ladders.match(chall.ready, ready);
@@ -760,9 +766,11 @@ class Ladder extends LadderStore {
 	}
 
 	static match(ready1: BattleReady, ready2: BattleReady) {
+		console.log(ready1.challengeType);
 		if (ready1.challengeType === "multi" && ready2.challengeType === "multi") {
 			const team1 = [ready1.user, ready1.teammate];
 			const team2 = [ready2.user, ready2.teammate];
+			console.log(`${team1[0].id} ${team1[1].id} ${team2[0].id} ${team2[1].id} `)
 			for (let player of team1) {
 				if (!player) {
 					team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
@@ -788,6 +796,7 @@ class Ladder extends LadderStore {
 				p1hidden: ready1.hidden,
 				p1inviteOnly: ready1.inviteOnly,
 				p2: team2[0],
+				p4: team2[1],
 				p2team: ready2.team,
 				p4team: ready2.team,
 				p2rating: ready2.rating,

@@ -675,10 +675,8 @@ export class ModdedDex {
 	 * Returns a sanitized format ID if valid, or throws if invalid.
 	 */
 	validateFormat(name: string) {
-		let [formatName, customRulesString] = name.split('@@@', 2);
+		const [formatName, customRulesString] = name.split('@@@', 2);
 		const format = this.getFormat(formatName);
-		const p3 = customRulesString.split('|')[1];
-		customRulesString = customRulesString.split('|')[0];
 		if (!format.exists) throw new Error(`Unrecognized format "${formatName}"`);
 		if (!customRulesString) return format.id;
 		const ruleTable = this.getRuleTable(format);

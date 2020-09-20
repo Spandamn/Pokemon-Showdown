@@ -28,6 +28,7 @@ import { consoleips } from '../config/config-example';
 class BattleReady {
 	readonly userid: ID;
 	readonly user: User | null;
+	readonly teammate?: User;
 	readonly formatid: string;
 	readonly team: string;
 	readonly hidden: boolean;
@@ -41,9 +42,11 @@ class BattleReady {
 		settings: User['battleSettings'],
 		rating: number,
 		challengeType: ChallengeType,
+		teammate?: User,
 	) {
 		this.userid = userid;
 		this.user = Users.get(userid);
+		this.teammate = teammate;
 		this.formatid = formatid;
 		this.team = settings.team;
 		this.hidden = settings.hidden; 
@@ -61,13 +64,15 @@ const searches = new Map<string, Map<string, BattleReady>>();
 
 class Challenge {
 	readonly from: ID;
+	p3?: User;
 	readonly to: string;
+	p4?: User;
 	readonly formatid: string;
-	ready: BattleReady | BattleReady[];
-	constructor(ready: BattleReady | BattleReady[], to: User) {
-		this.from = Array.isArray(ready) ? ready[0].userid : ready.userid;
+	readonly ready: BattleReady;
+	constructor(ready: BattleReady, to: User) {
+		this.from = ready.userid;
 		this.to = to.id;
-		this.formatid = Array.isArray(ready) ? ready[0].formatid : ready.formatid;
+		this.formatid = ready.formatid;
 		this.ready = ready;
 	}
 }
@@ -256,7 +261,7 @@ class Ladder extends LadderStore {
 		user.battleSettings.hidden = false;
 		return new BattleReady(user, this.formatid, settings, rating, challengeType);
 	}*/
-	async prepBattle(connection: Connection, challengeType: ChallengeType, team: string | null = null, isRated = false) {
+	async prepBattle(connection: Connection, challengeType: ChallengeType, team: string | null = null, isRated = false, teammate?: User) {
 		// all validation for a battle goes through here
 		const user = connection.user;
 		const userid = user.id;
@@ -354,7 +359,7 @@ class Ladder extends LadderStore {
 		const settings = {...user.battleSettings, team: valResult.slice(1) as string};
 		user.battleSettings.inviteOnly = false;
 		user.battleSettings.hidden = false;
-		return new BattleReady(userid, this.formatid, settings, rating, challengeType);
+		return new BattleReady(userid, this.formatid, settings, rating, challengeType, teammate);
 	}
 
 	static getChallenging(user: User) {
@@ -433,10 +438,10 @@ class Ladder extends LadderStore {
 			return false;
 		}
 		if (chall && Dex.getFormat(chall.formatid).gameType === "multi" && teammate && teammate !== connection.user) {
-			const ready = await this.prepBattle(connection, "multi");
-			const teammateReady = /*await*/ this.prepBattle(teammate.connections[0], "multi")
-			if (!ready || !teammateReady) return false;
-			Ladder.addChallenge(new Challenge([ready, teammateReady], targetUser));
+			const ready = await this.prepBattle(connection, "multi", null, false, teammate);
+			if (!ready) return false;
+			Ladder.addChallenge(new Challenge(ready, targetUser));
+			Ladder.getChallenging(user).p3 = teammate;
 			user.lastChallenge = Date.now();
 			return true;
 		}
@@ -476,21 +481,10 @@ class Ladder extends LadderStore {
 			return false;
 		}
 		const ladder = Ladders(chall.formatid);
-		console.log(chall + " " + chall.ready)
-		if (teammate && chall && Dex.getFormat(chall.formatid).gameType === 'multi') {
-			const ready1 = await ladder.prepBattle(connection, 'multi');
-			const ready2 = /*await*/ ladder.prepBattle(teammate.connections[0], 'multi');
-			if (!ready1 || !ready2) return;
-			if (Array.isArray(chall.ready)) {
-				chall.ready.push(ready1);
-				chall.ready.push(ready2);
-				if (Ladder.removeChallenge(chall)) {
-					Ladders.match(chall.ready.splice(0, 2), [ready1, ready2]);
-				}
-			}
-			return true;
+		const ready = await ladder.prepBattle(connection, 'challenge', null, false, teammate);
+		if (Dex.getFormat(chall.formatid).gameType === 'multi') {
+			chall.p4 = teammate;
 		}
-		const ready = await ladder.prepBattle(connection, 'challenge');
 		if (!ready) return false;
 		if (Ladder.removeChallenge(chall)) {
 			Ladders.match(chall.ready, ready);
@@ -765,11 +759,10 @@ class Ladder extends LadderStore {
 		}
 	}
 
-	static match(ready1: BattleReady | BattleReady[], ready2: BattleReady | BattleReady[]) {
-		// console.log(`${ready1}\n${ready2}\n${ready1[0].challengeType === 'multi'}\n`)
-		if (Array.isArray(ready1) && Array.isArray(ready2) && ready1[0].challengeType === "multi" && ready2[0].challengeType === "multi") {
-			const team1 = [ready1[0].user, ready1[1].user];
-			const team2 = [ready2[0].user, ready2[1].user];
+	static match(ready1: BattleReady, ready2: BattleReady) {
+		if (ready1.challengeType === "multi" && ready2.challengeType === "multi") {
+			const team1 = [ready1.user, ready1.teammate];
+			const team2 = [ready2.user, ready2.teammate];
 			for (let player of team1) {
 				if (!player) {
 					team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
@@ -786,22 +779,22 @@ class Ladder extends LadderStore {
 					return false;
 				}
 			}
-			Rooms.createBattle(ready1[0].formatid, {
+			Rooms.createBattle(ready1.formatid, {
 				p1: team1[0],
 				p3: team1[1],
-				p1team: ready1[0].team,
-				p3team: ready1[1].team,
-				p1rating: ready1[0].rating,
-				p1hidden: ready1[0].hidden,
-				p1inviteOnly: ready1[0].inviteOnly,
+				p1team: ready1.team,
+				p3team: ready1.team,
+				p1rating: ready1.rating,
+				p1hidden: ready1.hidden,
+				p1inviteOnly: ready1.inviteOnly,
 				p2: team2[0],
-				p2team: ready2[0].team,
-				p4team: ready2[1].team,
-				p2rating: ready2[0].rating,
-				p2hidden: ready2[0].hidden,
-				p2inviteOnly: ready2[0].inviteOnly,
-				rated: Math.min(ready1[0].rating, ready2[0].rating),
-				challengeType: ready1[0].challengeType,
+				p2team: ready2.team,
+				p4team: ready2.team,
+				p2rating: ready2.rating,
+				p2hidden: ready2.hidden,
+				p2inviteOnly: ready2.inviteOnly,
+				rated: Math.min(ready1.rating, ready2.rating),
+				challengeType: ready1.challengeType,
 			});
 			return;
 		}
@@ -819,12 +812,12 @@ class Ladder extends LadderStore {
 		}
 		Rooms.createBattle(ready1.formatid, {
 			p1: user1,
-			p1team: ready1.teams,
+			p1team: ready1.team,
 			p1rating: ready1.rating,
 			p1hidden: ready1.hidden,
 			p1inviteOnly: ready1.inviteOnly,
 			p2: user2,
-			p2team: ready2.teams,
+			p2team: ready2.team,
 			p2rating: ready2.rating,
 			p2hidden: ready2.hidden,
 			p2inviteOnly: ready2.inviteOnly,

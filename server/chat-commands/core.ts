@@ -1404,6 +1404,20 @@ export const commands: ChatCommands = {
 	},
 
 	accept(target, room, user, connection) {
+		target = this.splitTarget(target);
+		let teammate = null;
+		if (target) {
+			teammate = Users.get(target);
+			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target}' was not found.`);
+		}
+		const targetUser = this.targetUser || this.pmTarget;
+		const targetUsername = this.targetUsername;
+		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
+		return Ladders.acceptChallenge(connection, targetUser, !!teammate);
+	},
+
+	acceptmulti(target, room, user, connection) {
+		target = this.splitTarget(target);
 		let teammate = null;
 		if (target) {
 			teammate = Users.get(target);

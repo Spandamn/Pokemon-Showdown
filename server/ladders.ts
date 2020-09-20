@@ -221,7 +221,7 @@ class Ladder extends LadderStore {
 				return null;
 			}
 			if (!rating2) rating2 = 1;
-		} else if (teammateTeam && teammate) {
+		} else if (challengeType === 'multi') {
 			if (Ladders.disabled) {
 				connection.popup(`The ladder is temporarily disabled due to technical difficulties - you will not receive ladder rating for this game.`);
 				rating2 = 1;
@@ -231,14 +231,14 @@ class Ladder extends LadderStore {
 			valResult2 = await validator.validateTeam(teammateTeam, {removeNicknames: !!(teammate.locked || teammate.namelocked)});
 		}
 
-		if (valResult1?.charAt(0) !== '1') {
+		if (valResult1 && valResult1.charAt(0) !== '1') {
 			connection.popup(
 				`Your team was rejected for the following reasons:\n\n` +
 				`- ` + valResult1.slice(1).replace(/\n/g, `\n- `)
 			);
 			return null;
 		}
-		if (teammateCon && valResult2?.charAt(0) !== '1') {
+		if (teammateCon && valResult2 && valResult2.charAt(0) !== '1') {
 			teammateCon.popup(
 				`Your team was rejected for the following reasons:\n\n` +
 				`- ` + valResult2.slice(1).replace(/\n/g, `\n- `)

@@ -1404,8 +1404,6 @@ export const commands: ChatCommands = {
 	},
 
 	accept(target, room, user, connection) {
-		target = this.splitTarget(target);
-		let hasthirdPlayer = false;
 		let teammate = null;
 		if (target) {
 			teammate = Users.get(target);

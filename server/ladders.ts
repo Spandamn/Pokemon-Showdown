@@ -375,11 +375,11 @@ class Ladder extends LadderStore {
 	}
 	static async acceptChallenge(connection: Connection, targetUser: User, asTeammate: boolean | null) {
 		const chall = Ladder.getChallenging(targetUser);
-		if (chall && Dex.getFormat(chall.formatid).gameType === 'multi' && asTeammate && !chall.teammate) {
+		if (chall && asTeammate && !chall.teammate) {
 			chall.teammate = connection.user.id;
 			targetUser.connections[0].popup(`${connection.user.name} has accepted you team invite!`);
 		}
-		if (!chall || chall.to !== connection.user.id) {
+		if ((!chall || chall.to !== connection.user.id) && !asTeammate) {
 			connection.popup(`${targetUser.id} is not challenging you. Maybe they cancelled before you accepted?`);
 			return false;
 		}

@@ -1614,7 +1614,7 @@ export class Battle {
 			this.sides[1].ally = this.sides[3];
 			this.sides[3].ally = this.sides[1];
 			this.sides[0].foe = this.sides[2].foe = [this.sides[1], this.sides[3]];
-			this.sides[1].foe = this.sides[3].foe = [this.sides[0], this.sides[1]];
+			this.sides[1].foe = this.sides[3].foe = [this.sides[0], this.sides[2]];
 		} else if (this.gameType === 'free-for-all') {
 			this.sides.forEach(side => {
 				side.foe = side.battle.sides.filter(s => s !== side);
@@ -2268,7 +2268,7 @@ export class Battle {
 		const isAdjacent = (isFoe ?
 			Math.abs(acrossFromTargetLoc - sourceLoc) <= 1 :
 			Math.abs(targetLoc - sourceLoc) === 1);
-		const isSelf = (sourceLoc === targetLoc);
+		const isSelf = (sourceLoc === targetLoc) && !isFoe;
 
 		switch (targetType) {
 		case 'randomNormal':
@@ -2288,8 +2288,9 @@ export class Battle {
 	}
 
 	getTargetLoc(target: Pokemon, source: Pokemon) {
-		const position = target.position + 1;
-		return (target.side === source.side || target.side=== source.side.ally) ? -position : position;
+		let position = target.position + 1;
+		if (target.side.n % 2 === 0) position += 1;
+		return (target.side === source.side || target.side === source.side.ally) ? -position : position;
 	}
 
 	validTarget(target: Pokemon, source: Pokemon, targetType: string) {
@@ -2300,7 +2301,7 @@ export class Battle {
 		if (targetLoc > 0) {
 			return pokemon.side.getFoeActive()[targetLoc - 1];
 		} else {
-			return (this.gameType === 'multi' ? pokemon.side.getActive() : pokemon.side.active)[-targetLoc - 1];
+			return pokemon.side.getActive()[-targetLoc - 1];
 		}
 	}
 
@@ -2327,7 +2328,7 @@ export class Battle {
 		}
 		if (move.target !== 'randomNormal' && this.validTargetLoc(targetLoc, pokemon, move.target)) {
 			const target = this.getAtLoc(pokemon, targetLoc);
-			if (target?.fainted && target.side === pokemon.side) {
+			if (target?.fainted && (target.side === pokemon.side || target.side === pokemon.side.ally)) {
 				// Target is a fainted ally: attack shouldn't retarget
 				return target;
 			}

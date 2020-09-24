@@ -2289,7 +2289,7 @@ export class Battle {
 
 	getTargetLoc(target: Pokemon, source: Pokemon) {
 		const position = target.position + 1;
-		return (target.side === source.side) ? -position : position;
+		return (target.side === source.side || target.side.ally === source.side) ? -position : position;
 	}
 
 	validTarget(target: Pokemon, source: Pokemon, targetType: string) {

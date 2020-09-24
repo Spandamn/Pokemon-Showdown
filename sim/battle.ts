@@ -2260,7 +2260,7 @@ export class Battle {
 		if (this.gameType !== 'multi') {
 			if (Math.abs(targetLoc) > numSlots) return false;
 		} else {
-			if (Math.abs(targetLoc) >= this.getAllActive().length) return;
+			if (Math.abs(targetLoc) > this.getAllActive().length) return;
 		}
 		const sourceLoc = -(source.position + 1);
 		const isFoe = (targetLoc > 0);
@@ -2289,7 +2289,7 @@ export class Battle {
 
 	getTargetLoc(target: Pokemon, source: Pokemon) {
 		const position = target.position + 1;
-		return (target.side === source.side || target.side.ally === source.side) ? -position : position;
+		return (target.side === source.side || target.side=== source.side.ally) ? -position : position;
 	}
 
 	validTarget(target: Pokemon, source: Pokemon, targetType: string) {

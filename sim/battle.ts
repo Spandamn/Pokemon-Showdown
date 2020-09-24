@@ -2260,7 +2260,7 @@ export class Battle {
 		if (this.gameType !== 'multi') {
 			if (Math.abs(targetLoc) > numSlots) return false;
 		} else {
-			if (Math.abs(targetLoc) > this.getAllActive().length) return;
+			if (Math.abs(targetLoc) >= this.getAllActive().length) return;
 		}
 		const sourceLoc = -(source.position + 1);
 		const isFoe = (targetLoc > 0);

@@ -77,7 +77,7 @@ export class Side {
 		this.name = name;
 		this.avatar = '';
 		this.maxTeamSize = 6;
-		this.foe = battle.gameType === 'multi' ? [] : sideNum ? this.battle.sides[0] : this.battle.sides[1];;
+		this.foe = battle.gameType === 'multi' ? [] : (sideNum ? this.battle.sides[0] : this.battle.sides[1]);
 
 		this.team = team;
 		this.pokemon = [];

@@ -2256,8 +2256,12 @@ export class Battle {
 	 */
 	validTargetLoc(targetLoc: number, source: Pokemon, targetType: string) {
 		if (targetLoc === 0) return true;
-		let numSlots = source.side.active.length + this.gameType === 'multi' ? source.side.ally?.active.length : 0;
-		if (Math.abs(targetLoc) > numSlots) return false;
+		let numSlots = source.side.getActive().length;
+		if (this.gameType !== 'multi') {
+			if (Math.abs(targetLoc) > numSlots) return false;
+		} else {
+			if (Math.abs(targetLoc) > this.getAllActive().length) return;
+		}
 		const sourceLoc = -(source.position + 1);
 		const isFoe = (targetLoc > 0);
 		const acrossFromTargetLoc = -(numSlots + 1 - targetLoc);

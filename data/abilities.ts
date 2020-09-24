@@ -120,7 +120,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	},
 	anticipation: {
 		onStart(pokemon) {
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (!target || target.fainted) continue;
 				for (const moveSlot of target.moveSlots) {
 					const move = this.dex.getMove(moveSlot.move);
@@ -189,7 +189,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onResidualSubOrder: 1,
 		onResidual(pokemon) {
 			if (!pokemon.hp) return;
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (!target || !target.hp) continue;
 				if (target.status === 'slp' || target.hasAbility('comatose')) {
 					this.damage(target.baseMaxhp / 8, target, pokemon);
@@ -228,7 +228,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 			if (effect?.effectType !== 'Move') {
 				return;
 			}
-			if (source.species.id === 'greninja' && source.hp && !source.transformed && source.side.foe.pokemonLeft) {
+			if (source.species.id === 'greninja' && source.hp && !source.transformed && source.side.getFoePokemonLeft()) {
 				this.add('-activate', source, 'ability: Battle Bond');
 				source.formeChange('Greninja-Ash', this.effect, true);
 			}
@@ -701,7 +701,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onStart(pokemon) {
 			let totaldef = 0;
 			let totalspd = 0;
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (!target || target.fainted) continue;
 				totaldef += target.getStat('def', false, true);
 				totalspd += target.getStat('spd', false, true);
@@ -1019,7 +1019,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onStart(pokemon) {
 			let warnMoves: (Move | Pokemon)[][] = [];
 			let warnBp = 1;
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (target.fainted) continue;
 				for (const moveSlot of target.moveSlots) {
 					const move = this.dex.getMove(moveSlot.move);
@@ -1057,7 +1057,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	},
 	frisk: {
 		onStart(pokemon) {
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (!target || target.fainted) continue;
 				if (target.item) {
 					this.add('-item', target, target.getItem().name, '[from] ability: Frisk', '[of] ' + pokemon, '[identify]');
@@ -1514,7 +1514,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onStart(pokemon) {
 			// Imposter does not activate when Skill Swapped or when Neutralizing Gas leaves the field
 			if (!this.effectData.switchingIn) return;
-			const target = pokemon.side.foe.active[pokemon.side.foe.active.length - 1 - pokemon.position];
+			const target = pokemon.side.getFoeActive()[pokemon.side.getFoeActive().length - 1 - pokemon.position];
 			if (target) {
 				pokemon.transformInto(target, this.dex.getAbility('imposter'));
 			}
@@ -1578,7 +1578,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	intimidate: {
 		onStart(pokemon) {
 			let activated = false;
-			for (const target of pokemon.side.foe.active) {
+			for (const target of pokemon.side.getFoeActive()) {
 				if (!target || !this.isAdjacent(target, pokemon)) continue;
 				if (!activated) {
 					this.add('-ability', pokemon, 'Intimidate', 'boost');
@@ -3064,6 +3064,18 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 					}
 					pokemon.side.removeSideCondition(sideCondition);
 				}
+				if (Array.isArray(pokemon.side.foe)) {
+					for (const foe of pokemon.side.foe) {
+						if (foe.getSideCondition(sideCondition)) {
+							if (!activated) {
+								this.add('-activate', pokemon, 'ability: Screen Cleaner');
+								activated = true;
+							}
+							foe.removeSideCondition(sideCondition);
+						}
+					}
+					return;
+				}
 				if (pokemon.side.foe.getSideCondition(sideCondition)) {
 					if (!activated) {
 						this.add('-activate', pokemon, 'ability: Screen Cleaner');
@@ -3818,7 +3830,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	},
 	trace: {
 		onStart(pokemon) {
-			if (pokemon.side.foe.active.some(
+			if (pokemon.side.getFoeActive().some(
 				foeActive => foeActive && this.isAdjacent(pokemon, foeActive) && foeActive.ability === 'noability'
 			)) {
 				this.effectData.gaveUp = true;
@@ -3826,7 +3838,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		},
 		onUpdate(pokemon) {
 			if (!pokemon.isStarted || this.effectData.gaveUp) return;
-			const possibleTargets = pokemon.side.foe.active.filter(foeActive => foeActive && this.isAdjacent(pokemon, foeActive));
+			const possibleTargets = pokemon.side.getFoeActive().filter(foeActive => foeActive && this.isAdjacent(pokemon, foeActive));
 			while (possibleTargets.length) {
 				let rand = 0;
 				if (possibleTargets.length > 1) rand = this.random(possibleTargets.length);
@@ -3931,7 +3943,10 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	},
 	unnerve: {
 		onPreStart(pokemon) {
-			this.add('-ability', pokemon, 'Unnerve', pokemon.side.foe);
+			const foes = Array.isArray(pokemon.side.foe) ? pokemon.side.foe : [pokemon.side.foe];
+			for (const foe of foes) {
+				this.add('-ability', pokemon, 'Unnerve', foe);
+			}
 		},
 		onFoeTryEatItem: false,
 		name: "Unnerve",

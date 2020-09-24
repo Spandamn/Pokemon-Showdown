@@ -250,6 +250,12 @@ export class Battle {
 				this.setPlayer(side, options[side]!);
 			}
 		}
+		if (isFourPlayer && this.gameType === 'multi') {
+			this.sides[0].ally = this.sides[2];
+			this.sides[2].ally = this.sides[0];
+			this.sides[1].ally = this.sides[3];
+			this.sides[3].ally = this.sides[1];
+		}
 	}
 
 	toJSON(): AnyObject {
@@ -266,6 +272,14 @@ export class Battle {
 
 	get p2() {
 		return this.sides[1];
+	}
+
+	get p3() {
+		return this.sides[2];
+	}
+
+	get p4() {
+		return this.sides[3];
 	}
 
 	toString() {
@@ -1339,7 +1353,7 @@ export class Battle {
 			this.singleEvent('Start', pokemon.getItem(), pokemon.itemData, pokemon);
 		}
 		if (this.gen === 4) {
-			for (const foeActive of pokemon.side.foe.active) {
+			for (const foeActive of pokemon.side.getFoeActive()) {
 				foeActive.removeVolatile('substitutebroken');
 			}
 		}
@@ -1469,7 +1483,7 @@ export class Battle {
 				// canceling switches would leak information
 				// if a foe might have a trapping ability
 				if (this.gen > 2) {
-					for (const source of pokemon.side.foe.active) {
+					for (const source of pokemon.side.getFoeActive()) {
 						if (!source || source.fainted) continue;
 						const species = (source.illusion || source).species;
 						if (!species.abilities) continue;
@@ -1582,7 +1596,7 @@ export class Battle {
 		if (losers.length === 1) {
 			const loser = losers[0];
 			this.add('-message', `${loser.name}'s team started with the rudimentary means to perform restorative berry-cycling and thus loses.`);
-			return this.win(loser.foe);
+			return this.win(Array.isArray(loser.foe) ? loser.foe[0] : loser.foe);
 		}
 		if (losers.length === this.sides.length) {
 			this.add('-message', `Each side's team started with the rudimentary means to perform restorative berry-cycling.`);
@@ -1600,9 +1614,17 @@ export class Battle {
 		if (this.started) throw new Error(`Battle already started`);
 
 		this.started = true;
-		this.sides[1].foe = this.sides[0];
-		this.sides[0].foe = this.sides[1];
-
+		if (this.gameType === 'multi') {
+			this.sides[0].foe = this.sides[2].foe = [this.sides[1], this.sides[3]];
+			this.sides[1].foe = this.sides[3].foe = [this.sides[0], this.sides[1]];
+		} else if (this.gameType === 'free-for-all') {
+			this.sides.forEach(side => {
+				side.foe = side.battle.sides.filter(s => s !== side);
+			});
+		} else {
+			this.sides[0].foe = this.sides[1];
+			this.sides[1].foe = this.sides[0];
+		}
 		for (const side of this.sides) {
 			this.add('teamsize', side.id, side.pokemon.length);
 		}
@@ -1673,7 +1695,7 @@ export class Battle {
 		}
 		if (!target || !target.hp) return 0;
 		if (!target.isActive) return false;
-		if (this.gen > 5 && !target.side.foe.pokemonLeft) return false;
+		if (this.gen > 5 && !target.side.getFoeActive().length) return false;
 		boost = this.runEvent('Boost', target, source, effect, Object.assign({}, boost));
 		let success = null;
 		let boosted = isSecondary;
@@ -2236,9 +2258,8 @@ export class Battle {
 	 */
 	validTargetLoc(targetLoc: number, source: Pokemon, targetType: string) {
 		if (targetLoc === 0) return true;
-		const numSlots = source.side.active.length;
+		let numSlots = source.side.active.length + this.gameType === 'multi' ? source.side.ally?.active.length : 0;
 		if (Math.abs(targetLoc) > numSlots) return false;
-
 		const sourceLoc = -(source.position + 1);
 		const isFoe = (targetLoc > 0);
 		const acrossFromTargetLoc = -(numSlots + 1 - targetLoc);
@@ -2275,9 +2296,9 @@ export class Battle {
 
 	getAtLoc(pokemon: Pokemon, targetLoc: number) {
 		if (targetLoc > 0) {
-			return pokemon.side.foe.active[targetLoc - 1];
+			return pokemon.side.getFoeActive()[targetLoc - 1];
 		} else {
-			return pokemon.side.active[-targetLoc - 1];
+			return (this.gameType === 'multi' ? pokemon.side.getActive() : pokemon.side.active)[-targetLoc - 1];
 		}
 	}
 
@@ -2332,7 +2353,7 @@ export class Battle {
 
 		move = this.dex.getMove(move);
 		if (move.target === 'adjacentAlly') {
-			const allyActives = pokemon.side.active;
+			const allyActives = pokemon.side.getActive();
 			let adjacentAllies = [allyActives[pokemon.position - 1], allyActives[pokemon.position + 1]];
 			adjacentAllies = adjacentAllies.filter(active => active && !active.fainted);
 			return adjacentAllies.length ? this.sample(adjacentAllies) : null;
@@ -2341,11 +2362,12 @@ export class Battle {
 				move.target === 'allyTeam' || move.target === 'adjacentAllyOrSelf') {
 			return pokemon;
 		}
-		if (pokemon.side.active.length > 2) {
+		const activeTeamLength = pokemon.side.getActive().length;
+		if (activeTeamLength > 2) {
 			if (move.target === 'adjacentFoe' || move.target === 'normal' || move.target === 'randomNormal') {
 				// even if a move can target an ally, auto-resolution will never make it target an ally
 				// i.e. if both your opponents faint before you use Flamethrower, it will fail instead of targeting your all
-				const foeActives = pokemon.side.foe.active;
+				const foeActives = pokemon.side.getFoeActive();
 				const frontPosition = foeActives.length - 1 - pokemon.position;
 				let adjacentFoes = foeActives.slice(frontPosition < 1 ? 0 : frontPosition - 1, frontPosition + 2);
 				adjacentFoes = adjacentFoes.filter(active => active && !active.fainted);
@@ -2354,7 +2376,8 @@ export class Battle {
 				return foeActives[frontPosition];
 			}
 		}
-		return pokemon.side.foe.randomActive() || pokemon.side.foe.active[0];
+		const randomActive = Array.isArray(pokemon.side.foe) ? pokemon.side.foe[0].randomActive() : pokemon.side.foe.randomActive();
+		return randomActive || pokemon.side.getFoeActive()[0];
 	}
 
 	checkFainted() {

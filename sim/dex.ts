@@ -47,7 +47,6 @@ import * as path from 'path';
 import * as Data from './dex-data';
 import {PRNG, PRNGSeed} from './prng';
 import {Utils} from '../lib/utils';
-import { customavatars } from '../config/config-example';
 
 const BASE_MOD = 'gen8' as ID;
 const DEFAULT_MOD = BASE_MOD;

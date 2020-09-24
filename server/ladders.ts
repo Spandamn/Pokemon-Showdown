@@ -8,9 +8,6 @@
  * @license MIT
  */
 
-import { User } from './users';
-import { roomSettings } from './chat-commands/room-settings';
-
 // eslint-disable-next-line no-undef
 const LadderStore: typeof LadderStoreT = (typeof Config === 'object' && Config.remoteladder ?
 	require('./ladders-remote') :
@@ -766,7 +763,6 @@ class Ladder extends LadderStore {
 	}
 
 	static match(ready1: BattleReady, ready2: BattleReady) {
-		console.log(ready1.challengeType);
 		if (ready1.challengeType === "multi" && ready2.challengeType === "multi") {
 			const team1 = [ready1.user, ready1.teammate];
 			const team2 = [ready2.user, ready2.teammate];

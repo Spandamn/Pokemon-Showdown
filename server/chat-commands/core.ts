@@ -1356,7 +1356,7 @@ export const commands: ChatCommands = {
 		if (!user.named) {
 			return this.popupReply(this.tr`You must choose a username before you challenge someone.`);
 		}
-		let sep: string[] = target && target.includes(',') ? target.split(',') : [];
+		const sep: string[] = target && target.includes(',') ? target.split(',') : [];
 		let teammate = Users.get(sep.splice(-1)[0]), isMulti: boolean;
 		if (Dex.getFormat(target.substring(0, target.lastIndexOf(","))).gameType === 'multi' && teammate) {
 			isMulti = true;

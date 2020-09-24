@@ -1267,10 +1267,10 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onResidualOrder: 5,
 		onResidualSubOrder: 4,
 		onResidual(pokemon) {
-			if (pokemon.side.active.length === 1) {
+			if (pokemon.side.getActive().length === 1) {
 				return;
 			}
-			for (const allyActive of pokemon.side.active) {
+			for (const allyActive of pokemon.side.getActive()) {
 				if (
 					allyActive &&
 					(allyActive.hp && this.isAdjacent(pokemon, allyActive) && allyActive.status) && this.randomChance(3, 10)
@@ -1793,7 +1793,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 			return null;
 		},
 		onAllyTryHitSide(target, source, move) {
-			if (target.side === source.side || move.hasBounced || !move.flags['reflectable']) {
+			if (target.side === source.side || target.side === source.side.ally || move.hasBounced || !move.flags['reflectable']) {
 				return;
 			}
 			const newMove = this.dex.getActiveMove(move.id);
@@ -1954,10 +1954,10 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	minus: {
 		onModifySpAPriority: 5,
 		onModifySpA(spa, pokemon) {
-			if (pokemon.side.active.length === 1) {
+			if (pokemon.side.getActive().length === 1) {
 				return;
 			}
-			for (const allyActive of pokemon.side.active) {
+			for (const allyActive of pokemon.side.getActive()) {
 				if (
 					allyActive && allyActive.position !== pokemon.position &&
 					!allyActive.fainted && allyActive.hasAbility(['minus', 'plus'])
@@ -2488,10 +2488,10 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 	plus: {
 		onModifySpAPriority: 5,
 		onModifySpA(spa, pokemon) {
-			if (pokemon.side.active.length === 1) {
+			if (pokemon.side.getActive().length === 1) {
 				return;
 			}
-			for (const allyActive of pokemon.side.active) {
+			for (const allyActive of pokemon.side.getActive()) {
 				if (
 					allyActive && allyActive.position !== pokemon.position &&
 					!allyActive.fainted && allyActive.hasAbility(['minus', 'plus'])
@@ -2992,7 +2992,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 			}
 		},
 		onAllyTryHitSide(target, source, move) {
-			if (target === this.effectData.target || target.side !== source.side) return;
+			if (target === this.effectData.target || target.side !== source.side || target.side !== source.side.ally) return;
 			if (move.type === 'Grass') {
 				this.boost({atk: 1}, this.effectData.target);
 			}
@@ -4252,7 +4252,7 @@ export const Abilities: {[abilityid: string]: AbilityData} = {
 		onAllyTryHitSide(target, source, move) {
 			if (this.effectData.target.activeTurns) return;
 
-			if (target.side === source.side || move.hasBounced || !move.flags['reflectable']) {
+			if (target.side === source.side || target.side === source.side.ally || move.hasBounced || !move.flags['reflectable']) {
 				return;
 			}
 			const newMove = this.dex.getActiveMove(move.id);

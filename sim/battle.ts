@@ -250,12 +250,6 @@ export class Battle {
 				this.setPlayer(side, options[side]!);
 			}
 		}
-		if (isFourPlayer && this.gameType === 'multi') {
-			this.sides[0].ally = this.sides[2];
-			this.sides[2].ally = this.sides[0];
-			this.sides[1].ally = this.sides[3];
-			this.sides[3].ally = this.sides[1];
-		}
 	}
 
 	toJSON(): AnyObject {
@@ -1615,6 +1609,10 @@ export class Battle {
 
 		this.started = true;
 		if (this.gameType === 'multi') {
+			this.sides[0].ally = this.sides[2];
+			this.sides[2].ally = this.sides[0];
+			this.sides[1].ally = this.sides[3];
+			this.sides[3].ally = this.sides[1];
 			this.sides[0].foe = this.sides[2].foe = [this.sides[1], this.sides[3]];
 			this.sides[1].foe = this.sides[3].foe = [this.sides[0], this.sides[1]];
 		} else if (this.gameType === 'free-for-all') {

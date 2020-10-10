@@ -2,7 +2,7 @@ Pokémon Showdown
 ========================================================================
 
 Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex repository][3]
-
+  Main Issue: https://github.com/smogon/pokemon-showdown/issues/2924
   [1]: http://pokemonshowdown.com/
   [2]: https://github.com/smogon/pokemon-showdown-client
   [3]: https://github.com/Zarel/Pokemon-Showdown-Dex

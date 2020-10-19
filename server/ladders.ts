@@ -491,7 +491,7 @@ class Ladder extends LadderStore {
 	matchmakingOK(search1: BattleReady, user1: User, search2: BattleReady, user2: User,
 		search3?: BattleReady | undefined, user3?: User | undefined, search4?: BattleReady | undefined, user4?: User | undefined) {
 		const formatid = toID(this.formatid);
-		if (!user1 || !user2 || !user3 || !user3) {
+		if (!user1 || !user2 || !user3 || !user4) {
 			// This should never happen.
 			Monitor.crashlog(new Error(`Matched user ${user1 ? search2.userid : search1.userid} not found`), "The matchmaker");
 			return false;

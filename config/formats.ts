@@ -42,7 +42,9 @@ export const Formats: FormatList = [
 		threads: [
 			`&bullet; <a href="https://www.smogon.com/forums/threads/3656537/">Random Battle Suggestions</a>`,
 		],
-
+		teamLength: {
+			battle: 3,
+		},
 		mod: 'gen8',
 		gameType: 'multi',
 		team: 'random',

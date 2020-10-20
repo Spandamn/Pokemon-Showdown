@@ -17,7 +17,7 @@ const SECONDS = 1000;
 const PERIODIC_MATCH_INTERVAL = 60 * SECONDS;
 
 import type {ChallengeType} from './room-battle';
-import { consoleips } from '../config/config-example';
+// import {consoleips} from '../config/config-example'; // commented out incase it's needed later
 
 /**
  * This represents a user's search for a battle under a format.
@@ -46,7 +46,7 @@ class BattleReady {
 		this.teammate = teammate;
 		this.formatid = formatid;
 		this.team = settings.team;
-		this.hidden = settings.hidden; 
+		this.hidden = settings.hidden;
 		this.inviteOnly = settings.inviteOnly;
 		this.rating = rating;
 		this.challengeType = challengeType;
@@ -88,7 +88,8 @@ class Ladder extends LadderStore {
 		super(formatid);
 	}
 
-	async prepBattle(connection: Connection, challengeType: ChallengeType, team: string | null = null, isRated = false, teammate?: User) {
+	async prepBattle(connection: Connection, challengeType: ChallengeType, team: string | null = null, isRated = false,
+		teammate?: User) {
 		// all validation for a battle goes through here
 		const user = connection.user;
 		const userid = user.id;
@@ -240,12 +241,12 @@ class Ladder extends LadderStore {
 	}
 	async makeChallenge(connection: Connection, targetUser: User, teammate?: User) {
 		const user = connection.user;
-		const chall = Ladder.getChallenging(user);
+		const challenge = Ladder.getChallenging(user);
 		if (targetUser === user) {
 			connection.popup(`You can't battle yourself. The best you can do is open PS in Private Browsing (or another browser) and log into a different username, and battle that username.`);
 			return false;
 		}
-		if (Ladder.getChallenging(user) && teammate) {
+		if (challenge && teammate) {
 			connection.popup(`You are already challenging someone. Cancel that challenge before challenging someone else.`);
 			return false;
 		}
@@ -254,7 +255,7 @@ class Ladder extends LadderStore {
 			Chat.maybeNotifyBlocked('challenge', targetUser, user);
 			return false;
 		}
-		if (teammate && teammate.settings.blockChallenges && !user.can('bypassblocks', teammate)) {
+		if (teammate?.settings.blockChallenges && !user.can('bypassblocks', teammate)) {
 			connection.popup(`The user '${teammate.name}' is not accepting challenges right now.`);
 			Chat.maybeNotifyBlocked('challenge', teammate, user);
 			return false;
@@ -268,7 +269,7 @@ class Ladder extends LadderStore {
 			const ready = await this.prepBattle(connection, "multi", null, false, teammate);
 			if (!ready) return false;
 			Ladder.addChallenge(new Challenge(ready, targetUser));
-			Ladder.getChallenging(user).p3 = teammate;
+			challenge.p3 = teammate;
 			user.lastChallenge = Date.now();
 			return true;
 		}
@@ -489,8 +490,9 @@ class Ladder extends LadderStore {
 	 * Verifies whether or not a match made between two users is valid. Returns
 	 */
 	matchmakingOK(search1: BattleReady, user1: User, search2: BattleReady, user2: User,
-		search3?: BattleReady | undefined, user3?: User | undefined, search4?: BattleReady | undefined, user4?: User | undefined) {
-		const formatid = toID(this.formatid);
+		search3?: BattleReady | undefined, user3?: User | undefined, search4?: BattleReady | undefined,
+		user4?: User | undefined) {
+		// const formatid = toID(this.formatid); // commented out incase needed later in development
 		if (!user1 || !user2 || !user3 || !user4) {
 			// This should never happen.
 			Monitor.crashlog(new Error(`Matched user ${user1 ? search2.userid : search1.userid} not found`), "The matchmaker");
@@ -498,19 +500,19 @@ class Ladder extends LadderStore {
 		}
 
 		// users must be different
-		let users = [user1, user2, user3, user4]
-		for (let user of users) {
+		const users = [user1, user2, user3, user4];
+		for (const user of users) {
 			if (users.indexOf(user) !== users.lastIndexOf(user)) return false;
 		}
 
-		/*if (Config.fakeladder) {
+		/* if (Config.fakeladder) {
 			user1.lastMatch = user2.id;
 			user2.lastMatch = user1.id;
 			return true;
 		}
 
 		// users must have different IPs
-		// if (user1.latestIp === user2.latestIp) return false; // disabled for multi battle 
+		// if (user1.latestIp === user2.latestIp) return false; // disabled for multi battle
 
 		// users must not have been matched immediately previously
 		if (user1.lastMatch === user2.id || user2.lastMatch === user1.id) return false;
@@ -526,7 +528,8 @@ class Ladder extends LadderStore {
 		searchRange += elapsed / 300; // +1 every .3 seconds
 		if (searchRange > 300) searchRange = 300 + (searchRange - 300) / 10; // +1 every 3 sec after 300
 		if (searchRange > 600) searchRange = 600;
-		if (Math.abs(search1.rating - search2.rating) > searchRange) return false;*/
+		if (Math.abs(search1.rating - search2.rating) > searchRange) return false;
+		*/
 
 		user1.lastMatch = user2.id;
 		user2.lastMatch = user1.id;
@@ -544,10 +547,10 @@ class Ladder extends LadderStore {
 			Ladders.searches.set(formatid, formatTable);
 		}
 		if (formatTable.has(user.id)) {
-			//user.popup(`Couldn't search: You are already searching for a ${formatid} battle.`);
+			// user.popup(`Couldn't search: You are already searching for a ${formatid} battle.`);
 			return;
 		}
-		let players = [];
+		const players = [];
 		// In order from longest waiting to shortest waiting
 		for (const search of formatTable.values()) {
 			if (Dex.getFormat(formatid).gameType === 'multi') {
@@ -555,7 +558,8 @@ class Ladder extends LadderStore {
 				if (!searcher || searcher === user) continue;
 				players.push(search);
 				if (players.length === 3) {
-					const matched = this.matchmakingOK(newSearch, user, players[0], this.getSearcher(players[0]), players[1], this.getSearcher(players[1]), players[2], this.getSearcher(players[2]));
+					const matched = this.matchmakingOK(newSearch, user, players[0], this.getSearcher(players[0]), players[1],
+						this.getSearcher(players[1]), players[2], this.getSearcher(players[2]));
 					if (matched) {
 						players.forEach(player => formatTable.delete(search.userid));
 						Ladder.matchMulti(newSearch, players[0], players[1], players[2]);
@@ -611,23 +615,23 @@ class Ladder extends LadderStore {
 	}
 
 	static match(ready1: BattleReady, ready2: BattleReady) {
-		/*if (ready1.challengeType === "multi" && ready2.challengeType === "multi") {
+		/* if (ready1.challengeType === "multi" && ready2.challengeType === "multi") {
 			const team1 = [ready1.user, ready1.teammate];
 			const team2 = [ready2.user, ready2.teammate];
 			console.log(`${team1[0].id} ${team1[1].id} ${team2[0].id} ${team2[1].id} `)
 			for (let player of team1) {
 				if (!player) {
-					team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
-					team2[0].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
-					team2[1].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
+					team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before the battle could start.`);
+					team2[0].popup(`Sorry, your opponent ${player.id} went offline before the battle started.`);
+					team2[1].popup(`Sorry, your opponent ${player.id} went offline before the battle started.`);
 					return false;
 				}
 			}
 			for (let player of team2) {
 				if (!player) {
-					team2[team2.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
-					team1[0].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
-					team1[1].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
+					team2[team2.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before the battle could start.`);
+					team1[0].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
+					team1[1].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
 					return false;
 				}
 			}
@@ -680,26 +684,25 @@ class Ladder extends LadderStore {
 	}
 
 	static matchMulti(ready1: BattleReady, ready2: BattleReady, ready3: BattleReady,
-		ready4: BattleReady, challenge?: Boolean | false) {
+		ready4: BattleReady, challenge?: boolean | false) {
 		let formats = [ready1.formatid, ready2.formatid, ready3.formatid, ready4.formatid];
-		if (challenge) formats = [ready1.formatid, ready2.formatid, ready1.formatid, ready2.formatid]
+		if (challenge) formats = [ready1.formatid, ready2.formatid, ready1.formatid, ready2.formatid];
 		if (!formats.every(f => f === ready1.formatid)) throw new Error(`Format IDs don't match`);
 		const team1 = [ready1.user, ready3.user];
 		const team2 = [ready2.user, ready4.user];
-		console.log(`${team1[0].id} ${team1[1].id} ${team2[0].id} ${team2[1].id} `)
-		for (let player of team1) {
+		for (const player of team1) {
 			if (!player) {
-				team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
-				team2[0].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
-				team2[1].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
+				team1[team1.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before the battle could start.`);
+				team2[0].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
+				team2[1].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
 				return false;
 			}
 		}
-		for (let player of team2) {
+		for (const player of team2) {
 			if (!player) {
-				team2[team2.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before your battle could start.`);
-				team1[0].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
-				team1[1].popup(`Sorry, your opponent ${player.id} went offline before your battle could start.`);
+				team2[team2.indexOf(player) ^ 1].popup(`Sorry, your teammate ${player.id} went offline before the battle could start.`);
+				team1[0].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
+				team1[1].popup(`Sorry, your opponent ${player.id} went offline before the battle could start.`);
 				return false;
 			}
 		}

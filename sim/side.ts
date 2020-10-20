@@ -216,7 +216,8 @@ export class Side {
 	}
 
 	randomActive() {
-		const actives = this.battle.gameType === 'multi' ? this.getActive().filter(active => active && !active.fainted) : this.active;
+		const actives = this.battle.gameType === 'multi' ?
+			this.getActive().filter(active => active && !active.fainted) : this.active;
 		if (!actives.length) return null;
 		return this.battle.sample(actives);
 	}

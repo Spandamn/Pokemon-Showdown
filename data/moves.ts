@@ -4792,7 +4792,8 @@ export const Moves: {[moveid: string]: MoveData} = {
 				) {
 					continue;
 				}
-				if ((action.pokemon.side === source.side || action.pokemon.side === source.side.ally) && ['grasspledge', 'waterpledge'].includes(action.move.id)) {
+				if ((action.pokemon.side === source.side || action.pokemon.side === source.side.ally) &&
+					['grasspledge', 'waterpledge'].includes(action.move.id)) {
 					this.queue.prioritizeAction(action, move);
 					this.add('-waiting', source, action.pokemon);
 					return null;
@@ -6866,7 +6867,7 @@ export const Moves: {[moveid: string]: MoveData} = {
 				const removeAll = ['spikes', 'toxicspikes', 'stealthrock', 'stickyweb', 'gmaxsteelsurge'];
 				for (const targetCondition of removeTarget) {
 					const foes = Array.isArray(source.side.foe) ? source.side.foe : [source.side.foe];
-					for (const foe of foes) {	
+					for (const foe of foes) {
 						if (foe.removeSideCondition(targetCondition)) {
 							if (!removeAll.includes(targetCondition)) continue;
 							this.add('-sideend', foe, this.dex.getEffect(targetCondition).name, '[from] move: G-Max Wind Rage', '[of] ' + source);
@@ -6961,7 +6962,8 @@ export const Moves: {[moveid: string]: MoveData} = {
 				) {
 					continue;
 				}
-				if ((action.pokemon.side === source.side || action.pokemon.side === source.side.ally) && ['waterpledge', 'firepledge'].includes(action.move.id)) {
+				if ((action.pokemon.side === source.side || action.pokemon.side === source.side.ally) &&
+					['waterpledge', 'firepledge'].includes(action.move.id)) {
 					this.queue.prioritizeAction(action, move);
 					this.add('-waiting', source, action.pokemon);
 					return null;
@@ -9522,7 +9524,8 @@ export const Moves: {[moveid: string]: MoveData} = {
 				return 5;
 			},
 			onAnyModifyDamage(damage, source, target, move) {
-				if (target !== source && (target.side === this.effectData.target || target.side === this.effectData.target.ally) && this.getCategory(move) === 'Special') {
+				if (target !== source && (target.side === this.effectData.target || target.side === this.effectData.target.ally) &&
+					this.getCategory(move) === 'Special') {
 					if (!target.getMoveHitData(move).crit && !move.infiltrates) {
 						this.debug('Light Screen weaken');
 						if (target.side.getActive().length > 1) return this.chainModify([0xAAC, 0x1000]);
@@ -13717,7 +13720,8 @@ export const Moves: {[moveid: string]: MoveData} = {
 				return 5;
 			},
 			onAnyModifyDamage(damage, source, target, move) {
-				if (target !== source && (target.side === this.effectData.target || target.side === this.effectData.target.ally) && this.getCategory(move) === 'Physical') {
+				if (target !== source && (target.side === this.effectData.target || target.side === this.effectData.target.ally) &&
+					this.getCategory(move) === 'Physical') {
 					if (!target.getMoveHitData(move).crit && !move.infiltrates) {
 						this.debug('Reflect weaken');
 						if (target.side.getActive().length > 1) return this.chainModify([0xAAC, 0x1000]);
@@ -18831,7 +18835,8 @@ export const Moves: {[moveid: string]: MoveData} = {
 				) {
 					continue;
 				}
-				if ((otherMoveUser.side === source.side || otherMoveUser.side === source.side.ally) && ['firepledge', 'grasspledge'].includes(otherMove.id)) {
+				if ((otherMoveUser.side === source.side || otherMoveUser.side === source.side.ally) &&
+					['firepledge', 'grasspledge'].includes(otherMove.id)) {
 					this.queue.prioritizeAction(action, move);
 					this.add('-waiting', source, otherMoveUser);
 					return null;

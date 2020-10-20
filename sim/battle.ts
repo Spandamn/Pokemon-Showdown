@@ -2256,7 +2256,7 @@ export class Battle {
 	 */
 	validTargetLoc(targetLoc: number, source: Pokemon, targetType: string) {
 		if (targetLoc === 0) return true;
-		let numSlots = source.side.getActive().length;
+		const numSlots = source.side.getActive().length;
 		if (this.gameType !== 'multi') {
 			if (Math.abs(targetLoc) > numSlots) return false;
 		} else {
@@ -2379,7 +2379,8 @@ export class Battle {
 				return foeActives[frontPosition];
 			}
 		}
-		const randomActive = Array.isArray(pokemon.side.foe) ? pokemon.side.foe[0].randomActive() : pokemon.side.foe.randomActive();
+		const randomActive = Array.isArray(pokemon.side.foe) ? pokemon.side.foe[0].randomActive() :
+			pokemon.side.foe.randomActive();
 		return randomActive || pokemon.side.getFoeActive()[0];
 	}
 

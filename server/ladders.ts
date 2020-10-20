@@ -313,7 +313,7 @@ class Ladder extends LadderStore {
 			chall.p4 = teammate;
 			if (!ready) return false;
 			if (Ladder.removeChallenge(chall)) {
-				Ladders.match(chall.ready, ready);
+				Ladder.matchMulti(chall.ready, ready, chall.p3, chall.p4, true);
 			}
 			return true;
 		}
@@ -680,8 +680,9 @@ class Ladder extends LadderStore {
 	}
 
 	static matchMulti(ready1: BattleReady, ready2: BattleReady, ready3: BattleReady,
-		ready4: BattleReady) {
-		const formats = [ready1.formatid, ready2.formatid, ready3.formatid, ready4.formatid]
+		ready4: BattleReady, challenge?: Boolean | false) {
+		let formats = [ready1.formatid, ready2.formatid, ready3.formatid, ready4.formatid];
+		if (challenge) formats = [ready1.formatid, ready2.formatid, ready1.formatid, ready2.formatid]
 		if (!formats.every(f => f === ready1.formatid)) throw new Error(`Format IDs don't match`);
 		const team1 = [ready1.user, ready3.user];
 		const team2 = [ready2.user, ready4.user];

@@ -1403,20 +1403,15 @@ export const commands: ChatCommands = {
 		Ladders.cancelChallenging(user);
 	},
 
+	acceptmulti: 'accept',
 	accept(target, room, user, connection) {
 		target = this.splitTarget(target);
 		const targetUser = this.targetUser || this.pmTarget;
 		const targetUsername = this.targetUsername;
 		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		return Ladders.acceptChallenge(connection, targetUser, Users.get(target));
-	},
-
-	acceptmulti(target, room, user, connection) {
-		target = this.splitTarget(target);
-		const targetUser = this.targetUser || this.pmTarget;
-		const targetUsername = this.targetUsername;
-		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		return Ladders.acceptChallenge(connection, targetUser, Users.get(target));
+		let teammate = Users.get(target);
+		if (!teammate) return Ladders.acceptChallenge(connection, targetUser);
+		return Ladders.acceptChallenge(connection, targetUser, teammate);
 	},
 
 	reject(target, room, user) {

@@ -1,4 +1,4 @@
-import { consoleips } from '../../config/config-example';
+// import {consoleips} from '../../config/config-example'; // commented out incase it's needed later during development
 /**
  * Core commands
  * Pokemon Showdown - http://pokemonshowdown.com/
@@ -1356,11 +1356,14 @@ export const commands: ChatCommands = {
 		if (!user.named) {
 			return this.popupReply(this.tr`You must choose a username before you challenge someone.`);
 		}
-		const sep: string[] = target && target.includes(',') ? target.split(',') : [];
-		let teammate = Users.get(sep.splice(-1)[0]), isMulti: boolean;
+		const sep: string[] = target?.includes(',') ? target.split(',') : [];
+		const teammate = Users.get(sep.splice(-1)[0]);
+		// let isMulti: boolean; // commented out incase it's needed later during development
 		if (Dex.getFormat(target.substring(0, target.lastIndexOf(","))).gameType === 'multi' && teammate) {
-			isMulti = true;
-			if (!teammate || !teammate.connected) return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf(",") + 1)}' was not found.`);
+			// isMulti = true; // commented out incase it's needed later during development
+			if (!teammate || !teammate.connected) {
+				return this.popupReply(`The user '${teammate?.name || target.substring(target.indexOf(",") + 1)}' was not found.`);
+			}
 			target = target.substring(0, target.lastIndexOf(","));
 			return Ladders(target).makeChallenge(connection, targetUser, teammate);
 		}
@@ -1409,7 +1412,7 @@ export const commands: ChatCommands = {
 		const targetUser = this.targetUser || this.pmTarget;
 		const targetUsername = this.targetUsername;
 		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		let teammate = Users.get(target);
+		const teammate = Users.get(target);
 		if (!teammate) return Ladders.acceptChallenge(connection, targetUser);
 		return Ladders.acceptChallenge(connection, targetUser, teammate);
 	},

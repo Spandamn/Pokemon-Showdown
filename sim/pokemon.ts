@@ -601,7 +601,7 @@ export class Pokemon {
 	}
 
 	foes(): Pokemon[] {
-		let foes = this.side.getFoeActive();
+		const foes = this.side.getFoeActive();
 		return foes.filter(foe => foe && !foe.fainted);
 	}
 

@@ -1408,7 +1408,9 @@ export const commands: ChatCommands = {
 		const targetUser = this.targetUser || this.pmTarget;
 		const targetUsername = this.targetUsername;
 		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		return Ladders.acceptChallenge(connection, targetUser, Users.get(target));
+		let teammate = Users.get(target);
+		if (!teammate) return Ladders.acceptChallenge(connection, targetUser);
+		return Ladders.acceptChallenge(connection, targetUser, teammate);
 	},
 
 	acceptmulti(target, room, user, connection) {
@@ -1416,7 +1418,9 @@ export const commands: ChatCommands = {
 		const targetUser = this.targetUser || this.pmTarget;
 		const targetUsername = this.targetUsername;
 		if (!targetUser) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
-		return Ladders.acceptChallenge(connection, targetUser, Users.get(target));
+		let teammate = Users.get(target);
+		if (!teammate) return Ladders.acceptChallenge(connection, targetUser);
+		return Ladders.acceptChallenge(connection, targetUser, teammate);
 	},
 
 	reject(target, room, user) {

@@ -112,7 +112,7 @@ export class RoomBattlePlayer extends RoomGames.RoomGamePlayer {
 		this.dcSecondsLeft = 1;
 
 		this.connected = true;
-		this.id = user?.id : toID(user.name);
+		// this.id = user?.id : toID(user.name);
 		if (user) {
 			user.games.add(this.game.roomid);
 			user.updateSearch();

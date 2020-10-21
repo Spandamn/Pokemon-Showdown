@@ -1086,7 +1086,7 @@ export class RoomBattle extends RoomGames.RoomGame {
 			this.room.title = `${this.p1.name} vs. ${this.p2.name}`;
 		}
 		this.room.send(`|title|${this.room.title}`);
-		this.room.send(`|gametype|${this.gameType}`);
+		this.room.add(`|gametype|${this.gameType}`);
 	}
 
 	clearPlayers() {

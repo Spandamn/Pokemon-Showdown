@@ -492,16 +492,22 @@ class Ladder extends LadderStore {
 	matchmakingOK(search1: BattleReady, user1: User, search2: BattleReady, user2: User,
 		search3?: BattleReady | undefined, user3?: User | undefined, search4?: BattleReady | undefined,
 		user4?: User | undefined) {
-		// const formatid = toID(this.formatid); // commented out incase needed later in development
-		if (!user1 || !user2 || !user3 || !user4) {
+		const formatid = toID(this.formatid);
+		if (!user1 || !user2) {
 			// This should never happen.
 			Monitor.crashlog(new Error(`Matched user ${user1 ? search2.userid : search1.userid} not found`), "The matchmaker");
+			return false;
+		}
+		if (Dex.getFormat(formatid).gameType === 'multi' && (!user3 || !user4)) {
+			// This should never happen.
+			Monitor.crashlog(new Error(`Matched user ${user3 ? search4.userid : search3.userid} not found`), "The matchmaker");
 			return false;
 		}
 
 		// users must be different
 		const users = [user1, user2, user3, user4];
 		for (const user of users) {
+			if (!user) continue;
 			if (users.indexOf(user) !== users.lastIndexOf(user)) return false;
 		}
 
@@ -590,6 +596,7 @@ class Ladder extends LadderStore {
 	static periodicMatch() {
 		// In order from longest waiting to shortest waiting
 		for (const [formatid, formatTable] of Ladders.searches) {
+			if (Dex.getFormat(formatid).gameType === 'multi') return; // temporary probably
 			const matchmaker = Ladders(formatid);
 			let longest: [BattleReady, User] | null = null;
 			for (const search of formatTable.values()) {
@@ -603,7 +610,7 @@ class Ladder extends LadderStore {
 				if (!searcher) continue;
 
 				const [longestSearch, longestSearcher] = longest;
-				const matched = matchmaker.matchmakingOK(search, searcher, longestSearch, longestSearcher);
+				const matched = matchmaker.matchmakingOK(search, longestSearch, searcher, longestSearcher);
 				if (matched) {
 					formatTable.delete(search.userid);
 					formatTable.delete(longestSearch.userid);

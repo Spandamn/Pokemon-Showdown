@@ -1581,6 +1581,18 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 			}
 		},
 	},
+	ravioliqueen: {
+		noCopy: true,
+		onStart() {
+			this.add(`c|${getName('RavioliQueen')}|The Noodle Noble has Arrived!`);
+		},
+		onSwitchOut() {
+			this.add(`c|${getName('RavioliQueen')}|Time to spaghett out of here!`);
+		},
+		onFaint() {
+			this.add(`c|${getName('RavioliQueen')}|This is impastable!`);
+		},
+	},
 	rb220: {
 		noCopy: true,
 		onStart() {

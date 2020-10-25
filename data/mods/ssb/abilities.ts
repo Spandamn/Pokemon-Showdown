@@ -1712,6 +1712,53 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		gen: 8,
 	},
 
+	// RavioliQueen
+	phantomplane: {
+		shortDesc: "On switch-in, this Pokemon summons Phantom Plane.",
+		onStart(source) {
+			this.field.setTerrain('phantomplane');
+		},
+		name: "Phantom Plane",
+		condition: {
+			duration: 5,
+			durationCallback(source, effect) {
+				if (source?.hasItem('terrainextender')) {
+					return 8;
+				}
+				return 5;
+			},
+			onModifySpA(spa, pokemon) {
+				if (this.effectData.source !== pokemon) return;
+				return this.chainModify(1.5);
+			},
+			onModifySpD(atk, pokemon) {
+				if (this.effectData.source !== pokemon) return;
+				return this.chainModify(1.5);
+			},
+			onStart(battle, source, effect) {
+				if (effect?.effectType === 'Ability') {
+					this.add('-fieldstart', 'move: Phanttom Plane', '[from] ability: ' + effect, '[of] ' + source);
+				} else {
+					this.add('-fieldstart', 'move: Phanttom Plane');
+				}
+			},
+			onResidualOrder: 21,
+			onResidualSubOrder: 2,
+			onTerrain(pokemon) {
+				if (pokemon.isGrounded() && !pokemon.isSemiInvulnerable()) {
+					if (pokemon && !pokemon.hasType('Ghost')) {
+						this.damage(pokemon.baseMaxhp / 16, pokemon);
+					}
+				}
+			},
+			onEnd() {
+				this.add('-fieldend', 'move: Phantom Plane');
+			},
+		},
+		isNonstandard: "Custom",
+		gen: 8,
+	},
+
 	// rb220
 	wavesurge: {
 		shortDesc: "On switch-in, this Pokemon summons Wave Terrain.",

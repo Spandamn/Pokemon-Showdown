@@ -4107,6 +4107,23 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		type: "Fighting",
 	},
 
+	// RavioliQueen
+	witchinghour: {
+		accuracy: 90,
+		basePower: 60,
+		category: "Special",
+		name: "Witching Hour",
+		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		secondary: {
+			chance: 50,
+			volatileStatus: 'partiallytrapped',
+		},
+		target: "normal",
+		type: "Ghost",
+	},
+
 	// rb220
 	quickhammer: {
 		accuracy: 100,

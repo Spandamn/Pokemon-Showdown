@@ -615,7 +615,7 @@ export const Conditions: {[k: string]: ModdedConditionData} = {
 					species: 'Alcremie-Mind-Cream',
 					movepool: ['Sticky Web', 'Parting Shot', ['Light of Ruin', 'Sparkling Aria'], 'Cradily Chaos'],
 				},
-			],
+			];
 			pokemon.m.changeForme = (context: Battle, formeNumber: number) => {
 				const forme = Object.assign({}, pokemon.m.formes[formeNumber]);
 				forme.movepool[2] = Object.assign([], forme.movepool[2])[this.random(2)];

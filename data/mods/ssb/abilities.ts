@@ -1737,9 +1737,9 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			},
 			onStart(battle, source, effect) {
 				if (effect?.effectType === 'Ability') {
-					this.add('-fieldstart', 'move: Phanttom Plane', '[from] ability: ' + effect, '[of] ' + source);
+					this.add('-fieldstart', 'move: Phantom Plane', '[from] ability: ' + effect, '[of] ' + source);
 				} else {
-					this.add('-fieldstart', 'move: Phanttom Plane');
+					this.add('-fieldstart', 'move: Phantom Plane');
 				}
 			},
 			onResidualOrder: 21,

@@ -4116,6 +4116,13 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Sprit Shackle', target);
+			this.add('-anim', source, 'Curse', target);
+		},
 		secondary: {
 			chance: 50,
 			volatileStatus: 'partiallytrapped',

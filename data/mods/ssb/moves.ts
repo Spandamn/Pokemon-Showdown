@@ -4142,7 +4142,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {},
-		terrain: 'waveterrain',
+		terrain: 'pitchblack',
 		condition: {
 			duration: 5,
 			durationCallback(source, effect) {

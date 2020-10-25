@@ -1750,7 +1750,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		shortDesc: "If this Pokemon is the target of a foe's move, that move loses one additional PP. If it targets itself, it loses half than it should..",
 		name: "Royal Aura",
 		onDeductPP(target, source) {
-			if (target === source) return 0.5;
+			if (target === source) return -0.5;
 			if (target.side === source.side) return;
 			return 1;
 		},

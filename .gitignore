@@ -10,6 +10,7 @@
 npm-debug.log
 .eslintcache
 .eslintfullcache
+package.json
 package-lock.json
 /tools/set-import/sets
 databases/*.db*

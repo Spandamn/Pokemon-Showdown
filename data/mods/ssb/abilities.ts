@@ -1119,7 +1119,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 	kingofatlantis: {
 		shortDesc: "Drizzle + Dry Skin; +1 turn of rain for every water type teammate.",
 		onStart(source) {
-			let drizzle = this.dex.deepClone(this.dex.deepClone('raindance'));
+			const drizzle = this.dex.deepClone(this.dex.deepClone('raindance'));
 			for (const teammate of source.side.pokemon) if (teammate.hasType('Water') && teammate !== source) drizzle.duration++;
 		},
 		onTryHit(target, source, move) {

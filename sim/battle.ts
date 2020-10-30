@@ -13,6 +13,7 @@ import {Side} from './side';
 import {State} from './state';
 import {BattleQueue, Action} from './battle-queue';
 import {Utils} from '../lib/utils';
+import { formatText } from '../server/chat-formatter';
 
 /** A Pokemon that has fainted. */
 interface FaintedPokemon {
@@ -1611,6 +1612,7 @@ export class Battle {
 		if (this.started) throw new Error(`Battle already started`);
 		this.add('gametype', this.gameType);
 
+		const format = this.format;
 		this.started = true;
 		if (this.gameType === 'multi') {
 			this.sides[0].ally = this.sides[2];
@@ -1628,12 +1630,14 @@ export class Battle {
 			this.sides[1].foe = this.sides[0];
 		}
 		for (const side of this.sides) {
-			this.add('teamsize', side.id, side.pokemon.length);
+			let teamsize = side.pokemon.length;
+			if (format.teamLength && format.teamLength.battle) {
+				teamsize = format.teamLength.battle <= teamsize ? teamsize : format.teamLength.battle;
+			}
+			this.add('teamsize', side.id, teamsize);
 		}
 
 		this.add('gen', this.gen);
-
-		const format = this.format;
 
 		this.add('tier', format.name);
 		if (this.rated) {

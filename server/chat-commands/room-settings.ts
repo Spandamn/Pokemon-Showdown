@@ -723,12 +723,20 @@ export const commands: ChatCommands = {
 	],
 
 	subroomgroupchat: 'makegroupchat',
+	mgc: 'makegroupchat',
 	makegroupchat(target, room, user, connection, cmd) {
 		room = this.requireRoom();
 		this.checkChat();
 		if (!user.autoconfirmed) {
 			return this.errorReply("You must be autoconfirmed to make a groupchat.");
 		}
+
+		const groupchatbanned = Punishments.isGroupchatBanned(user);
+		if (groupchatbanned) {
+			const expireText = Punishments.checkPunishmentExpiration(groupchatbanned);
+			return this.errorReply(`You are banned from using groupchats ${expireText}.`);
+		}
+
 		if (cmd === 'subroomgroupchat') {
 			if (!user.can('mute', null, room)) {
 				return this.errorReply("You can only create subroom groupchats for rooms you're staff in.");
@@ -778,7 +786,7 @@ export const commands: ChatCommands = {
 		}
 
 		const titleMsg = Utils.html`Welcome to ${parent ? room.title : user.name}'s` +
-			`${!/^[0-9]+$/.test(title) ? ` ${title}` : ''}${parent ? ' subroom' : ''} groupchat!`;
+			Utils.html`${!/^[0-9]+$/.test(title) ? ` ${title}` : ''}${parent ? ' subroom' : ''} groupchat!`;
 		const targetRoom = Rooms.createChatRoom(roomid, `[G] ${title}`, {
 			isPersonal: true,
 			isPrivate: 'hidden',
@@ -854,12 +862,13 @@ export const commands: ChatCommands = {
 
 	deletechatroom: 'deleteroom',
 	deletegroupchat: 'deleteroom',
+	dgc: 'deleteroom',
 	deleteroom(target, room, user, connection, cmd) {
 		room = this.requireRoom();
 		const roomid = target.trim();
 		if (!roomid) {
 			// allow deleting personal rooms without typing out the room name
-			if (!room.settings.isPersonal || cmd !== "deletegroupchat") {
+			if (!room.settings.isPersonal || !['deletegroupchat', 'dgc'].includes(cmd)) {
 				return this.parse(`/help deleteroom`);
 			}
 		} else {
@@ -869,7 +878,7 @@ export const commands: ChatCommands = {
 			}
 		}
 
-		if (room.settings.isPersonal) {
+		if (room.roomid.startsWith('groupchat-')) {
 			this.checkCan('gamemanagement', null, room);
 		} else {
 			this.checkCan('makeroom');
@@ -1267,10 +1276,10 @@ export const commands: ChatCommands = {
 		if (normalizedTarget.includes(' welcome ')) {
 			return this.errorReply(`Error: Room description must not contain the word "welcome".`);
 		}
-		if (normalizedTarget.slice(0, 9) === ' discuss ') {
+		if (normalizedTarget.startsWith(' discuss ')) {
 			return this.errorReply(`Error: Room description must not start with the word "discuss".`);
 		}
-		if (normalizedTarget.slice(0, 12) === ' talk about ' || normalizedTarget.slice(0, 17) === ' talk here about ') {
+		if (normalizedTarget.startsWith(' talk about ') || normalizedTarget.startsWith(' talk here about ')) {
 			return this.errorReply(`Error: Room description must not start with the phrase "talk about".`);
 		}
 
@@ -1289,7 +1298,7 @@ export const commands: ChatCommands = {
 			if (!this.runBroadcast()) return;
 			if (!room.settings.introMessage) return this.sendReply("This room does not have an introduction set.");
 			this.sendReply('|raw|<div class="infobox infobox-limited">' + room.settings.introMessage.replace(/\n/g, '') + '</div>');
-			if (!this.broadcasting && user.can('declare', null, room) && cmd !== 'topic') {
+			if (!this.broadcasting && user.can('declare', null, room, 'roomintro') && cmd !== 'topic') {
 				const code = Utils.escapeHTML(room.settings.introMessage).replace(/\n/g, '<br />');
 				this.sendReplyBox(`<details open><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/roomintro ${code}</code></details>`);
 			}
@@ -1336,7 +1345,7 @@ export const commands: ChatCommands = {
 			this.checkCan('mute', null, room);
 			if (!room.settings.staffMessage) return this.sendReply("This room does not have a staff introduction set.");
 			this.sendReply(`|raw|<div class="infobox">${room.settings.staffMessage.replace(/\n/g, ``)}</div>`);
-			if (user.can('ban', null, room) && cmd !== 'stafftopic') {
+			if (user.can('ban', null, room, 'staffintro') && cmd !== 'stafftopic') {
 				const code = Utils.escapeHTML(room.settings.staffMessage).replace(/\n/g, '<br />');
 				this.sendReplyBox(`<details open><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/staffintro ${code}</code></details>`);
 			}

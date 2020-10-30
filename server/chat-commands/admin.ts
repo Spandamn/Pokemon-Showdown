@@ -330,6 +330,7 @@ export const commands: ChatCommands = {
 				}
 				if (requiresForce(patch)) return this.errorReply(requiresForceMessage);
 
+				const oldPlugins = Chat.plugins;
 				Chat.destroy();
 
 				const processManagers = ProcessManager.processManagers;
@@ -346,7 +347,7 @@ export const commands: ChatCommands = {
 				global.Tournaments = require('../tournaments').Tournaments;
 
 				this.sendReply("Chat commands have been hot-patched.");
-				Chat.loadPlugins();
+				Chat.loadPlugins(oldPlugins);
 				this.sendReply("Chat plugins have been loaded.");
 			} else if (target === 'tournaments') {
 				if (lock['tournaments']) {
@@ -373,7 +374,7 @@ export const commands: ChatCommands = {
 				// reload .sim-dist/dex.js
 				global.Dex = require('../../sim/dex').Dex;
 				// rebuild the formats list
-				delete Rooms.global.formatList;
+				Rooms.global.formatList = '';
 				// respawn validator processes
 				void TeamValidatorAsync.PM.respawn();
 				// respawn simulator processes
@@ -848,7 +849,7 @@ export const commands: ChatCommands = {
 		} catch (e) {
 			// failed while rebasing or popping the stash
 			await exec(`git reset --hard ${oldHash}`);
-			await exec(`git stash pop`);
+			if (stashedChanges) await exec(`git stash pop`);
 			this.sendReply(`FAILED, old changes restored.`);
 		}
 		if (!isPrivate) await rebuild();
@@ -905,8 +906,14 @@ export const commands: ChatCommands = {
 			this.broadcasting = true;
 			this.broadcastToRoom = true;
 		}
-		this.sendReply(`|html|<table border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">&gt;&gt;&nbsp;</td><td>${Chat.getReadmoreCodeBlock(target)}</td></tr><table>`);
+		const generateHTML = (direction: string, contents: string) => (
+			`<table border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">` +
+				Utils.escapeHTML(direction).repeat(2) +
+				`&nbsp;</td><td>${Chat.getReadmoreCodeBlock(contents)}</td></tr><table>`
+		);
+		this.sendReply(`|html|${generateHTML('>', target)}`);
 		logRoom?.roomlog(`>> ${target}`);
+		let uhtmlId = null;
 		try {
 			/* eslint-disable no-eval, @typescript-eslint/no-unused-vars */
 			const battle = room.battle;
@@ -915,15 +922,20 @@ export const commands: ChatCommands = {
 			/* eslint-enable no-eval, @typescript-eslint/no-unused-vars */
 
 			if (result?.then) {
+				uhtmlId = `eval-${room.nextGameNumber()}`;
+				this.sendReply(`|uhtml|${uhtmlId}|${generateHTML('<', 'Promise pending')}`);
+				this.update();
 				result = `Promise -> ${Utils.visualize(await result)}`;
+				this.sendReply(`|uhtmlchange|${uhtmlId}|${generateHTML('<', result)}`);
 			} else {
 				result = Utils.visualize(result);
+				this.sendReply(`|html|${generateHTML('<', result)}`);
 			}
-			this.sendReply(`|html|<table border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">&lt;&lt;&nbsp;</td><td>${Chat.getReadmoreCodeBlock(result)}</td></tr><table>`);
 			logRoom?.roomlog(`<< ${result}`);
 		} catch (e) {
 			const message = ('' + e.stack).replace(/\n *at CommandContext\.eval [\s\S]*/m, '');
-			this.sendReply(`|html|<table border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">&lt;&lt;&nbsp;</td><td>${Chat.getReadmoreCodeBlock(message)}</td></tr><table>`);
+			const command = uhtmlId ? `|uhtmlchange|${uhtmlId}|` : '|html|';
+			this.sendReply(`${command}${generateHTML('<', message)}`);
 			logRoom?.roomlog(`<< ${message}`);
 		}
 	},
@@ -958,7 +970,7 @@ export const commands: ChatCommands = {
 			cmd = target.toLowerCase();
 			target = '';
 		}
-		if (cmd.charAt(cmd.length - 1) === ',') cmd = cmd.slice(0, -1);
+		if (cmd.endsWith(',')) cmd = cmd.slice(0, -1);
 		const targets = target.split(',');
 		function getPlayer(input: string) {
 			const player = battle.playerTable[toID(input)];

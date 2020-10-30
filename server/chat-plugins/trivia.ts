@@ -27,6 +27,13 @@ const ALL_CATEGORIES: {[k: string]: string} = {
 	subcat: 'Sub-Category',
 };
 
+/**
+ * Aliases for keys in the ALL_CATEGORIES object.
+ */
+const CATEGORY_ALIASES: {[k: string]: ID} = {
+	poke: 'pokemon' as ID,
+};
+
 const MODES: {[k: string]: string} = {
 	first: 'First',
 	number: 'Number',
@@ -120,7 +127,7 @@ const PATH = 'config/chat-plugins/triviadata.json';
 /**
  * TODO: move trivia database code to a separate file once relevant.
  */
-let triviaData: TriviaData = {};
+export let triviaData: TriviaData = {};
 try {
 	triviaData = JSON.parse(FS(PATH).readIfExistsSync() || "{}");
 } catch (e) {} // file doesn't exist or contains invalid JSON
@@ -134,9 +141,8 @@ if (triviaData.questions.some(q => !('type' in q))) {
 	triviaData.questions = triviaData.questions.map(q => Object.assign(Object.create(null), q, {type: 'trivia'}));
 }
 
-function isTriviaRoom(room: Room) {
-	return room.roomid === 'trivia';
-}
+/** from:to Map */
+export const pendingAltMerges = new Map<ID, ID>();
 
 function getTriviaGame(room: Room | null) {
 	if (!room) {
@@ -166,7 +172,7 @@ function getMastermindGame(room: Room | null) {
 	return game as Mastermind;
 }
 
-function writeTriviaData() {
+export function writeTriviaData() {
 	FS(PATH).writeUpdate(() => (
 		JSON.stringify(triviaData, null, 2)
 	));
@@ -254,6 +260,56 @@ function getQuestions(category: ID): TriviaQuestion[] {
 	}
 }
 
+function hasLeaderboardEntry(userid: ID) {
+	return userid in triviaData.leaderboard! || userid in triviaData.altLeaderboard!;
+}
+
+/**
+ * Records a pending alt merge
+ */
+export function requestAltMerge(from: ID, to: ID) {
+	if (from === to) throw new Chat.ErrorMessage(`You cannot merge leaderboard entries with yourself!`);
+	if (!hasLeaderboardEntry(from)) {
+		throw new Chat.ErrorMessage(`The user '${from}' does not have an entry in the Trivia leaderboard.`);
+	}
+	if (!hasLeaderboardEntry(to)) {
+		throw new Chat.ErrorMessage(`The user '${to}' does not have an entry in the Trivia leaderboard.`);
+	}
+
+	pendingAltMerges.set(from, to);
+}
+
+
+/**
+ * Checks that it has been approved by both users,
+ * and merges two alts on the Trivia leaderboard.
+ */
+export function mergeAlts(from: ID, to: ID) {
+	if (pendingAltMerges.get(from) !== to) {
+		throw new Chat.ErrorMessage(`Both '${from}' and '${to}' must use /trivia mergescore to approve the merge.`);
+	}
+
+	if (!hasLeaderboardEntry(to)) {
+		throw new Chat.ErrorMessage(`The user '${to}' does not have an entry in the Trivia leaderboard.`);
+	}
+	if (!hasLeaderboardEntry(from)) {
+		throw new Chat.ErrorMessage(`The user '${from}' does not have an entry in the Trivia leaderboard.`);
+	}
+
+	for (const leaderboard of [triviaData.altLeaderboard!, triviaData.leaderboard!]) {
+		if (leaderboard[to] && leaderboard[from]) {
+			for (let i = 0; i < leaderboard[to].length; i++) {
+				leaderboard[to][i] += leaderboard[from][i];
+			}
+			delete leaderboard[from];
+		}
+	}
+
+	writeTriviaData();
+	cachedLadder.invalidateCache();
+	cachedAltLadder.invalidateCache();
+}
+
 class Ladder {
 	leaderboard: TriviaLeaderboard;
 	cache: {ladder: TriviaLadder, ranks: TriviaLeaderboard} | null;
@@ -303,8 +359,8 @@ class Ladder {
 	}
 }
 
-const cachedLadder = new Ladder(triviaData.leaderboard);
-const cachedAltLadder = new Ladder(triviaData.altLeaderboard);
+export const cachedLadder = new Ladder(triviaData.leaderboard);
+export const cachedAltLadder = new Ladder(triviaData.altLeaderboard);
 
 class TriviaPlayer extends Rooms.RoomGamePlayer {
 	points: number;
@@ -376,9 +432,10 @@ export class Trivia extends Rooms.RoomGame {
 	askedAt: number[];
 	constructor(
 		room: Room, mode: string, category: string,
-		length: string, questions: TriviaQuestion[], creator: string, isRandomMode = false
+		length: string, questions: TriviaQuestion[], creator: string,
+		isRandomMode = false, isSubGame = false
 	) {
-		super(room);
+		super(room, isSubGame);
 		this.playerTable = {};
 		this.gameid = 'trivia' as ID;
 		this.title = 'Trivia';
@@ -395,7 +452,7 @@ export class Trivia extends Rooms.RoomGame {
 		case 'random':
 			category = this.room.tr`Random (${ALL_CATEGORIES[questions[0].category]})`; break;
 		default:
-			category = ALL_CATEGORIES[category];
+			category = ALL_CATEGORIES[CATEGORY_ALIASES[category] || category];
 		}
 
 		this.game = {
@@ -769,7 +826,11 @@ export class Trivia extends Rooms.RoomGame {
 		const logbuf = this.getStaffEndMessage(winners, winner => winner.id);
 		this.room.sendMods(`(${buf}!)`);
 		this.room.roomlog(buf);
-		this.room.modlog(`TRIVIAGAME: by ${toID(this.game.creator)}: ${logbuf}`);
+		this.room.modlog({
+			action: 'TRIVIAGAME',
+			loggedBy: toID(this.game.creator),
+			note: logbuf,
+		});
 
 		if (!triviaData.history) triviaData.history = [];
 		triviaData.history.push(this.game);
@@ -793,11 +854,9 @@ export class Trivia extends Rooms.RoomGame {
 			if ((options.requirePoints && !player.points) || !user) continue;
 			ranks.push({id: userid, player, name: user.name});
 		}
-		ranks.sort((a, b) => {
-			return b.player.points - a.player.points ||
+		ranks.sort((a, b) => b.player.points - a.player.points ||
 				a.player.lastQuestion - b.player.lastQuestion ||
-				hrtimeToNanoseconds(a.player.answeredAt) - hrtimeToNanoseconds(b.player.answeredAt);
-		});
+				hrtimeToNanoseconds(a.player.answeredAt) - hrtimeToNanoseconds(b.player.answeredAt));
 		return options.max === null ? ranks : ranks.slice(0, options.max);
 	}
 
@@ -844,9 +903,7 @@ export class Trivia extends Rooms.RoomGame {
  * Helper function for timer and number modes. Milliseconds are not precise
  * enough to score players properly in rare cases.
  */
-const hrtimeToNanoseconds = (hrtime: number[]) => {
-	return hrtime[0] * 1e9 + hrtime[1];
-};
+const hrtimeToNanoseconds = (hrtime: number[]) => hrtime[0] * 1e9 + hrtime[1];
 
 /**
  * First mode rewards points to the first user to answer the question
@@ -1212,7 +1269,12 @@ export class Mastermind extends Rooms.RoomGame {
 
 	formatPlayerList() {
 		return Object.values(this.playerTable)
-			.map(player => Utils.html`${player.name} (${this.leaderboard.get(player.id) || "0"})`)
+			.sort((a, b) => (this.leaderboard.get(b.id) || 0) - (this.leaderboard.get(a.id) || 0))
+			.map(player => {
+				const isFinalist = this.currentRound instanceof MastermindFinals && player.id in this.currentRound.playerTable;
+				const name = isFinalist ? Utils.html`<strong>${player.name}</strong>` : Utils.escapeHTML(player.name);
+				return `${name} (${this.leaderboard.get(player.id) || "0"})`;
+			})
 			.join(', ');
 	}
 
@@ -1272,7 +1334,7 @@ export class Mastermind extends Rooms.RoomGame {
 			}
 		}
 
-		const questions = getQuestions('all' as ID);
+		const questions = Utils.shuffle(getQuestions('all' as ID));
 		if (!questions.length) throw new Chat.ErrorMessage(this.room.tr`There are no questions in the Trivia database.`);
 
 		this.currentRound = new MastermindFinals(this.room, 'all', questions, this.getTopPlayers(this.numFinalists));
@@ -1308,7 +1370,7 @@ export class Mastermind extends Rooms.RoomGame {
 
 	getTopPlayers(n: number) {
 		return [...this.leaderboard]
-			.sort((a, b) => a[1] - b[1]) // sort by number of points
+			.sort((a, b) => b[1] - a[1]) // sort by number of points
 			.map(entry => entry[0]) // convert to an array of IDs
 			.slice(0, n); // get the top n players
 	}
@@ -1318,18 +1380,19 @@ export class Mastermind extends Rooms.RoomGame {
 		if (this.currentRound) this.currentRound.destroy();
 		this.destroy();
 	}
+
+	leave(user: User) {
+		if (!this.playerTable[user.id]) {
+			throw new Chat.ErrorMessage(this.room.tr`You are not a player in the current game.`);
+		}
+		this.leaderboard.delete(user.id);
+		super.removePlayer(user);
+	}
 }
 
 export class MastermindRound extends FirstModeTrivia {
 	constructor(room: Room, category: string, questions: TriviaQuestion[], playerID?: ID) {
-		/**
-		 * The RoomGame constructor automatically sets room.game to the newly created game.
-		 * We don't want this, since MastermindRounds are an attribute of the correct room.game,
-		 * which is a Mastermind object. Thus, we manually reset room.game when creating a new MastermindRound.
-		 */
-		const trueGame = room.game;
-		super(room, 'first', category, 'infinite', questions, 'Automatically Created');
-		room.game = trueGame;
+		super(room, 'first', category, 'infinite', questions, 'Automatically Created', false, true);
 
 		this.playerCap = 1;
 		this.minPlayers = 0;
@@ -1360,6 +1423,10 @@ export class MastermindRound extends FirstModeTrivia {
 		this.phaseTimeout = null;
 	}
 
+	addTriviaPlayer(user: User): string | undefined {
+		throw new Chat.ErrorMessage(`This is a round of Mastermind; to join the overall game of Mastermind, use /mm join`);
+	}
+
 	setTallyTimeout() {
 		// Players must use /mastermind pass to pass on a question
 		return;
@@ -1374,11 +1441,7 @@ export class MastermindRound extends FirstModeTrivia {
 	}
 
 	destroy() {
-		// Just like in the constructor, we need to ensure that room.game is not overwritten.
-		const room = this.room;
-		const trueGame = room.game;
 		super.destroy();
-		room.game = trueGame;
 	}
 }
 
@@ -1418,9 +1481,12 @@ export class MastermindFinals extends MastermindRound {
 }
 
 const triviaCommands: ChatCommands = {
-	new(target, room, user) {
-		room = this.requireRoom();
-		if (!isTriviaRoom(room)) return this.errorReply(this.tr`This command can only be used in the Trivia room.`);
+	sortednew: 'new',
+	newsorted: 'new',
+	new(target, room, user, connection, cmd) {
+		const randomizeQuestionOrder = !cmd.includes('sorted');
+
+		room = this.requireRoom('trivia' as RoomID);
 		this.checkCan('show', null, room);
 		this.checkChat();
 		if (room.game) {
@@ -1434,16 +1500,18 @@ const triviaCommands: ChatCommands = {
 		if (['triforce', 'tri'].includes(mode)) mode = 'triumvirate';
 		const isRandomMode = (mode === 'random');
 		if (isRandomMode) {
-			mode = Utils.shuffle(['first', 'number', 'timer', 'triumvirate'])[0];
+			const recentFirstMode = triviaData.history?.some(game => game.mode === 'First');
+			const modes = recentFirstMode ? Object.keys(MODES).filter(curMode => curMode !== 'first') : Object.keys(MODES);
+			mode = Utils.shuffle(modes)[0];
 		}
 		if (!MODES[mode]) return this.errorReply(this.tr`"${mode}" is an invalid mode.`);
 
-		const category = toID(targets[1]);
+		const categoryID = toID(targets[1]);
+		const category = CATEGORY_ALIASES[categoryID] || categoryID;
 		let questions = getQuestions(category);
-		// Randomizes the order of the questions.
 		const length = toID(targets[2]);
 		if (!LENGTHS[length]) return this.errorReply(this.tr`"${length}" is an invalid game length.`);
-		// Assume that infinite mode will take at least 75 questions
+		// Assume that infinite mode will last for at least 75 points
 		if (questions.length < (LENGTHS[length].cap || 75) / 5) {
 			if (category === 'random') {
 				return this.errorReply(
@@ -1471,10 +1539,21 @@ const triviaCommands: ChatCommands = {
 			_Trivia = TimerModeTrivia;
 		}
 
-		questions = Utils.shuffle(questions);
+		if (randomizeQuestionOrder) {
+			// Randomizes the order of the questions.
+			questions = Utils.shuffle(questions);
+		} else {
+			// Reverses the order of the questions so that they appear
+			// in the order they were added to the Trivia question "database".
+			questions = questions.reverse();
+		}
 		room.game = new _Trivia(room, mode, category, length, questions, user.name, isRandomMode);
 	},
-	newhelp: [`/trivia new [mode], [category], [length] - Begin a new trivia game. Requires: + % @ # &`],
+	newhelp: [
+		`/trivia new [mode], [category], [length] - Begin a new Trivia game.`,
+		`/trivia sortednew [mode], [category], [length] — Begin a new Trivia game in which the question order is not randomized.`,
+		`Requires: + % @ # &`,
+	],
 
 	join(target, room, user) {
 		room = this.requireRoom();
@@ -1512,6 +1591,7 @@ const triviaCommands: ChatCommands = {
 
 	answer(target, room, user) {
 		room = this.requireRoom();
+		this.checkChat();
 		let game: Trivia | MastermindRound | MastermindFinals;
 		try {
 			const mastermindRound = getMastermindGame(room).currentRound;
@@ -1612,10 +1692,7 @@ const triviaCommands: ChatCommands = {
 
 	submit: 'add',
 	add(target, room, user, connection, cmd) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		if (cmd === 'add') this.checkCan('mute', null, room);
 		if (cmd === 'submit') this.checkCan('show', null, room);
 		if (!target) return false;
@@ -1628,7 +1705,8 @@ const triviaCommands: ChatCommands = {
 				continue;
 			}
 
-			const category = toID(param[0]);
+			const categoryID = toID(param[0]);
+			const category = CATEGORY_ALIASES[categoryID] || categoryID;
 			if (!ALL_CATEGORIES[category]) {
 				this.errorReply(this.tr`'${param[0].trim()}' is not a valid category. View /trivia help for more information.`);
 				continue;
@@ -1696,10 +1774,7 @@ const triviaCommands: ChatCommands = {
 	addhelp: [`/trivia add [category] | [question] | [answer1], [answer2], ... [answern] - Adds question(s) to the question database. Requires: % @ # &`],
 
 	review(target, room) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('ban', null, room);
 
 		const submissions = triviaData.submissions;
@@ -1724,10 +1799,7 @@ const triviaCommands: ChatCommands = {
 
 	reject: 'accept',
 	accept(target, room, user, connection, cmd) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('ban', null, room);
 		this.checkChat();
 
@@ -1816,10 +1888,7 @@ const triviaCommands: ChatCommands = {
 	rejecthelp: [`/trivia reject [index1], [index2], ... [indexn] OR all - Remove questions from the submission database using their index numbers or ranges of them. Requires: @ # &`],
 
 	delete(target, room, user) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('mute', null, room);
 		this.checkChat();
 
@@ -1847,10 +1916,7 @@ const triviaCommands: ChatCommands = {
 	deletehelp: [`/trivia delete [question] - Delete a question from the trivia database. Requires: % @ # &`],
 
 	move(target, room, user) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('mute', null, room);
 		this.checkChat();
 
@@ -1864,7 +1930,8 @@ const triviaCommands: ChatCommands = {
 				continue;
 			}
 
-			const category = toID(param[0]);
+			const categoryID = toID(param[0]);
+			const category = CATEGORY_ALIASES[categoryID] || categoryID;
 			if (!ALL_CATEGORIES[category]) {
 				this.errorReply(this.tr`'${param[0].trim()}' is not a valid category. View /trivia help for more information.`);
 				continue;
@@ -1898,14 +1965,11 @@ const triviaCommands: ChatCommands = {
 		}
 	},
 	movehelp: [
-		`/trivia move [category] | [question] - Change the category of question in the trivia databse. Requires: % @ # &`,
+		`/trivia move [category] | [question] - Change the category of question in the trivia database. Requires: % @ # &`,
 	],
 
 	qs(target, room, user) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr('This command can only be used in Question Workshop.'));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 
 		let buffer = "|raw|<div class=\"ladder\" style=\"overflow-y: scroll; max-height: 300px;\"><table>";
 		if (!target) {
@@ -1930,7 +1994,8 @@ const triviaCommands: ChatCommands = {
 
 		this.checkCan('mute', null, room);
 
-		const category = toID(target);
+		target = toID(target);
+		const category = CATEGORY_ALIASES[target] || target;
 		if (category === 'random') return false;
 		if (!ALL_CATEGORIES[category]) {
 			return this.errorReply(this.tr`'${target}' is not a valid category. View /help trivia for more information.`);
@@ -1943,7 +2008,7 @@ const triviaCommands: ChatCommands = {
 		}
 
 		if (user.can('ban', null, room)) {
-			const cat = ALL_CATEGORIES[target];
+			const cat = ALL_CATEGORIES[category];
 			buffer += `<tr><td colspan="3">${this.tr`There are <strong>${list.length}</strong> questions in the ${cat} category.`}</td></tr>` +
 				`<tr><th>#</th><th>${this.tr`Question`}</th><th>${this.tr`Answer(s)`}</th></tr>`;
 			for (const [i, entry] of list.entries()) {
@@ -1969,8 +2034,7 @@ const triviaCommands: ChatCommands = {
 	cssearch: 'search',
 	casesensitivesearch: 'search',
 	search(target, room, user, connection, cmd) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') return this.errorReply("This command can only be used in Question Workshop.");
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('show', null, room);
 		if (!target.includes(',')) return this.errorReply(this.tr("No valid search arguments entered."));
 
@@ -1987,24 +2051,23 @@ const triviaCommands: ChatCommands = {
 		}
 
 		let queryString = query.join(',').trim();
-		if (!queryString) return this.errorReply(this.tr("No valid search query as entered."));
-
+		if (!queryString) return this.errorReply(this.tr("No valid search query was entered."));
 
 		let transformQuestion = (question: string) => question;
 		if (cmd === 'search') {
 			queryString = queryString.toLowerCase();
 			transformQuestion = (question: string) => question.toLowerCase();
 		}
-		const results = (triviaData as any)[type].filter((q: TriviaQuestion) => {
-			return transformQuestion(q.question).includes(queryString) && !SPECIAL_CATEGORIES[q.category];
-		});
+		const results = triviaData[type as 'questions' | 'submissions']!.filter(
+			q => transformQuestion(q.question).includes(queryString) && !SPECIAL_CATEGORIES[q.category]
+		);
 		if (!results.length) return this.sendReply(this.tr`No results found under the ${type} list.`);
 
 		let buffer = `|raw|<div class="ladder"><table><tr><th>#</th><th>${this.tr`Category`}</th><th>${this.tr`Question`}</th></tr>` +
 			`<tr><td colspan="3">${this.tr`There are <strong>${results.length}</strong> matches for your query:`}</td></tr>`;
-		buffer += results.map((q: TriviaQuestion, i: number) => {
-			return this.tr`<tr><td><strong>${i + 1}</strong></td><td>${q.category}</td><td>${q.question}</td></tr>`;
-		}).join('');
+		buffer += results.map(
+			(q, i) => this.tr`<tr><td><strong>${i + 1}</strong></td><td>${q.category}</td><td>${q.question}</td></tr>`
+		).join('');
 		buffer += "</table></div>";
 
 		this.sendReply(buffer);
@@ -2015,8 +2078,7 @@ const triviaCommands: ChatCommands = {
 	],
 
 	rank(target, room, user) {
-		room = this.requireRoom();
-		if (!isTriviaRoom(room)) return this.errorReply(this.tr("This command can only be used in Trivia."));
+		room = this.requireRoom('trivia' as RoomID);
 
 		let name;
 		let userid;
@@ -2048,8 +2110,7 @@ const triviaCommands: ChatCommands = {
 
 	alltimeladder: 'ladder',
 	ladder(target, room, user, connection, cmd) {
-		room = this.requireRoom();
-		if (!isTriviaRoom(room)) return this.errorReply('This command can only be used in Trivia.');
+		room = this.requireRoom('trivia' as RoomID);
 		if (!this.runBroadcast()) return false;
 		const cache = cmd === 'ladder' ? cachedAltLadder : cachedLadder;
 		const {ladder} = cache.get();
@@ -2079,12 +2140,10 @@ const triviaCommands: ChatCommands = {
 
 	clearquestions: 'clearqs',
 	clearqs(target, room, user) {
-		room = this.requireRoom();
-		if (room.roomid !== 'questionworkshop') {
-			return this.errorReply(this.tr("This command can only be used in Question Workshop"));
-		}
+		room = this.requireRoom('questionworkshop' as RoomID);
 		this.checkCan('declare', null, room);
-		const category = toID(target);
+		target = toID(target);
+		const category = CATEGORY_ALIASES[target] || target;
 		if (ALL_CATEGORIES[category]) {
 			if (SPECIAL_CATEGORIES[category]) {
 				triviaData.questions = triviaData.questions!.filter(q => q.category !== category);
@@ -2101,8 +2160,7 @@ const triviaCommands: ChatCommands = {
 
 	pastgames: 'history',
 	history(target, room, user) {
-		room = this.requireRoom();
-		if (room.roomid !== 'trivia') return this.errorReply(this.tr("This command can only be used in Trivia."));
+		room = this.requireRoom('trivia' as RoomID);
 		if (!this.runBroadcast()) return false;
 		if (!triviaData.history?.length) return this.sendReplyBox(this.tr("There is no game history."));
 
@@ -2118,6 +2176,95 @@ const triviaCommands: ChatCommands = {
 		return this.sendReplyBox(buf.join('<br />'));
 	},
 	historyhelp: [`/trivia history - View a list of the 10 most recently played trivia games.`],
+
+	removepoints: 'addpoints',
+	addpoints(target, room, user, connection, cmd) {
+		room = this.requireRoom('trivia' as RoomID);
+		this.checkCan('editroom', null, room);
+
+		const [userid, pointString] = this.splitOne(target).map(toID);
+
+		const points = parseInt(pointString);
+		if (isNaN(points)) return this.errorReply(`You must specify a number of points to add/remove.`);
+		const isRemoval = cmd === 'removepoints';
+
+		if (!hasLeaderboardEntry(userid)) {
+			return this.errorReply(`The user '${userid}' has no Trivia leaderboard entry.`);
+		}
+
+		if (userid in triviaData.leaderboard!) triviaData.leaderboard![userid][0] += (isRemoval ? points * -1 : points);
+		if (userid in triviaData.altLeaderboard!) triviaData.altLeaderboard![userid][0] += (isRemoval ? points * -1 : points);
+		writeTriviaData();
+		cachedLadder.invalidateCache();
+		cachedAltLadder.invalidateCache();
+
+		this.modlog(`TRIVIAPOINTS ${isRemoval ? 'REMOVE' : 'ADD'}`, userid, `${points} points`);
+		this.privateModAction(
+			isRemoval ?
+				`${user.name} removed ${points} points from ${userid}'s Trivia leaderboard score.` :
+				`${user.name} added ${points} points to ${userid}'s Trivia leaderboard score.`
+		);
+	},
+	addpointshelp: [
+		`/trivia removepoints [user], [points] - Remove points from a given user's score on the Trivia leaderboard.`,
+		`/trivia addpoints [user], [points] - Add points to a given user's score on the Trivia leaderboard.`,
+		`Requires: # &`,
+	],
+
+	removeleaderboardentry(target, room, user) {
+		room = this.requireRoom('trivia' as RoomID);
+		this.checkCan('editroom', null, room);
+
+		const userid = toID(target);
+		if (!userid) return this.parse('/help trivia removeleaderboardentry');
+		if (hasLeaderboardEntry(userid)) {
+			return this.errorReply(`The user '${userid}' has no Trivia leaderboard entry.`);
+		}
+
+		const command = `/trivia removeleaderboardentry ${userid}`;
+		if (user.lastCommand !== command) {
+			user.lastCommand = command;
+			this.sendReply(`Are you sure you want to DELETE ALL LEADERBOARD SCORES FOR '${userid}'?`);
+			this.sendReply(`If so, type ${command} to confirm.`);
+			return;
+		}
+		user.lastCommand = '';
+
+		if (userid in triviaData.leaderboard!) delete triviaData.leaderboard![userid];
+		if (userid in triviaData.altLeaderboard!) delete triviaData.altLeaderboard![userid];
+		writeTriviaData();
+		cachedLadder.invalidateCache();
+		cachedAltLadder.invalidateCache();
+
+		this.modlog(`TRIVIAPOINTS DELETE`, userid);
+		this.privateModAction(`${user.name} removed ${userid}'s Trivia leaderboard entries.`);
+	},
+	removeleaderboardentryhelp: [
+		`/trivia removeleaderboardentry [user] — Remove all leaderboard entries for a user. Requires: # &`,
+	],
+
+	mergealt: 'mergescore',
+	mergescores: 'mergescore',
+	mergescore(target, room, user) {
+		const altid = toID(target);
+		if (!altid) return this.parse('/help trivia mergescore');
+
+		try {
+			mergeAlts(user.id, altid);
+			return this.sendReply(`Your Trivia leaderboard score has been transferred to '${altid}'!`);
+		} catch (err) {
+			if (!err.message.includes('/trivia mergescore')) throw err;
+
+			requestAltMerge(altid, user.id);
+			return this.sendReply(
+				`A Trivia leaderboard score merge with ${altid} is now pending! ` +
+				`To complete the merge, log in on the account '${altid}' and type /trivia mergescore ${user.id}`
+			);
+		}
+	},
+	mergescorehelp: [
+		`/trivia mergescore [user] — Merge another user's Trivia leaderboard score with yours.`,
+	],
 
 	help(target, room, user) {
 		return this.parse(`${this.cmdToken}help trivia`);
@@ -2140,7 +2287,8 @@ const triviaCommands: ChatCommands = {
 				`<li>Infinite: No score cap. The winner gains 5 leaderboard points, which increases the more questions they answer.</li>` +
 			`</ul></details>` +
 			`<details><summary><strong>Game commands</strong></summary><ul>` +
-				`<li><code>/trivia new [mode], [category], [length]</code> - Begin signups for a new trivia game. Requires: + % @ # &</li>` +
+				`<li><code>/trivia new [mode], [category], [length]</code> - Begin signups for a new Trivia game. Requires: + % @ # &</li>` +
+				`<li><code>/trivia sortednew [mode], [category], [length]</code> — Begin a new Trivia game in which the question order is not randomized. Requires: + % @ # &</li>` +
 				`<li><code>/trivia join</code> - Join a game of Trivia or Mastermind during signups.</li>` +
 				`<li><code>/trivia start</code> - Begin the game once enough users have signed up. Requires: + % @ # &</li>` +
 				`<li><code>/ta [answer]</code> - Answer the current question.</li>` +
@@ -2158,6 +2306,7 @@ const triviaCommands: ChatCommands = {
 				`<li><code>/trivia reject [index1], [index2], ... [indexn] OR all</code> - Remove questions from the submission database using their index numbers or ranges of them. Requires: @ # &</li>` +
 				`<li><code>/trivia add [category] | [question] | [answer1], [answer2], ... [answern]</code> - Adds question(s) to the question database. Requires: % @ # &</li>` +
 				`<li><code>/trivia delete [question]</code> - Delete a question from the trivia database. Requires: % @ # &</li>` +
+				`<li><code>/trivia move [category] | [question]</code> - Change the category of question in the trivia database. Requires: % @ # &</li>` +
 				`<li><code>/trivia qs</code> - View the distribution of questions in the question database.</li>` +
 				`<li><code>/trivia qs [category]</code> - View the questions in the specified category. Requires: % @ # &</li>` +
 				`<li><code>/trivia clearqs [category]</code> - Clear all questions in the given category. Requires: # &</li>` +
@@ -2167,9 +2316,16 @@ const triviaCommands: ChatCommands = {
 				`<li><code>/trivia casesensitivesearch [type], [query]</code> - Like <code>/trivia search</code>, but is case sensitive (i.e., capitalization matters). Requires: + % @ * &</li>` +
 				`<li><code>/trivia status [player]</code> - lists the player's standings (your own if no player is specified) and the list of players in the current trivia game.</li>` +
 				`<li><code>/trivia rank [username]</code> - View the rank of the specified user. If none is given, view your own.</li>` +
-				`<li><code>/trivia ladder</code> - View information about the top 15 users on the trivia leaderboard.</li>` +
-				`<li><code>/trivia alltimeladder</code> - View information about the top 15 users on the all time trivia leaderboard</li>` +
 				`<li><code>/trivia history</code> - View a list of the 10 most recently played trivia games.</li>` +
+			`</ul></details>` +
+			`<details><summary><strong>Leaderboard commands</strong></summary><ul>` +
+				`<li><code>/trivia ladder</code> - View information about the top 15 users on the Trivia leaderboard.</li>` +
+				`<li><code>/trivia alltimeladder</code> - View information about the top 15 users on the all time Trivia leaderboard.</li>` +
+				`<li><code>/trivia mergescore [user]</code> — Merge another user's Trivia leaderboard score with yours.</li>` +
+				`<li><code>/trivia addpoints [user], [points]</code> - Add points to a given user's score on the Trivia leaderboard. Requires: # &</li>` +
+				`<li><code>/trivia removepoints [user], [points]</code> - Remove points from a given user's score on the Trivia leaderboard. Requires: # &</li>` +
+				`<li><code>/trivia removeleaderboardentry [user]</code> — Remove all Trivia leaderboard entries for a user. Requires: # &</li>` +
+
 			`</ul></details>`
 		);
 	},
@@ -2181,8 +2337,7 @@ const mastermindCommands: ChatCommands = {
 	end: triviaCommands.end,
 
 	new(target, room, user) {
-		room = this.requireRoom();
-		if (!isTriviaRoom(room)) return this.errorReply(this.tr`This command can only be used in the Trivia room.`);
+		room = this.requireRoom('trivia' as RoomID);
 		this.checkCan('show', null, room);
 
 		const finalists = parseInt(target);
@@ -2207,13 +2362,13 @@ const mastermindCommands: ChatCommands = {
 		if (!(category in ALL_CATEGORIES)) {
 			return this.errorReply(this.tr`${category} is not a valid category.`);
 		}
-		const categoryName = ALL_CATEGORIES[category];
+		const categoryName = ALL_CATEGORIES[CATEGORY_ALIASES[category] || category];
 		const timeout = parseInt(timeoutString);
-		if (isNaN(timeout) || timeout < 1) {
+		if (isNaN(timeout) || timeout < 1 || (timeout * 1000) > Chat.MAX_TIMEOUT_DURATION) {
 			return this.errorReply(this.tr`You must specify a round length of at least 1 second.`);
 		}
 
-		const questions = getQuestions(category);
+		const questions = Utils.shuffle(getQuestions(category));
 		if (!questions.length) {
 			return this.errorReply(this.tr`There are no questions in the ${categoryName} category.`);
 		}
@@ -2232,7 +2387,7 @@ const mastermindCommands: ChatCommands = {
 		if (!target) return this.parse(`/help mastermind finals`);
 
 		const timeout = parseInt(target);
-		if (isNaN(timeout) || timeout < 1) {
+		if (isNaN(timeout) || timeout < 1 || (timeout * 1000) > Chat.MAX_TIMEOUT_DURATION) {
 			return this.errorReply(this.tr`You must specify a length of at least 1 second.`);
 		}
 
@@ -2246,6 +2401,13 @@ const mastermindCommands: ChatCommands = {
 		this.sendReply(this.tr('You are now signed up for this game!'));
 	},
 	joinhelp: [`/mastermind join — Joins the current game of Mastermind.`],
+
+
+	leave(target, room, user) {
+		getMastermindGame(room).leave(user);
+		this.sendReply(this.tr("You have left the current game of Mastermind."));
+	},
+	leavehelp: [`/mastermind leave - Makes the player leave the game.`],
 
 	pass(target, room, user) {
 		room = this.requireRoom();

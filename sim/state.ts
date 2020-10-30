@@ -33,10 +33,9 @@ type Referable = Battle | Field | Side | Pokemon | Condition | Ability | Item | 
 // need special treatment from these sets are then handled manually.
 
 const BATTLE = new Set([
-	'dex', 'gen', 'ruleTable', 'id', 'log', 'inherit', 'format',
-	'zMoveTable', 'teamGenerator', 'NOT_FAIL', 'FAIL', 'SILENT_FAIL',
-	'field', 'sides', 'prng', 'hints', 'deserialized', 'maxMoveTable',
-	'queue',
+	'dex', 'gen', 'ruleTable', 'id', 'log', 'inherit', 'format', 'zMoveTable', 'teamGenerator',
+	'HIT_SUBSTITUTE', 'NOT_FAIL', 'FAIL', 'SILENT_FAIL', 'field', 'sides', 'prng', 'hints',
+	'deserialized', 'maxMoveTable', 'queue',
 ]);
 const FIELD = new Set(['id', 'battle']);
 const SIDE = new Set(['battle', 'team', 'pokemon', 'choice', 'activeRequest']);
@@ -53,7 +52,7 @@ export const State = new class {
 	// due to circular module dependencies on Battle and Field instead
 	// of simply initializing it as a const. See isReferable for where this
 	// gets lazily created on demand.
-	// tslint:disable-next-line: ban-types
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	REFERABLE?: Set<Function>;
 
 	serializeBattle(battle: Battle): /* Battle */ AnyObject {
@@ -386,7 +385,7 @@ export const State = new class {
 		// class types to be decode, so we're probably OK. We could make the reference
 		// markers more esoteric with additional sigils etc to avoid collisions, but
 		// we're making a conscious decision to favor readability over robustness.
-		if (ref.charAt(0) !== '[' && ref.slice(-1) !== ']') return undefined;
+		if (!ref.startsWith('[') && !ref.endsWith(']')) return undefined;
 
 		ref = ref.substring(1, ref.length - 1);
 		// There's only one instance of these thus they don't need an id to differentiate.

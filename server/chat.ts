@@ -56,6 +56,14 @@ export interface AnnotatedChatCommands {
 	[k: string]: AnnotatedChatHandler | string | string[] | AnnotatedChatCommands;
 }
 
+export interface ChatPlugin {
+	commands?: AnnotatedChatCommands;
+	pages?: PageTable;
+	destroy?: () => void;
+	roomSettings?: SettingsHandler | SettingsHandler[];
+	[k: string]: any;
+}
+
 export type SettingsHandler = (
 	room: Room,
 	user: User,
@@ -89,6 +97,11 @@ export type PunishmentFilter = (user: User | ID, punishment: Punishment) => void
 export type LoginFilter = (user: User, oldUser: User | null, userType: string) => void;
 export type HostFilter = (host: string, user: User, connection: Connection, hostType: string) => void;
 
+export interface Translations {
+	name?: string;
+	strings: {[english: string]: string};
+}
+
 const LINK_WHITELIST = [
 	'*.pokemonshowdown.com', 'psim.us', 'smogtours.psim.us',
 	'*.smogon.com', '*.pastebin.com', '*.hastebin.com',
@@ -104,17 +117,17 @@ const MAX_PARSE_RECURSION = 10;
 const VALID_COMMAND_TOKENS = '/!';
 const BROADCAST_TOKEN = '!';
 
-const TRANSLATION_DIRECTORY = 'translations/';
-
 import {FS} from '../lib/fs';
 import {Utils} from '../lib/utils';
 import {formatText, linkRegex, stripFormatting} from './chat-formatter';
+import {ModlogEntry} from './modlog';
 
 // @ts-ignore no typedef available
 import ProbeModule = require('probe-image-size');
 const probe: (url: string) => Promise<{width: number, height: number}> = ProbeModule;
 
 const EMOJI_REGEX = /[\p{Emoji_Modifier_Base}\p{Emoji_Presentation}\uFE0F]/u;
+const TRANSLATION_DIRECTORY = `${__dirname}/../.translations-dist`;
 
 class PatternTester {
 	// This class sounds like a RegExp
@@ -200,9 +213,9 @@ export class Interruption extends Error {
 // These classes need to be declared here because they aren't hoisted
 export abstract class MessageContext {
 	readonly user: User;
-	language: string | null;
+	language: ID | null;
 	recursionDepth: number;
-	constructor(user: User, language: string | null = null) {
+	constructor(user: User, language: ID | null = null) {
 		this.user = user;
 		this.language = language;
 		this.recursionDepth = 0;
@@ -241,7 +254,7 @@ export class PageContext extends MessageContext {
 	initialized: boolean;
 	title: string;
 	args: string[];
-	constructor(options: {pageid: string, user: User, connection: Connection, language?: string}) {
+	constructor(options: {pageid: string, user: User, connection: Connection, language?: ID}) {
 		super(options.user, options.language);
 
 		this.connection = options.connection;
@@ -307,6 +320,9 @@ export class PageContext extends MessageContext {
 
 		const parts = this.pageid.split('-');
 		parts.shift(); // first part is always `view`
+
+		if (!this.connection.openPages) this.connection.openPages = new Set();
+		this.connection.openPages.add(parts.join('-'));
 
 		let handler: PageHandler | PageTable = Chat.pages;
 		while (handler) {
@@ -500,9 +516,11 @@ export class CommandContext extends MessageContext {
 			}).catch(err => {
 				if (err.name?.endsWith('ErrorMessage')) {
 					this.errorReply(err.message);
+					this.update();
 					return false;
 				}
 				if (err.name.endsWith('Interruption')) {
+					this.update();
 					return;
 				}
 				Monitor.crashlog(err, 'An async chat command', {
@@ -755,7 +773,7 @@ export class CommandContext extends MessageContext {
 		this.add(`|html|<div class="infobox">${htmlContent}</div>`);
 	}
 	sendReplyBox(htmlContent: string) {
-		this.sendReply(`|c|${this.room ? this.user.getIdentity() : '~'}|/raw <div class="infobox">${htmlContent}</div>`);
+		this.sendReply(`|c|${this.room && this.broadcasting ? this.user.getIdentity() : '~'}|/raw <div class="infobox">${htmlContent}</div>`);
 	}
 	popupReply(message: string) {
 		this.connection.popup(message);
@@ -809,25 +827,23 @@ export class CommandContext extends MessageContext {
 		}
 		this.roomlog(`(${msg})`);
 	}
-	globalModlog(action: string, user: string | User | null, note?: string | null) {
-		let buf = `${action}: `;
+	globalModlog(action: string, user: string | User | null, note?: string | null, ip?: string) {
+		const entry: ModlogEntry = {action, isGlobal: true, loggedBy: this.user.id, note: note?.replace(/\n/gm, ' ')};
 		if (user) {
 			if (typeof user === 'string') {
-				buf += `[${user}]`;
+				entry.userid = toID(user);
 			} else {
+				entry.ip = user.latestIp;
 				const userid = user.getLastId();
-				buf += `[${userid}]`;
-				if (user.autoconfirmed && user.autoconfirmed !== userid) buf += ` ac:[${user.autoconfirmed}]`;
-				const alts = user.getAltUsers(false, true).slice(1).map(alt => alt.getLastId()).join('], [');
-				if (alts.length) buf += ` alts:[${alts}]`;
-				buf += ` [${user.latestIp}]`;
+				entry.userid = userid;
+				if (user.autoconfirmed && user.autoconfirmed !== userid) entry.autoconfirmedID = user.autoconfirmed;
+				const alts = user.getAltUsers(false, true).slice(1).map(alt => alt.getLastId());
+				if (alts.length) entry.alts = alts;
 			}
 		}
-		if (!note) note = ` by ${this.user.id}`;
-		buf += note.replace(/\n/gm, ' ');
-
-		Rooms.global.modlog(buf, this.room?.roomid);
-		if (this.room) this.room.modlog(buf);
+		if (ip) entry.ip = ip;
+		this.room?.modlog(entry);
+		Rooms.global.modlog(entry, this.room?.roomid);
 	}
 	modlog(
 		action: string,
@@ -835,25 +851,22 @@ export class CommandContext extends MessageContext {
 		note: string | null = null,
 		options: Partial<{noalts: any, noip: any}> = {}
 	) {
-		let buf = `${action}: `;
+		const entry: ModlogEntry = {action, loggedBy: this.user.id, note: note?.replace(/\n/gm, ' ')};
 		if (user) {
 			if (typeof user === 'string') {
-				buf += `[${toID(user)}]`;
+				entry.userid = toID(user);
 			} else {
 				const userid = user.getLastId();
-				buf += `[${userid}]`;
+				entry.userid = userid;
 				if (!options.noalts) {
-					if (user.autoconfirmed && user.autoconfirmed !== userid) buf += ` ac:[${user.autoconfirmed}]`;
-					const alts = user.getAltUsers(false, true).slice(1).map(alt => alt.getLastId()).join('], [');
-					if (alts.length) buf += ` alts:[${alts}]`;
+					if (user.autoconfirmed && user.autoconfirmed !== userid) entry.autoconfirmedID = user.autoconfirmed;
+					const alts = user.getAltUsers(false, true).slice(1).map(alt => alt.getLastId());
+					if (alts.length) entry.alts = alts;
 				}
-				if (!options.noip) buf += ` [${user.latestIp}]`;
+				if (!options.noip) entry.ip = user.latestIp;
 			}
 		}
-		buf += ` by ${this.user.id}`;
-		if (note) buf += `: ${note.replace(/\n/gm, ' ')}`;
-
-		(this.room || Rooms.global).modlog(buf);
+		(this.room || Rooms.global).modlog(entry);
 	}
 	roomlog(data: string) {
 		if (this.room) this.room.roomlog(data);
@@ -871,9 +884,8 @@ export class CommandContext extends MessageContext {
 	update() {
 		if (this.room) this.room.update();
 	}
-	filter(message: string, targetUser: User | null = null) {
-		if (!this.room) return null;
-		return Chat.filter(this, message, this.user, this.room, this.connection, targetUser);
+	filter(message: string) {
+		return Chat.filter(message, this);
 	}
 	statusfilter(status: string) {
 		return Chat.statusfilter(status, this.user);
@@ -1125,7 +1137,7 @@ export class CommandContext extends MessageContext {
 		}
 
 		if (Chat.filters.length) {
-			return Chat.filter(this, message, user, room, connection, targetUser);
+			return this.filter(message);
 		}
 
 		return message;
@@ -1207,7 +1219,7 @@ export class CommandContext extends MessageContext {
 		const tags = htmlContent.match(/<!--.*?-->|<\/?[^<>]*/g);
 		if (tags) {
 			const ILLEGAL_TAGS = [
-				'script', 'head', 'body', 'html', 'canvas', 'base', 'meta', 'link',
+				'script', 'head', 'body', 'html', 'canvas', 'base', 'meta', 'link', 'iframe',
 			];
 			const LEGAL_AUTOCLOSE_TAGS = [
 				// void elements (no-close tags)
@@ -1220,7 +1232,7 @@ export class CommandContext extends MessageContext {
 			const stack = [];
 			for (const tag of tags) {
 				const isClosingTag = tag.charAt(1) === '/';
-				const contentEndLoc = tag.charAt(tag.length - 1) === '/' ? -1 : undefined;
+				const contentEndLoc = tag.endsWith('/') ? -1 : undefined;
 				const tagContent = tag.slice(isClosingTag ? 2 : 1, contentEndLoc).replace(/\s+/, ' ').trim();
 				const tagNameEndIndex = tagContent.indexOf(' ');
 				const tagName = tagContent.slice(0, tagNameEndIndex >= 0 ? tagNameEndIndex : undefined).toLowerCase();
@@ -1329,11 +1341,31 @@ export class CommandContext extends MessageContext {
 		return rest;
 	}
 
-	requireRoom() {
+	requireRoom(id?: RoomID) {
 		if (!this.room) {
 			throw new Chat.ErrorMessage(`/${this.cmd} - must be used in a chat room, not a ${this.pmTarget ? "PM" : "console"}`);
 		}
+		if (id && this.room.roomid !== id) {
+			const targetRoom = Rooms.get(id);
+			if (!targetRoom) {
+				throw new Chat.ErrorMessage(`This command can only be used in the room '${id}', but that room does not exist.`);
+			}
+			throw new Chat.ErrorMessage(`This command can only be used in the ${targetRoom.title} room.`);
+		}
 		return this.room;
+	}
+	// eslint-disable-next-line @typescript-eslint/type-annotation-spacing
+	requireGame<T extends RoomGame>(constructor: new (...args: any[]) => T) {
+		const room = this.requireRoom();
+		if (!room.game) {
+			throw new Chat.ErrorMessage(`This command requires a game of ${constructor.name} (this room has no game).`);
+		}
+		const game = room.getGame(constructor);
+		// must be a different game
+		if (!game) {
+			throw new Chat.ErrorMessage(`This command requires a game of ${constructor.name} (this game is ${room.game.title}).`);
+		}
+		return game;
 	}
 	commandDoesNotExist(): never {
 		if (this.cmdToken === '!') {
@@ -1352,6 +1384,13 @@ export const Chat = new class {
 		});
 	}
 	translationsLoaded = false;
+	/**
+	 * As per the node.js documentation at https://nodejs.org/api/timers.html#timers_settimeout_callback_delay_args,
+	 * timers with durations that are too long for a 32-bit signed integer will be invoked after 1 millisecond,
+	 * which tends to cause unexpected behavior.
+	 */
+	readonly MAX_TIMEOUT_DURATION = 2147483647;
+
 	readonly multiLinePattern = new PatternTester();
 
 	/*********************************************************
@@ -1363,28 +1402,31 @@ export const Chat = new class {
 	pages!: PageTable;
 	readonly destroyHandlers: (() => void)[] = [];
 	/** The key is the name of the plugin. */
-	readonly plugins: {[k: string]: AnyObject} = {};
+	readonly plugins: {[k: string]: ChatPlugin} = {};
+	/** Will be empty except during hotpatch */
+	oldPlugins: {[k: string]: ChatPlugin} = {};
 	roomSettings: SettingsHandler[] = [];
 
 	/*********************************************************
 	 * Load chat filters
 	 *********************************************************/
 	readonly filters: ChatFilter[] = [];
-	filter(
-		context: CommandContext,
-		message: string,
-		user: User,
-		room: Room | null,
-		connection: Connection,
-		targetUser: User | null = null
-	) {
+	filter(message: string, context: CommandContext) {
 		// Chat filters can choose to:
 		// 1. return false OR null - to not send a user's message
 		// 2. return an altered string - to alter a user's message
 		// 3. return undefined to send the original message through
 		const originalMessage = message;
 		for (const curFilter of Chat.filters) {
-			const output = curFilter.call(context, message, user, room, connection, targetUser, originalMessage);
+			const output = curFilter.call(
+				context,
+				message,
+				context.user,
+				context.room,
+				context.connection,
+				context.pmTarget,
+				originalMessage
+			);
 			if (output === false) return null;
 			if (!output && output !== undefined) return output;
 			if (output !== undefined) message = output;
@@ -1491,26 +1533,35 @@ export const Chat = new class {
 	 * Translations
 	 *********************************************************/
 	/** language id -> language name */
-	readonly languages = new Map<string, string>();
+	readonly languages = new Map<ID, string>();
 	/** language id -> (english string -> translated string) */
-	readonly translations = new Map<string, Map<string, [string, string[], string[]]>>();
+	readonly translations = new Map<ID, Map<string, [string, string[], string[]]>>();
 
-	loadTranslations() {
-		return FS(TRANSLATION_DIRECTORY).readdir().then(files => {
-			// ensure that english is the first entry when we iterate over Chat.languages
-			Chat.languages.set('english', 'English');
-			for (const fname of files) {
-				if (!fname.endsWith('.json')) continue;
+	async loadTranslations() {
+		const directories = await FS(TRANSLATION_DIRECTORY).readdir();
 
-				interface TRStrings {
-					[k: string]: string;
+		// ensure that english is the first entry when we iterate over Chat.languages
+		Chat.languages.set('english' as ID, 'English');
+		for (const dirname of directories) {
+			const dir = FS(`${TRANSLATION_DIRECTORY}/${dirname}`);
+			if (!dir.isDirectorySync()) continue;
+
+			// For some reason, toID() isn't available as a global when this executes.
+			const languageID = Dex.toID(dirname);
+			const files = await dir.readdir();
+			for (const filename of files) {
+				if (!filename.endsWith('.js')) continue;
+
+				const content: Translations = require(`${TRANSLATION_DIRECTORY}/${dirname}/${filename}`).translations;
+
+				if (!Chat.translations.has(languageID)) {
+					Chat.translations.set(languageID, new Map());
 				}
-				// eslint-disable-next-line @typescript-eslint/no-var-requires
-				const content: {name: string, strings: TRStrings} = require(`../${TRANSLATION_DIRECTORY}${fname}`);
-				const id = fname.slice(0, -5);
+				const translationsSoFar = Chat.translations.get(languageID)!;
 
-				Chat.languages.set(id, content.name || "Unknown Language");
-				Chat.translations.set(id, new Map());
+				if (content.name && !Chat.languages.has(languageID)) {
+					Chat.languages.set(languageID, content.name);
+				}
 
 				if (content.strings) {
 					for (const key in content.strings) {
@@ -1524,17 +1575,20 @@ export const Chat = new class {
 							valLabels.push(str);
 							return '${}';
 						}).replace(/\[TN: ?.+?\]/g, '');
-						Chat.translations.get(id)!.set(newKey, [val, keyLabels, valLabels]);
+						translationsSoFar.set(newKey, [val, keyLabels, valLabels]);
 					}
 				}
 			}
-		});
+			if (!Chat.languages.has(languageID)) {
+				// Fallback in case no translation files provide the language's name
+				Chat.languages.set(languageID, "Unknown Language");
+			}
+		}
 	}
-	tr(language: string | null): (fStrings: TemplateStringsArray | string, ...fKeys: any) => string;
-	tr(language: string | null, strings: TemplateStringsArray | string, ...keys: any[]): string;
-	tr(language: string | null, strings: TemplateStringsArray | string = '', ...keys: any[]) {
-		if (!language) language = 'english';
-		language = toID(language);
+	tr(language: ID | null): (fStrings: TemplateStringsArray | string, ...fKeys: any) => string;
+	tr(language: ID | null, strings: TemplateStringsArray | string, ...keys: any[]): string;
+	tr(language: ID | null, strings: TemplateStringsArray | string = '', ...keys: any[]) {
+		if (!language) language = 'english' as ID;
 		// If strings is an array (normally the case), combine before translating.
 		const trString = Array.isArray(strings) ? strings.join('${}') : strings as string;
 
@@ -1543,9 +1597,7 @@ export const Chat = new class {
 			throw new Error(`Trying to translate to a nonexistent language: ${language}`);
 		}
 		if (!strings.length) {
-			return ((fStrings: TemplateStringsArray | string, ...fKeys: any) => {
-				return Chat.tr(language, fStrings, ...fKeys);
-			});
+			return ((fStrings: TemplateStringsArray | string, ...fKeys: any) => Chat.tr(language, fStrings, ...fKeys));
 		}
 
 		const entry = Chat.translations.get(language)!.get(trString);
@@ -1690,8 +1742,9 @@ export const Chat = new class {
 		if (plugin.statusfilter) Chat.statusfilters.push(plugin.statusfilter);
 		Chat.plugins[name] = plugin;
 	}
-	loadPlugins() {
+	loadPlugins(oldPlugins?: {[k: string]: ChatPlugin}) {
 		if (Chat.commands) return;
+		if (oldPlugins) Chat.oldPlugins = oldPlugins;
 
 		void FS('package.json').readIfExists().then(data => {
 			if (data) Chat.packageData = JSON.parse(data);
@@ -1742,6 +1795,7 @@ export const Chat = new class {
 		for (const file of files) {
 			this.loadPlugin(`chat-plugins/${file}`);
 		}
+		Chat.oldPlugins = {};
 	}
 	destroy() {
 		for (const handler of Chat.destroyHandlers) {
@@ -1826,7 +1880,7 @@ export const Chat = new class {
 	 *
 	 * options.human = true will reports hours human-readable
 	 */
-	toTimestamp(date: Date, options: {human?: any} = {}) {
+	toTimestamp(date: Date, options: {human?: boolean} = {}) {
 		const human = options.human;
 		let parts: any[] = [
 			date.getFullYear(),	date.getMonth() + 1, date.getDate(),
@@ -1846,10 +1900,12 @@ export const Chat = new class {
 	 * options.hhmmss = true will instead report the duration in 00:00:00 format
 	 *
 	 */
-	toDurationString(val: number, options: {hhmmss?: any, precision?: number} = {}) {
+	toDurationString(val: number, options: {hhmmss?: boolean, precision?: number} = {}) {
 		// TODO: replace by Intl.DurationFormat or equivalent when it becomes available (ECMA-402)
 		// https://github.com/tc39/ecma402/issues/47
 		const date = new Date(+val);
+		if (isNaN(date.getTime())) return 'forever';
+
 		const parts = [
 			date.getUTCFullYear() - 1970, date.getUTCMonth(), date.getUTCDate() - 1,
 			date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(),
@@ -1857,21 +1913,30 @@ export const Chat = new class {
 		const roundingBoundaries = [6, 15, 12, 30, 30];
 		const unitNames = ["second", "minute", "hour", "day", "month", "year"];
 		const positiveIndex = parts.findIndex(elem => elem > 0);
-		const precision = (options?.precision ? options.precision : parts.length);
+		let precision = (options?.precision ? options.precision : 3);
 		if (options?.hhmmss) {
 			const str = parts.slice(positiveIndex).map(value => value < 10 ? "0" + value : "" + value).join(":");
 			return str.length === 2 ? "00:" + str : str;
 		}
+
 		// round least significant displayed unit
 		if (positiveIndex + precision < parts.length && precision > 0 && positiveIndex >= 0) {
 			if (parts[positiveIndex + precision] >= roundingBoundaries[positiveIndex + precision - 1]) {
 				parts[positiveIndex + precision - 1]++;
 			}
 		}
+
+		// don't display trailing 0's if the number is exact
+		let precisionIndex = 5;
+		while (precisionIndex > positiveIndex && !parts[precisionIndex]) {
+			precisionIndex--;
+		}
+		precision = Math.min(precision, precisionIndex - positiveIndex + 1);
+
 		return parts
 			.slice(positiveIndex)
 			.reverse()
-			.map((value, index) => value ? value + " " + unitNames[index] + (value > 1 ? "s" : "") : "")
+			.map((value, index) => `${value} ${unitNames[index]}${value !== 1 ? "s" : ""}`)
 			.reverse()
 			.slice(0, precision)
 			.join(" ")
@@ -1912,11 +1977,11 @@ export const Chat = new class {
 		return htmlContent;
 	}
 	/**
-	 * Takes a string of code and transforms it into a block of html using the details tag.
+	 * Takes a string of text and transforms it into a block of html using the details tag.
 	 * If it has a newline, will make the 3 lines the preview, and fill the rest in.
 	 * @param str string to block
 	 */
-	getReadmoreCodeBlock(str: string, cutoff = 3) {
+	getReadmoreBlock(str: string, isCode?: boolean, cutoff = 3) {
 		const params = str.slice(+str.startsWith('\n')).split('\n');
 		const output = [];
 		for (const param of params) {
@@ -1925,16 +1990,21 @@ export const Chat = new class {
 		}
 
 		if (output.length > cutoff) {
-			return `<details class="readmore code" style="white-space: pre-wrap; display: table; tab-size: 3"><summary>${
+			return `<details class="readmore${isCode ? ` code` : ``}" style="white-space: pre-wrap; display: table; tab-size: 3"><summary>${
 				output.slice(0, cutoff).join('<br />')
 			}</summary>${
 				output.slice(cutoff).join('<br />')
 			}</details>`;
 		} else {
-			return `<code style="white-space: pre-wrap; display: table; tab-size: 3">${
+			const tag = isCode ? `code` : `div`;
+			return `<${tag} style="white-space: pre-wrap; display: table; tab-size: 3">${
 				output.join('<br />')
-			}</code>`;
+			}</${tag}>`;
 		}
+	}
+
+	getReadmoreCodeBlock(str: string, cutoff?: number) {
+		return Chat.getReadmoreBlock(str, true, cutoff);
 	}
 
 	getDataPokemonHTML(species: Species, gen = 8, tier = '') {
@@ -1985,7 +2055,6 @@ export const Chat = new class {
 		return `<div class="message"><ul class="utilichart">${buf}<li style="clear:both"></li></ul></div>`;
 	}
 	getDataMoveHTML(move: Move) {
-		if (typeof move === 'string') move = Object.assign({}, Dex.getMove(move));
 		let buf = `<ul class="utilichart"><li class="result">`;
 		buf += `<span class="col movenamecol"><a href="https://${Config.routes.dex}/moves/${move.id}">${move.name}</a></span> `;
 		// encoding is important for the ??? type icon
@@ -2004,15 +2073,13 @@ export const Chat = new class {
 		return buf;
 	}
 	getDataAbilityHTML(ability: Ability) {
-		if (typeof ability === 'string') ability = Object.assign({}, Dex.getAbility(ability));
 		let buf = `<ul class="utilichart"><li class="result">`;
 		buf += `<span class="col namecol"><a href="https://${Config.routes.dex}/abilities/${ability.id}">${ability.name}</a></span> `;
 		buf += `<span class="col abilitydesccol">${ability.shortDesc || ability.desc}</span> `;
 		buf += `</li><li style="clear:both"></li></ul>`;
 		return buf;
 	}
-	getDataItemHTML(item: string | Item) {
-		if (typeof item === 'string') item = Object.assign({}, Dex.getItem(item));
+	getDataItemHTML(item: Item) {
 		let buf = `<ul class="utilichart"><li class="result">`;
 		buf += `<span class="col itemiconcol"><psicon item="${item.id}"></span> <span class="col namecol"><a href="https://${Config.routes.dex}/items/${item.id}">${item.name}</a></span> `;
 		buf += `<span class="col itemdesccol">${item.shortDesc || item.desc}</span> `;
@@ -2121,10 +2188,10 @@ CommandContext.prototype.requiresRoom = CommandContext.prototype.requireRoom;
 export interface FilterWord {
 	regex: RegExp;
 	word: string;
-	reason: string;
+	hits: number;
+	reason?: string;
 	publicReason?: string;
 	replacement?: string;
-	hits: number;
 }
 
 export type MonitorHandler = (

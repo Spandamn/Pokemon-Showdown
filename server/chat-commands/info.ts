@@ -11,6 +11,21 @@
 import * as net from 'net';
 import {YoutubeInterface} from '../chat-plugins/youtube';
 import {Utils} from '../../lib/utils';
+import {Net} from '../../lib/net';
+
+export function getCommonBattles(userID1: ID, user1: User | null, userID2: ID, user2: User | null) {
+	const battles = [];
+	for (const curRoom of Rooms.rooms.values()) {
+		if (!curRoom.battle) continue;
+		if (
+			(user1?.inRooms.has(curRoom.roomid) || curRoom.auth.get(userID1) === Users.PLAYER_SYMBOL) &&
+			(user2?.inRooms.has(curRoom.roomid) || curRoom.auth.get(userID2) === Users.PLAYER_SYMBOL)
+		) {
+			battles.push(curRoom.roomid);
+		}
+	}
+	return battles;
+}
 
 export const commands: ChatCommands = {
 	ip: 'whois',
@@ -19,7 +34,8 @@ export const commands: ChatCommands = {
 	alts: 'whois',
 	whoare: 'whois',
 	altsnorecurse: 'whois',
-	whois(target, room: Room | null, user, connection, cmd) {
+	profile: 'whois',
+	whois(target, room, user, connection, cmd) {
 		if (room?.roomid === 'staff' && !this.runBroadcast()) return;
 		const targetUser = this.targetUserOrSelf(target, user.tempGroup === ' ');
 		const showAll = (cmd === 'ip' || cmd === 'whoare' || cmd === 'alt' || cmd === 'alts' || cmd === 'altsnorecurse');
@@ -136,20 +152,21 @@ export const commands: ChatCommands = {
 					if (punishment[3]) buf += Utils.html` (reason: ${punishment[3]})`;
 				}
 			}
+
 			const battlebanned = Punishments.isBattleBanned(targetUser);
 			if (battlebanned) {
 				buf += `<br />BATTLEBANNED: ${battlebanned[1]}`;
-				const expiresIn = new Date(battlebanned[2]).getTime() - Date.now();
-				const expiresDays = Math.round(expiresIn / 1000 / 60 / 60 / 24);
-				let expiresText = ``;
-				if (expiresDays >= 1) {
-					expiresText = `in around ${Chat.count(expiresDays, "days")}`;
-				} else {
-					expiresText = `soon`;
-				}
-				if (expiresIn > 1) buf += ` (expires ${expiresText})`;
+				buf += ` (expires ${Punishments.checkPunishmentExpiration(battlebanned)})`;
 				if (battlebanned[3]) buf += Utils.html` (reason: ${battlebanned[3]})`;
 			}
+
+			const groupchatbanned = Punishments.isGroupchatBanned(targetUser);
+			if (groupchatbanned) {
+				buf += `<br />Banned from using groupchats${groupchatbanned[1] !== targetUser.id ? `: ${groupchatbanned[1]}` : ``}`;
+				buf += ` ${Punishments.checkPunishmentExpiration(groupchatbanned)}`;
+				if (groupchatbanned[3]) buf += Utils.html` (reason: ${groupchatbanned[3]})`;
+			}
+
 			if (targetUser.semilocked) {
 				buf += `<br />Semilocked: ${targetUser.semilocked}`;
 			}
@@ -320,16 +337,7 @@ export const commands: ChatCommands = {
 		const userID1 = toID(targetUsername1);
 		const userID2 = toID(targetUsername2);
 
-		const battles = [];
-		for (const curRoom of Rooms.rooms.values()) {
-			if (!curRoom.battle) continue;
-			if (
-				(user1?.inRooms.has(curRoom.roomid) || curRoom.auth.has(userID1)) &&
-				(user2?.inRooms.has(curRoom.roomid) || curRoom.auth.has(userID2))
-			) {
-				battles.push(curRoom.roomid);
-			}
-		}
+		const battles = getCommonBattles(userID1, user1, userID2, user2);
 
 		if (!battles.length) return this.sendReply(`${targetUsername1} and ${targetUsername2} have no common battles.`);
 
@@ -357,15 +365,14 @@ export const commands: ChatCommands = {
 	},
 	showglobalpunishmentshelp: [`/showpunishments - Shows the current global punishments. Requires: % @ # &`],
 
-	host(target, room, user, connection, cmd) {
+	async host(target, room, user, connection, cmd) {
 		if (!target) return this.parse('/help host');
 		this.checkCan('ip');
 		target = target.trim();
 		if (!net.isIPv4(target)) return this.errorReply('You must pass a valid IPv4 IP to /host.');
-		void IPTools.lookup(target).then(({dnsbl, host, hostType}) => {
-			const dnsblMessage = dnsbl ? ` [${dnsbl}]` : ``;
-			this.sendReply(`IP ${target}: ${host || "ERROR"} [${hostType}]${dnsblMessage}`);
-		});
+		const {dnsbl, host, hostType} = await IPTools.lookup(target);
+		const dnsblMessage = dnsbl ? ` [${dnsbl}]` : ``;
+		this.sendReply(`IP ${target}: ${host || "ERROR"} [${hostType}]${dnsblMessage}`);
 	},
 	hosthelp: [`/host [ip] - Gets the host for a given IP. Requires: @ &`],
 
@@ -396,7 +403,7 @@ export const commands: ChatCommands = {
 			if (results.length > 100 && !isAll) {
 				return this.sendReply(`More than 100 users match the specified IP range. Use /ipsearchall to retrieve the full list.`);
 			}
-		} else if (ip.slice(-1) === '*') {
+		} else if (ip.endsWith('*')) {
 			// IP range
 			this.sendReply(`Users in IP range ${ip}${targetRoom ? ` in the room ${targetRoom.title}` : ``}:`);
 			ip = ip.slice(0, -1);
@@ -1351,10 +1358,10 @@ export const commands: ChatCommands = {
 				if (['band', 'scarf', 'specs'].includes(arg)) {
 					modifier = 1;
 					modSet = true;
-				} else if (arg.charAt(0) === '+') {
+				} else if (arg.startsWith('+')) {
 					modifier = parseInt(arg.charAt(1));
 					modSet = true;
-				} else if (arg.charAt(0) === '-') {
+				} else if (arg.startsWith('-')) {
 					positiveMod = false;
 					modifier = parseInt(arg.charAt(1));
 					modSet = true;
@@ -1411,7 +1418,7 @@ export const commands: ChatCommands = {
 		if (realSet) {
 			if (!baseSet) {
 				if (calcHP) {
-					baseStat = Math.ceil((100 * realStat - 10 - level * (ev / 4 + iv + 100)) / (2 * level));
+					baseStat = Math.ceil((100 * realStat - 10 - level * (Math.floor(ev / 4) + iv + 100)) / (2 * level));
 				} else {
 					if (!positiveMod) {
 						realStat *= (2 + modifier) / 2;
@@ -1419,7 +1426,10 @@ export const commands: ChatCommands = {
 						realStat *= 2 / (2 + modifier);
 					}
 
-					baseStat = Math.ceil((100 * Math.ceil(realStat) - nature * (level * (ev / 4 + iv) + 500)) / (2 * level * nature));
+					baseStat = Math.ceil(
+						(100 * Math.ceil(realStat) - nature * (level * (Math.floor(ev / 4) + iv) + 500)) /
+						(2 * level * nature)
+					);
 				}
 				if (baseStat < 0) {
 					return this.sendReplyBox('No valid value for base stat possible with given parameters.');
@@ -1452,9 +1462,9 @@ export const commands: ChatCommands = {
 		let output: number;
 
 		if (calcHP) {
-			output = (((iv + (2 * baseStat) + (ev / 4) + 100) * level) / 100) + 10;
+			output = (((iv + (2 * baseStat) + Math.floor(ev / 4) + 100) * level) / 100) + 10;
 		} else {
-			output = Math.floor(nature * Math.floor((((iv + (2 * baseStat) + (ev / 4)) * level) / 100) + 5));
+			output = Math.floor(nature * Math.floor((((iv + (2 * baseStat) + Math.floor(ev / 4)) * level) / 100) + 5));
 			if (positiveMod) {
 				output *= (2 + modifier) / 2;
 			} else {
@@ -1498,11 +1508,13 @@ export const commands: ChatCommands = {
 
 	groups(target, room, user) {
 		if (!this.runBroadcast()) return;
+		target = toID(target);
 		const showRoom = (target !== 'global');
 		const showGlobal = (target !== 'room' && target !== 'rooms');
 
 		const roomRanks = [
 			`<strong>Room ranks</strong>`,
+			`^ <strong>Prize Winner</strong> - They don't have any powers beyond a symbol.`,
 			`+ <strong>Voice</strong> - They can use ! commands like !groups`,
 			`% <strong>Driver</strong> - The above, and they can mute and warn`,
 			`@ <strong>Moderator</strong> - The above, and they can room ban users`,
@@ -1551,6 +1563,7 @@ export const commands: ChatCommands = {
 			`<strong>lock</strong> - Locks a user (makes them unable to talk in any rooms or PM non-staff) for 2 days.`,
 			`<strong>weeklock</strong> - Locks a user for a week.`,
 			`<strong>namelock</strong> - Locks a user and prevents them from having a username for 2 days.`,
+			`<strong>groupchatban</strong> — Bans a user from creating or joining groupchats for a week or a month.`,
 			`<strong>globalban</strong> - Globally bans (makes them unable to connect and play games) for a week.`,
 		];
 
@@ -1839,19 +1852,19 @@ export const commands: ChatCommands = {
 				if (rules.length > 0) {
 					rulesetHtml = `<details><summary>Banlist/Ruleset</summary>${rules.join("<br />")}</details>`;
 				} else {
-					rulesetHtml = `No ruleset found for ${format.name}`;
+					rulesetHtml = `No ruleset found for ${subformat.name}`;
 				}
 			}
-			let formatType: string = (format.gameType || "singles");
+			let formatType: string = (subformat.gameType || "singles");
 			formatType = formatType.charAt(0).toUpperCase() + formatType.slice(1).toLowerCase();
-			if (!format.desc && !format.threads) {
-				if (format.effectType === 'Format') {
-					return this.sendReplyBox(`No description found for this ${formatType} ${format.section} format.<br />${rulesetHtml}`);
+			if (!subformat.desc && !subformat.threads) {
+				if (subformat.effectType === 'Format') {
+					return this.sendReplyBox(`No description found for this ${formatType} ${subformat.section} format.<br />${rulesetHtml}`);
 				} else {
 					return this.sendReplyBox(`No description found for this rule.<br />${rulesetHtml}`);
 				}
 			}
-			const descHtml = [...(format.desc ? [format.desc] : []), ...(format.threads || [])];
+			const descHtml = [...(subformat.desc ? [subformat.desc] : []), ...(subformat.threads || [])];
 			return this.sendReplyBox(`${descHtml.join("<br />")}<br />${rulesetHtml}`);
 		}
 
@@ -1897,8 +1910,6 @@ export const commands: ChatCommands = {
 				`- /modlog <em>username</em>: search the moderator log of the room`,
 				`- /modnote <em>note</em>: add a moderator note that can be read through modlog`,
 				`- !show [image or youtube link]: display given media in chat.`,
-				`- /whitelist [user]: whitelist a non-staff user to use !show.`,
-				`- /unwhitelist [user]: removes the user from !show whitelist.`,
 			],
 			[
 				`<strong>Room moderators (@)</strong> can also use:`,
@@ -2004,13 +2015,14 @@ export const commands: ChatCommands = {
 
 		const buffer = [];
 		if (showAll || target === 'staff') {
-			buffer.push(`<a href="https://pokemonshowdown.com/pages/staff">${this.tr`Staff FAQ`}</a>`);
+			buffer.push(`<a href="https://pokemonshowdown.com/${this.tr`pages/staff`}">${this.tr`Staff FAQ`}</a>`);
 		}
 		if (showAll || target === 'autoconfirmed' || target === 'ac') {
 			buffer.push(this.tr`A user is autoconfirmed when they have won at least one rated battle and have been registered for one week or longer. In order to prevent spamming and trolling, most chatrooms only allow autoconfirmed users to chat. If you are not autoconfirmed, you can politely PM a staff member (staff have %, @, or # in front of their username) in the room you would like to chat and ask them to disable modchat. However, staff are not obligated to disable modchat.`);
+			if (!this.broadcasting) this.parse(`/regtime`);
 		}
 		if (showAll || target === 'ladder' || target === 'ladderhelp' || target === 'decay') {
-			buffer.push(`<a href="https://${Config.routes.root}/pages/ladderhelp">${this.tr`How the ladder works`}</a>`);
+			buffer.push(`<a href="https://${Config.routes.root}/${this.tr`pages/ladderhelp`}">${this.tr`How the ladder works`}</a>`);
 		}
 		if (showAll || target === 'tiering' || target === 'tiers' || target === 'tier') {
 			buffer.push(`<a href="https://www.smogon.com/ingame/battle/tiering-faq">${this.tr`Tiering FAQ`}</a>`);
@@ -2019,7 +2031,7 @@ export const commands: ChatCommands = {
 			buffer.push(`<a href="https://www.smogon.com/badge_faq">${this.tr`Badge FAQ`}</a>`);
 		}
 		if (showAll || target === 'rng') {
-			buffer.push(`<a href="https://${Config.routes.root}/pages/rng">${this.tr`Common misconceptions about our RNG`}</a>`);
+			buffer.push(`<a href="https://${Config.routes.root}/${this.tr`pages/rng`}">${this.tr`Common misconceptions about our RNG`}</a>`);
 		}
 		if (showAll || ['tournaments', 'tournament', 'tours', 'tour'].includes(target)) {
 			buffer.push(this.tr`To join a room tournament, click the <strong>Join!</strong> button or type the command <code>/tour join</code> in the room's chat. You can check if your team is legal for the tournament by clicking the <strong>Validate</strong> button once you've joined and selected a team. To battle your opponent in the tournament, click the <strong>Ready!</strong> button when it appears. There are two different types of room tournaments: elimination (if a user loses more than a certain number of times, they are eliminated) and round robin (all users play against each other, and the user with the most wins is the winner).`);
@@ -2028,8 +2040,8 @@ export const commands: ChatCommands = {
 			this.errorReply(`'${target}' is an invalid FAQ.`);
 			return this.parse(`/help faq`);
 		}
-		if (showAll) {
-			buffer.unshift(`<a href="https://pokemonshowdown.com/pages/faq">${this.tr`Frequently Asked Questions`}</a>`);
+		if (!target || showAll) {
+			buffer.unshift(`<a href="https://pokemonshowdown.com/${this.tr`pages/faq`}">${this.tr`Frequently Asked Questions`}</a>`);
 		}
 		this.sendReplyBox(buffer.join(`<br />`));
 	},
@@ -2535,84 +2547,6 @@ export const commands: ChatCommands = {
 	},
 	denyshowhelp: [`/denyshow [user] - Denies the media display request of [user]. Requires: % @ # &`],
 
-	randquote(target, room, user) {
-		room = this.requireRoom();
-		if (!room.settings.quotes?.length) return this.errorReply(`This room has no quotes.`);
-		this.runBroadcast();
-		const {quote, date, userid} = room.settings.quotes[Math.floor(Math.random() * room.settings.quotes.length)];
-		const time = Chat.toTimestamp(new Date(date), {human: true});
-		const attribution = toID(target) === 'showauthor' ? `<br /><hr /><small>Added by ${userid} on ${time}</small>` : '';
-		return this.sendReplyBox(`${Chat.formatText(quote).replace(/\n/g, '<br />')}${attribution}`);
-	},
-	randquotehelp: [`/randquote [showauthor] - Show a random quote from the room. Add 'showauthor' to see who added it and when.`],
-
-	addquote: 'quote',
-	quote(target, room, user) {
-		room = this.requireRoom();
-		if (!room.persist) {
-			return this.errorReply("This command is unavailable in temporary rooms.");
-		}
-		target = target.trim();
-		this.checkCan('mute', null, room);
-		if (!target) {
-			return this.parse(`/help quote`);
-		}
-		if (!room.settings.quotes) room.settings.quotes = [];
-		if (this.filter(target) !== target) {
-			return this.errorReply(`Invalid quote.`);
-		}
-		if (room.settings.quotes.filter(item => item.quote === target).length) {
-			return this.errorReply(`"${target}" is already quoted in this room.`);
-		}
-		if (target.length > 8192) {
-			return this.errorReply(`Your quote cannot exceed 8192 characters.`);
-		}
-		if (room.settings.quotes.length >= 100) {
-			return this.errorReply(`This room already has 100 quotes, which is the maximum.`);
-		}
-		room.settings.quotes.push({userid: user.id, quote: target, date: Date.now()});
-		room.saveSettings();
-		const collapsedQuote = target.replace(/\n/g, ' ');
-		this.privateModAction(`${user.name} added a new quote: "${collapsedQuote}".`);
-		return this.modlog(`ADDQUOTE`, null, collapsedQuote);
-	},
-	quotehelp: [`/quote [quote] - Adds [quote] to the room's quotes. Requires: % @ # &`],
-
-	removequote(target, room, user) {
-		target = target.trim();
-		const [idx, roomid] = Utils.splitFirst(target, ',');
-		const targetRoom = roomid ? Rooms.search(roomid) : room;
-		if (!targetRoom) return this.errorReply(`Invalid room.`);
-		if (!targetRoom.persist) {
-			return this.errorReply("This command is unavailable in temporary rooms.");
-		}
-		this.room = targetRoom;
-		this.checkCan('mute', null, targetRoom);
-		if (!targetRoom.settings.quotes?.length) return this.errorReply(`This room has no quotes.`);
-		const index = parseInt(idx);
-		if (isNaN(index)) {
-			return this.errorReply(`Invalid index.`);
-		}
-		if (!targetRoom.settings.quotes[index - 1]) {
-			return this.errorReply(`Quote not found.`);
-		}
-		const [removed] = targetRoom.settings.quotes.splice(index - 1, 1);
-		const collapsedQuote = removed.quote.replace(/\n/g, ' ');
-		this.privateModAction(`${user.name} removed quote indexed at ${index}: "${collapsedQuote}" (originally added by ${removed.userid}).`);
-		this.modlog(`REMOVEQUOTE`, null, collapsedQuote);
-		targetRoom.saveSettings();
-		if (roomid) this.parse(`/join view-quotes-${targetRoom.roomid}`);
-	},
-	removequotehelp: [`/removequote [index] - Removes the quote from the room's quotes. Requires: % @ # &`],
-
-	viewquotes: 'quotes',
-	quotes(target, room) {
-		const targetRoom = target ? Rooms.search(target) : room;
-		if (!targetRoom) return this.errorReply(`Invalid room.`);
-		return this.parse(`/join view-quotes-${targetRoom.roomid}`);
-	},
-	quoteshelp: [`/quotes [room] - Shows all quotes for [room]. Defaults the room the command is used in.`],
-
 	approvallog(target, room, user) {
 		room = this.requireRoom();
 		return this.parse(`/sl approved showing media from, ${room.roomid}`);
@@ -2623,17 +2557,19 @@ export const commands: ChatCommands = {
 		return this.parse(`/join view-approvals-${room.roomid}`);
 	},
 
-	async show(target, room, user) {
+	async show(target, room, user, connection) {
 		if (!room?.persist && !this.pmTarget) return this.errorReply(`/show cannot be used in temporary rooms.`);
 		if (!toID(target).trim()) return this.parse(`/help show`);
+		if (Monitor.countNetRequests(connection.ip)) {
+			return this.errorReply(`You are using this command too quickly. Wait a bit and try again.`);
+		}
 
 		const [link, comment] = Utils.splitFirst(target, ',');
 
 		let buf;
-		if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)(\/|$)/i.test(link)) {
-			const YouTube = new YoutubeInterface();
+		const YouTube = new YoutubeInterface();
+		if (YouTube.linkRegex.test(link)) {
 			buf = await YouTube.generateVideoDisplay(link);
-			if (!buf) return this.errorReply('Could not get YouTube video');
 		} else {
 			try {
 				const [width, height, resized] = await Chat.fitImage(link);
@@ -2662,6 +2598,32 @@ export const commands: ChatCommands = {
 	},
 	showhelp: [`/show [url] - shows an image or video url in chat. Requires: whitelist % @ # &`],
 
+	regdate: 'registertime',
+	regtime: 'registertime',
+	async registertime(target, room, user, connection) {
+		this.runBroadcast();
+		if (Monitor.countNetRequests(connection.ip)) {
+			return this.errorReply(`You are using this command too quickly. Wait a bit and try again.`);
+		}
+		if (!user.autoconfirmed) return this.errorReply(`Only autoconfirmed users can use this command.`);
+		target = toID(target);
+		if (!target) target = user.id;
+		let rawResult;
+		try {
+			rawResult = await Net(`https://${Config.routes.root}/users/${target}.json`).get();
+		} catch (e) {
+			if (e.message.includes('Not found')) throw new Chat.ErrorMessage(`User '${target}' is unregistered.`);
+			throw new Chat.ErrorMessage(e.message);
+		}
+		// not in a try-catch block because if this doesn't work, this is a problem that should be known
+		const result = JSON.parse(rawResult);
+		const date = new Date(result.registertime * 1000);
+		const regDate = Chat.toTimestamp(date, {human: true});
+		const regTimeAgo = Chat.toDurationString(Date.now() - date.getTime(), {precision: 1});
+		this.sendReplyBox(Utils.html`The user '${target}' registered ${regTimeAgo} ago, at ${regDate}.`);
+	},
+	registertimehelp: [`/registertime OR /regtime [user] - Find out when [user] registered.`],
+
 	pi(target, room, user) {
 		if (!this.runBroadcast()) return false;
 		return this.sendReplyBox(
@@ -2672,7 +2634,7 @@ export const commands: ChatCommands = {
 		);
 	},
 
-	code(target, room, user) {
+	code(target, room, user, connection) {
 		// target is trimmed by Chat#splitMessage, but leading spaces can be
 		// important to code block indentation.
 		target = this.message.substr(this.cmdToken.length + this.cmd.length + +this.message.includes(' ')).trimRight();
@@ -2683,13 +2645,18 @@ export const commands: ChatCommands = {
 		}
 
 		this.checkBroadcast(true, '!code');
-
-		const code = Chat.getReadmoreCodeBlock(target);
 		this.runBroadcast(true);
+
+		const isPMOrPersonalRoom = this.room?.settings.isPersonal !== false;
+
 		if (this.broadcasting) {
-			return `/raw <div class="infobox">${code}</div>`;
+			if (isPMOrPersonalRoom) {
+				target = this.filter(target)!;
+				if (!target) return this.errorReply(`Invalid code.`);
+			}
+			return `/raw <div class="infobox">${Chat.getReadmoreCodeBlock(target)}</div>`;
 		} else {
-			this.sendReplyBox(code);
+			this.sendReplyBox(Chat.getReadmoreCodeBlock(target));
 		}
 	},
 	codehelp: [
@@ -2786,39 +2753,12 @@ export const pages: PageTable = {
 		}
 		return buf;
 	},
-	quotes(args, user) {
-		const room = this.requireRoom();
-		this.title = `[Quotes]`;
-		// allow it for users if they can access the room
-		if (!user.inRooms.has(room.roomid) && room.settings.isPrivate && !user.isStaff) {
-			return this.errorReply(`Access denied.`);
-		}
-		let buffer = `<div class="pad">`;
-		buffer += `<button style="float:right;" class="button" name="send" value="/join view-quotes-${room.roomid}"><i class="fa fa-refresh"></i> Refresh</button>`;
-		if (!room.settings.quotes?.length) {
-			return `${buffer}<h2>This room has no quotes.</h2></div>`;
-		}
-
-		buffer += `<h2>Quotes for ${room.title} (${room.settings.quotes.length}):</h2>`;
-		for (const [i, quoteObj] of room.settings.quotes.entries()) {
-			const index = i + 1;
-			const {quote, userid, date} = quoteObj;
-			buffer += `<div class="infobox">${index}: ${Chat.formatText(quote).replace(/\n/g, '<br />')}`;
-			buffer += `<br /><hr /><small>Added by ${userid} on ${Chat.toTimestamp(new Date(date), {human: true})}</small>`;
-			if (user.can('mute', null, room)) {
-				buffer += `<br /><hr /><button class="button" name="send" value="/removequote ${index},${room.roomid}">Remove</button>`;
-			}
-			buffer += `</div>`;
-		}
-		buffer += `</div>`;
-		return buffer;
-	},
 };
 
 process.nextTick(() => {
 	Dex.includeData();
 	Chat.multiLinePattern.register(
 		'/htmlbox', '/quote', '/addquote', '!htmlbox', '/addhtmlbox', '/addrankhtmlbox', '/adduhtml',
-		'/changeuhtml', '/addrankuhtmlbox', '/changerankuhtmlbox'
+		'/changeuhtml', '/addrankuhtmlbox', '/changerankuhtmlbox', '/addrankuhtml',
 	);
 });

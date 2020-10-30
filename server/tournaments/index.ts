@@ -1,3 +1,4 @@
+
 import {Elimination} from './generator-elimination';
 import {RoundRobin} from './generator-round-robin';
 import {Utils} from '../../lib/utils';
@@ -197,7 +198,7 @@ export class Tournament extends Rooms.RoomGame {
 		return true;
 	}
 
-	setCustomRules(rules: string[]) {
+	setCustomRules(rules: string) {
 		try {
 			this.fullFormat = Dex.validateFormat(`${this.baseFormat}@@@${rules}`);
 		} catch (e) {
@@ -588,14 +589,14 @@ export class Tournament extends Rooms.RoomGame {
 		return data;
 	}
 
-	startTournament(output: CommandContext) {
+	startTournament(output: CommandContext, isAutostart?: boolean) {
 		if (this.isTournamentStarted) {
 			output.sendReply('|tournament|error|AlreadyStarted');
 			return false;
 		}
 
 		if (this.players.length < 2) {
-			if (output.target.startsWith('autostart')) {
+			if (isAutostart) {
 				this.room.send('|tournament|error|NotEnoughUsers');
 				this.forceEnd();
 				this.room.update();
@@ -774,7 +775,7 @@ export class Tournament extends Rooms.RoomGame {
 		if (timeout === Infinity) {
 			this.room.add('|tournament|autostart|off');
 		} else {
-			this.autoStartTimer = setTimeout(() => this.startTournament(output), timeout);
+			this.autoStartTimer = setTimeout(() => this.startTournament(output, true), timeout);
 			this.room.add(`|tournament|autostart|on|${timeout}`);
 		}
 		this.autoStartTimeout = timeout;
@@ -1377,23 +1378,22 @@ const commands: ChatCommands = {
 			if (!tournament) return this.errorReply(`There is no tournament running.`);
 			void tournament.acceptChallenge(user, this);
 		},
-		vtm(target, room, user, connection) {
+		async vtm(target, room, user, connection) {
 			room = this.requireRoom();
 			const tournament = room.getGame(Tournament);
 			if (!tournament) return this.errorReply(`There is no tournament running.`);
 			if (Monitor.countPrepBattle(connection.ip, connection)) {
 				return;
 			}
-			void TeamValidatorAsync.get(tournament.fullFormat).validateTeam(user.battleSettings.team).then(result => {
-				if (result.charAt(0) === '1') {
-					connection.popup("Your team is valid for this tournament.");
-				} else {
-					const formatName = Dex.getFormat(tournament.baseFormat).name;
-					// split/join is the easiest way to do a find/replace with an untrusted string, sadly
-					const reasons = result.slice(1).split(formatName).join('this tournament');
-					connection.popup(`Your team was rejected for the following reasons:\n\n- ${reasons.replace(/\n/g, '\n- ')}`);
-				}
-			});
+			const result = await TeamValidatorAsync.get(tournament.fullFormat).validateTeam(user.battleSettings.team);
+			if (result.charAt(0) === '1') {
+				connection.popup("Your team is valid for this tournament.");
+			} else {
+				const formatName = Dex.getFormat(tournament.baseFormat).name;
+				// split/join is the easiest way to do a find/replace with an untrusted string, sadly
+				const reasons = result.slice(1).split(formatName).join('this tournament');
+				connection.popup(`Your team was rejected for the following reasons:\n\n- ${reasons.replace(/\n/g, '\n- ')}`);
+			}
 		},
 		viewruleset: 'viewcustomrules',
 		viewbanlist: 'viewcustomrules',
@@ -1502,7 +1502,6 @@ const commands: ChatCommands = {
 			this.checkCan('tournaments', null, room);
 			const tournament = room.getGame(Tournament);
 			if (!tournament) return this.errorReply(`There is no tournament running.`);
-			const params = target.split(',').map(item => item.trim());
 			if (cmd === 'banlist') {
 				return this.errorReply('The new syntax is: /tour rules -bannedthing, +un[banned|restricted]thing, *restrictedthing, !removedrule, addedrule');
 			}
@@ -1514,7 +1513,7 @@ const commands: ChatCommands = {
 			if (tournament.isTournamentStarted) {
 				return this.errorReply("The custom rules cannot be changed once the tournament has started.");
 			}
-			if (tournament.setCustomRules(params)) {
+			if (tournament.setCustomRules(target)) {
 				room.addRaw(
 					`<div class="infobox infobox-limited">This tournament includes:<br />${tournament.getCustomRules()}</div>`
 				);
@@ -1659,9 +1658,12 @@ const commands: ChatCommands = {
 					target = 'off';
 					tournament.autostartcap = false;
 				}
-				const timeout = target.toLowerCase() === 'off' ? Infinity : target;
-				if (tournament.setAutoStartTimeout(Number(timeout) * 60 * 1000, this)) {
-					this.privateModAction(`The tournament auto start timer was set to  ${target} by ${user.name}`);
+				const timeout = target.toLowerCase() === 'off' ? Infinity : Number(target) * 60 * 1000;
+				if (timeout <= 0 || (timeout !== Infinity && timeout > Chat.MAX_TIMEOUT_DURATION)) {
+					return this.errorReply(`The automatic tournament start timer must be set to a positive number.`);
+				}
+				if (tournament.setAutoStartTimeout(timeout, this)) {
+					this.privateModAction(`The tournament auto start timer was set to ${target} by ${user.name}`);
 					this.modlog('TOUR AUTOSTART', null, timeout === Infinity ? 'off' : target);
 				}
 			}
@@ -1682,6 +1684,9 @@ const commands: ChatCommands = {
 			}
 			if (target.toLowerCase() === 'infinity' || target === '0') target = 'off';
 			const timeout = target.toLowerCase() === 'off' ? Infinity : Number(target) * 60 * 1000;
+			if (timeout <= 0 || (timeout !== Infinity && timeout > Chat.MAX_TIMEOUT_DURATION)) {
+				return this.errorReply(`The automatic disqualification timer must be set to a positive number.`);
+			}
 			if (timeout === tournament.autoDisqualifyTimeout) {
 				return this.errorReply(`The automatic tournament disqualify timer is already set to ${target} minute(s).`);
 			}

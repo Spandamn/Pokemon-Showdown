@@ -1632,7 +1632,7 @@ export class Battle {
 		for (const side of this.sides) {
 			let teamsize = side.pokemon.length;
 			if (format.teamLength && format.teamLength.battle) {
-				teamsize = format.teamLength.battle <= teamsize ? teamsize : format.teamLength.battle;
+				teamsize = format.teamLength.battle <= teamsize ? format.teamLength.battle : teamsize;
 			}
 			this.add('teamsize', side.id, teamsize);
 		}

@@ -2269,7 +2269,7 @@ export class Battle {
 			if (Math.abs(targetLoc) > numSlots) return false;
 		} else {
 			if (Math.abs(targetLoc) > this.getAllActive().length) return;
-			sourceLoc = source.side.n > 1 ? -(source.position + 2);
+			sourceLoc = source.side.n > 1 ? -(source.position + 2) : sourceLoc;
 		}
 		const isFoe = (targetLoc > 0);
 		const acrossFromTargetLoc = -(numSlots + 1 - targetLoc);

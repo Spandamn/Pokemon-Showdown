@@ -2264,12 +2264,13 @@ export class Battle {
 	validTargetLoc(targetLoc: number, source: Pokemon, targetType: string) {
 		if (targetLoc === 0) return true;
 		const numSlots = source.side.getActive().length;
+		let sourceLoc = -(source.position + 1);
 		if (this.gameType !== 'multi') {
 			if (Math.abs(targetLoc) > numSlots) return false;
 		} else {
 			if (Math.abs(targetLoc) > this.getAllActive().length) return;
+			sourceLoc = source.side.n > 1 ? -(source.position + 2);
 		}
-		const sourceLoc = -(source.position + 1);
 		const isFoe = (targetLoc > 0);
 		const acrossFromTargetLoc = -(numSlots + 1 - targetLoc);
 		const isAdjacent = (isFoe ?

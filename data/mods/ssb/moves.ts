@@ -4763,6 +4763,19 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.add('-anim', source, 'Eruption', target);
 			this.add('-anim', source, 'Earthquake', target);
 		},
+		secondary: null,
+		target: "normal",
+		type: "Fire",
+	},
+	lavaterrain: {
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		name: "Lava Terrain",
+		pp: 10,
+		priority: 0,
+		flags: {nonsky: 1},
+		terrain: 'lavaterrain',
 		condition: {
 			duration: 5,
 			durationCallback(source, effect) {
@@ -4802,7 +4815,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			},
 		},
 		secondary: null,
-		target: "normal",
+		target: "all",
 		type: "Fire",
 	},
 

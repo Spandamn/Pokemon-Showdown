@@ -80,15 +80,8 @@ export const Formats: FormatList = [
 		],
 
 		mod: 'gen8',
-		ruleset: ['Standard', 'Dynamax Clause'],
-		banlist: ['Uber', 'Arena Trap', 'Moody', 'Shadow Tag', 'Baton Pass'],
-		unbanlist: ['Cinderace'],
 		gameType: 'multi',
-		onBegin() {
-			if (this.rated && this.format.id === 'gen8ou') {
-				this.add('html', '<div class="broadcast-blue"><strong>OU is currently suspecting Cinderace! For information on how to participate check out the <a href="https://www.smogon.com/forums/threads/3670532/">suspect thread</a>.</strong></div>');
-			}
-		},
+		ruleset: ['[Gen 8] OU'],
 	},
 	{
 		name: "[Gen 8] OU (Blitz)",

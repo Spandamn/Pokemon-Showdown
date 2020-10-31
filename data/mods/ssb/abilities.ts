@@ -1145,6 +1145,7 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		onStart(source) {
 			const drizzle = this.dex.deepClone(this.dex.deepClone('raindance'));
 			for (const teammate of source.side.pokemon) if (teammate.hasType('Water') && teammate !== source) drizzle.duration++;
+			this.field.setWeather(drizzle);
 		},
 		onTryHit(target, source, move) {
 			if (target !== source && move.type === 'Water') {

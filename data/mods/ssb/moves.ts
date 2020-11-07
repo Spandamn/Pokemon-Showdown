@@ -428,6 +428,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		pp: 15,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Shadow Ball', target);
+		},
 		onHit(target, source, move) {
 			let success = false;
 			const removeAll = [

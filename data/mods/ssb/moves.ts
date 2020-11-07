@@ -5328,6 +5328,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			case 'Cleric':
 				changeSet(this, source, ssbSets['yuki-Cleric']);
 				this.add('-message', 'yuki patches up her wounds!');
+				return;
 			case 'Ninja':
 				changeSet(this, source, ssbSets['yuki-Ninja']);
 				this.add('-message', `yuki's fast movements confuse ${target.name}!`);

@@ -106,18 +106,17 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 			this.add('-ability', source, 'Scyphozoa');
 			this.add('-clearallboost');
 			for (const pokemon of this.getAllActive()) {
-				if (pokemon.clearBoosts()) {
-					for (stat in source.boosts) {
-						if (source.boosts[stat] < 6 && !exclude.includes(stat)) {
-							stats.push(stat);
-						}
+				pokemon.clearBoosts();
+				for (stat in source.boosts) {
+					if (source.boosts[stat] < 6 && !exclude.includes(stat)) {
+						stats.push(stat);
 					}
-					if (stats.length) {
-						const randomStat = this.sample(stats);
-						const boost: SparseBoostsTable = {};
-						boost[randomStat] = 1;
-						this.boost(boost, source, source);
-					}
+				}
+				if (stats.length) {
+					const randomStat = this.sample(stats);
+					const boost: SparseBoostsTable = {};
+					boost[randomStat] = 1;
+					this.boost(boost, source, source);
 				}
 				if (pokemon.removeVolatile('substitute')) {
 					for (stat in source.boosts) {

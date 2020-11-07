@@ -5299,7 +5299,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			this.attrLastMove('[still]');
 		},
 		onPrepareHit(foe, source, move) {
-			let animation: string;
 			const formes = ['Cleric', 'Ninja', 'Dancer', 'Songstress', 'Jester'];
 			source.m.yukiCosplayForme = this.sample(formes);
 			switch (source.m.yukiCosplayForme) {

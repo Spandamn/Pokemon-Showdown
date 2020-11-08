@@ -549,7 +549,17 @@ export const commands: ChatCommands = {
 		if (!targetRoom) {
 			return this.errorReply(this.tr`The room "${target}" was not found.`);
 		}
-		if (!targetUser) return this.parse(`/help invite`);
+		if (!targetUser) {
+			return this.parse('/help invite');
+		}
+
+		const invitesBlocked = targetUser.settings.blockInvites;
+		if (invitesBlocked) {
+			if (invitesBlocked === true ? !user.can('lock') : !Users.globalAuth.atLeast(user, invitesBlocked as GroupSymbol)) {
+				Chat.maybeNotifyBlocked('invite', targetUser, user);
+				return this.errorReply(`This user is currently blocking room invites.`);
+			}
+		}
 		if (!targetRoom.checkModjoin(targetUser)) {
 			this.room = targetRoom;
 			this.parse(`/roomvoice ${targetUser.name}`);
@@ -606,6 +616,34 @@ export const commands: ChatCommands = {
 		return this.sendReply(this.tr("You are no longer blocking private messages."));
 	},
 	unblockpmshelp: [`/unblockpms - Unblocks private messages. Block them with /blockpms.`],
+
+	unblockinvites: 'blockinvites',
+	blockinvites(target, room, user, connection, cmd) {
+		const unblock = cmd.includes('unblock');
+		if (unblock) {
+			if (!user.settings.blockInvites) {
+				return this.errorReply(`You are not blocking room invites! To block, use /blockinvites.`);
+			}
+			user.settings.blockInvites = false;
+			this.sendReply(`You are no longer blocking room invites.`);
+		} else {
+			if (toID(target) === 'ac') target = 'autoconfirmed';
+			if (user.settings.blockInvites === (target || true)) {
+				return this.errorReply("You are already blocking room invites - to unblock, use /unblockinvites");
+			}
+			if (target in Config.groups) {
+				user.settings.blockInvites = target as GroupSymbol;
+				this.sendReply(this.tr `You are now blocking room invites, except from staff and ${target}.`);
+			} else if (target === 'autoconfirmed' || target === 'trusted' || target === 'unlocked') {
+				user.settings.blockInvites = target;
+				this.sendReply(this.tr `You are now blocking room invites, except from staff and ${target} users.`);
+			} else {
+				user.settings.blockInvites = true;
+				this.sendReply(this.tr("You are now blocking room invites, except from staff."));
+			}
+		}
+		return user.update();
+	},
 
 	status(target, room, user, connection, cmd) {
 		if (user.locked || user.semilocked) {
@@ -733,7 +771,9 @@ export const commands: ChatCommands = {
 	showrank: 'hiderank',
 	hiderank(target, room, user, connection, cmd) {
 		const userGroup = Users.Auth.getGroup(Users.globalAuth.get(user.id));
-		if (!userGroup['hiderank']) return this.errorReply(`/hiderank - Access denied.`);
+		if (!userGroup['hiderank'] || !user.registered) {
+			return this.errorReply(`/hiderank - Access denied.`);
+		}
 
 		const isShow = cmd === 'showrank';
 		const group = (isShow ? Users.globalAuth.get(user.id) : (target.trim() || Users.Auth.defaultSymbol()) as GroupSymbol);
@@ -1618,21 +1658,10 @@ export const commands: ChatCommands = {
 	trn(target, room, user, connection) {
 		if (target === user.name) return false;
 
-		let commaIndex = target.indexOf(',');
-		let targetName = target;
-		let targetRegistered = false;
-		let targetToken = '';
-		if (commaIndex >= 0) {
-			targetName = target.substr(0, commaIndex);
-			target = target.substr(commaIndex + 1);
-			commaIndex = target.indexOf(',');
-			targetRegistered = !!target;
-			if (commaIndex >= 0) {
-				targetRegistered = !!parseInt(target.substr(0, commaIndex));
-				targetToken = target.substr(commaIndex + 1);
-			}
-		}
-		return user.rename(targetName, targetToken, targetRegistered, connection);
+		const [name, registeredString, token] = Utils.splitFirst(target, ',', 2);
+		const registered = !!parseInt(registeredString);
+
+		return user.rename(name, token || '', registered, connection);
 	},
 
 	/*********************************************************

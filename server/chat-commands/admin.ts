@@ -131,10 +131,13 @@ export const commands: ChatCommands = {
 		`/changerankuhtml [rank], [name], [message] - Changes the message previously shown with /addrankuhtml [rank], [name]. Requires: * # &`,
 	],
 
-	addline(target, room, user) {
-		this.checkCan('rawpacket');
-		// secret sysop command
-		this.add(target);
+	pline(target, room, user) {
+		// Secret console admin command
+		this.canUseConsole();
+		const message = target.length > 30 ? target.slice(0, -30) + '...' : target;
+		this.checkBroadcast(true, `!pline ${message}`);
+		this.runBroadcast(true);
+		this.sendReply(target);
 	},
 
 	pminfobox(target, room, user, connection) {
@@ -431,7 +434,11 @@ export const commands: ChatCommands = {
 					if (manager.filename.startsWith(FS('.server-dist/modlog').path)) void manager.destroy();
 				}
 
-				Rooms.Modlog = require('../modlog').modlog;
+				const {Modlog} = require('../modlog');
+				Rooms.Modlog = new Modlog(
+					Rooms.MODLOG_PATH || 'logs/modlog',
+					Rooms.MODLOG_DB_PATH || `${__dirname}/../../databases/modlog.db`
+				);
 				this.sendReply("Modlog has been hot-patched.");
 				Rooms.Modlog.streams = streams;
 				Rooms.Modlog.sharedStreams = sharedStreams;
@@ -444,14 +451,14 @@ export const commands: ChatCommands = {
 			}
 		} catch (e) {
 			Rooms.global.notifyRooms(
-				['development', 'staff', 'upperstaff'] as RoomID[],
+				['development', 'staff'] as RoomID[],
 				`|c|${user.getIdentity()}|/log ${user.name} used /hotpatch ${patch} - but something failed while trying to hot-patch.`
 			);
 			return this.errorReply(`Something failed while trying to hot-patch ${patch}: \n${e.stack}`);
 		}
 		Monitor.hotpatchVersions[patch] = version;
 		Rooms.global.notifyRooms(
-			['development', 'staff', 'upperstaff'] as RoomID[],
+			['development', 'staff'] as RoomID[],
 			`|c|${user.getIdentity()}|/log ${user.name} used /hotpatch ${patch}`
 		);
 	},

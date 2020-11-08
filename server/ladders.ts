@@ -260,6 +260,7 @@ class Ladder extends LadderStore {
 			return false;
 		}
 		if (Date.now() < user.lastChallenge + 10 * SECONDS) {
+		if (Date.now() < user.lastChallenge + 10 * SECONDS && !Config.nothrottle) {
 			// 10 seconds ago, probable misclick
 			connection.popup(`You challenged less than 10 seconds after your last challenge! It's cancelled in case it's a misclick.`);
 			return false;
@@ -510,7 +511,7 @@ class Ladder extends LadderStore {
 			if (users.indexOf(user) !== users.lastIndexOf(user)) return false;
 		}
 
-		/* if (Config.fakeladder) {
+		/*if (Config.noipchecks) {
 			user1.lastMatch = user2.id;
 			user2.lastMatch = user1.id;
 			return true;

@@ -25,6 +25,7 @@ To reload chat commands:
 
 import type {RoomPermission, GlobalPermission} from './user-groups';
 import type {Punishment} from './punishments';
+import type {PartialModlogEntry} from './modlog';
 
 export type PageHandler = (this: PageContext, query: string[], user: User, connection: Connection)
 => Promise<string | null | void> | string | null | void;
@@ -120,7 +121,6 @@ const BROADCAST_TOKEN = '!';
 import {FS} from '../lib/fs';
 import {Utils} from '../lib/utils';
 import {formatText, linkRegex, stripFormatting} from './chat-formatter';
-import {ModlogEntry} from './modlog';
 
 // @ts-ignore no typedef available
 import ProbeModule = require('probe-image-size');
@@ -492,9 +492,11 @@ export class CommandContext extends MessageContext {
 		} catch (err) {
 			if (err.name?.endsWith('ErrorMessage')) {
 				this.errorReply(err.message);
+				this.update();
 				return false;
 			}
 			if (err.name.endsWith('Interruption')) {
+				this.update();
 				return;
 			}
 			Monitor.crashlog(err, 'A chat command', {
@@ -542,6 +544,16 @@ export class CommandContext extends MessageContext {
 
 	sendChatMessage(message: string) {
 		if (this.pmTarget) {
+			const blockInvites = this.pmTarget.settings.blockInvites;
+			if (blockInvites && /^<<.*>>$/.test(message.trim())) {
+				if (
+					!this.user.can('lock') && blockInvites === true ||
+					!Users.globalAuth.atLeast(this.user, blockInvites as GroupSymbol)
+				) {
+					Chat.maybeNotifyBlocked(`invite`, this.pmTarget, this.user);
+					return this.errorReply(`${this.pmTarget.name} is blocking room invites.`);
+				}
+			}
 			Chat.sendPM(message, this.user, this.pmTarget);
 		} else if (this.room) {
 			this.room.add(`|c|${this.user.getIdentity(this.room.roomid)}|${message}`);
@@ -828,7 +840,12 @@ export class CommandContext extends MessageContext {
 		this.roomlog(`(${msg})`);
 	}
 	globalModlog(action: string, user: string | User | null, note?: string | null, ip?: string) {
-		const entry: ModlogEntry = {action, isGlobal: true, loggedBy: this.user.id, note: note?.replace(/\n/gm, ' ')};
+		const entry: PartialModlogEntry = {
+			action,
+			isGlobal: true,
+			loggedBy: this.user.id,
+			note: note?.replace(/\n/gm, ' ') || '',
+		};
 		if (user) {
 			if (typeof user === 'string') {
 				entry.userid = toID(user);
@@ -842,8 +859,11 @@ export class CommandContext extends MessageContext {
 			}
 		}
 		if (ip) entry.ip = ip;
-		this.room?.modlog(entry);
-		Rooms.global.modlog(entry, this.room?.roomid);
+		if (this.room) {
+			this.room.modlog(entry);
+		} else {
+			Rooms.global.modlog(entry);
+		}
 	}
 	modlog(
 		action: string,
@@ -851,7 +871,11 @@ export class CommandContext extends MessageContext {
 		note: string | null = null,
 		options: Partial<{noalts: any, noip: any}> = {}
 	) {
-		const entry: ModlogEntry = {action, loggedBy: this.user.id, note: note?.replace(/\n/gm, ' ')};
+		const entry: PartialModlogEntry = {
+			action,
+			loggedBy: this.user.id,
+			note: note?.replace(/\n/gm, ' ') || '',
+		};
 		if (user) {
 			if (typeof user === 'string') {
 				entry.userid = toID(user);
@@ -1120,7 +1144,7 @@ export class CommandContext extends MessageContext {
 			const normalized = message.trim();
 			if (
 				!user.can('bypassall') && (['help', 'lobby'].includes(room.roomid)) && (normalized === user.lastMessage) &&
-				((Date.now() - user.lastMessageTime) < MESSAGE_COOLDOWN)
+				((Date.now() - user.lastMessageTime) < MESSAGE_COOLDOWN) && !Config.nothrottle
 			) {
 				throw new Chat.ErrorMessage(this.tr("You can't send the same message again so soon."));
 			}
@@ -1212,7 +1236,7 @@ export class CommandContext extends MessageContext {
 		htmlContent = ('' + (htmlContent || '')).trim();
 		if (!htmlContent) return '';
 		if (/>here.?</i.test(htmlContent) || /click here/i.test(htmlContent)) {
-			throw new Chat.ErrorMessage('Do not use "click here"');
+			throw new Chat.ErrorMessage('Do not use "click here" – See [[Design standard #2 <https://github.com/smogon/pokemon-showdown/blob/master/CONTRIBUTING.md#design-standards>]]');
 		}
 
 		// check for mismatched tags
@@ -2128,7 +2152,7 @@ export const Chat = new class {
 	/**
 	 * Notifies a targetUser that a user was blocked from reaching them due to a setting they have enabled.
 	 */
-	maybeNotifyBlocked(blocked: 'pm' | 'challenge', targetUser: User, user: User) {
+	maybeNotifyBlocked(blocked: 'pm' | 'challenge' | 'invite', targetUser: User, user: User) {
 		const prefix = `|pm|&|${targetUser.getIdentity()}|/nonotify `;
 		const options = 'or change it in the <button name="openOptions" class="subtle">Options</button> menu in the upper right.';
 		if (blocked === 'pm') {
@@ -2140,6 +2164,11 @@ export const Chat = new class {
 			if (!targetUser.notified.blockChallenges) {
 				targetUser.send(`${prefix}The user '${Utils.escapeHTML(user.name)}' attempted to challenge you to a battle but was blocked. To enable challenges, use /unblockchallenges ${options}`);
 				targetUser.notified.blockChallenges = true;
+			}
+		} else if (blocked === 'invite') {
+			if (!targetUser.notified.blockInvites) {
+				targetUser.send(`${prefix}The user '${Utils.escapeHTML(user.name)}' attempted to invite you to a room but was blocked. To enable invites, use /unblockinvites.`);
+				targetUser.notified.blockInvites = true;
 			}
 		}
 	}

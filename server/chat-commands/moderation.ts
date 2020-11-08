@@ -909,6 +909,7 @@ export const commands: ChatCommands = {
 			if (curUser.locked && !curUser.locked.startsWith('#') && !Punishments.getPunishType(curUser.id)) {
 				curUser.locked = null;
 				curUser.namelocked = null;
+				curUser.destroyPunishmentTimer();
 				curUser.updateIdentity();
 			}
 		}
@@ -945,6 +946,7 @@ export const commands: ChatCommands = {
 					curUser.namelocked = null;
 					curUser.resetName();
 				}
+				curUser.destroyPunishmentTimer();
 				curUser.updateIdentity();
 			}
 		}
@@ -1251,6 +1253,7 @@ export const commands: ChatCommands = {
 		if (!Users.Auth.hasPermission(user, 'promote', nextGroup)) {
 			this.errorReply(`/${cmd} - Access denied for promoting to ${groupName}`);
 			this.errorReply(`You can only promote to/from: ${Users.Auth.listJurisdiction(user, 'promote')}`);
+			return;
 		}
 
 		if (!Users.isUsernameKnown(userid)) {
@@ -1891,9 +1894,9 @@ export const commands: ChatCommands = {
 				const modlogEntry = {
 					action: 'NOTE',
 					loggedBy: user.id,
+					isGlobal: true,
 					note: `participants in ${roomid} (creator: ${targetUser.id}): ${participants.join(', ')}`,
 				};
-				Rooms.global.modlog(modlogEntry, targetRoom.roomid);
 				targetRoom.modlog(modlogEntry);
 			}
 

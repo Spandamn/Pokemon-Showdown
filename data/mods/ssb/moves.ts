@@ -2935,7 +2935,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		accuracy: 100,
 		basePower: 0,
 		category: "Status",
-		desc: "Calls the following moves in order, with their normal respective accuracy: Haze -> Worry Seed -> Poison Powder -> Stun Spore -> Leech Seed -> Struggle (for each of the 5 preceding moves that has no effect, increases Struggle's base power by 40)",
+		desc: "Calls the following moves in order, with their normal respective accuracy: Haze -> Worry Seed -> Poison Powder -> Stun Spore -> Leech Seed -> Struggle (150 BP)",
 		shortDesc: "Does many things then struggles.",
 		name: "spamguess",
 		isNonstandard: "Custom",
@@ -2943,12 +2943,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		pp: 10,
 		priority: 0,
 		flags: {},
-		condition: {
-			duration: 1,
-			onStart(pokemon) {
-				this.effectData.failCount = 0;
-			},
-		},
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
@@ -2957,7 +2951,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		}, */
 		// fruit this move.
 		onHit(target, source) {
-			source.addVolatile('spamguess'); // apparently adding it with self {} doesn't add it in time but if it wasn't with self {} it would add it instantly to the foe
 			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Haze.`);
 			// Haze
 			this.add('-clearallboost');
@@ -3049,8 +3042,9 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
 				source.volatiles["spamguess"].failCount++;
 			}
-
-			this.useMove('Struggle', source);
+			let strgl = this.dex.getActiveMove('Struggle');
+			strgl.basePower = 150;
+			this.useMove(strgl, source);
 		},
 		secondary: null,
 		target: "normal",

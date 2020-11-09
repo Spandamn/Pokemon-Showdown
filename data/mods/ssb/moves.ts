@@ -2971,7 +2971,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 
 			if (!cleared) {
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				source.volatiles["spamguess"].failCount++;
 			}
 
 			// Worry Seed
@@ -2982,7 +2981,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 			];
 			if (bannedAbilities.includes(target.ability)) {
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				source.volatiles["spamguess"].failCount++;
 			} else {
 				const oldAbility = target.setAbility('insomnia');
 				if (oldAbility) {
@@ -2993,7 +2991,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				} else {
 					this.add('-message', `Worry Seed had no effect.`);
 					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-					source.volatiles["spamguess"].failCount++;
 				}
 			}
 
@@ -3003,12 +3000,10 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				if (!target.trySetStatus('psn', source)) {
 					this.add('-message', `Poison Powder had no effect.`);
 					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-					source.volatiles["spamguess"].failCount++;
 				}
 			} else {
 				this.add('-message', `Poison Powder missed!`);
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				source.volatiles["spamguess"].failCount++;
 			}
 
 			// Stun Spore
@@ -3017,12 +3012,10 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				if (!target.trySetStatus('par', source)) {
 					this.add('-message', `Stun spore had no effect.`);
 					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-					source.volatiles["spamguess"].failCount++;
 				}
 			} else {
 				this.add('-message', `Stun Spore missed!`);
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				source.volatiles["spamguess"].failCount++;
 			}
 
 			// Leech Seed
@@ -3031,18 +3024,15 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				if (target.hasType('Grass')) {
 					this.add('-message', `Leech Seed had no effect.`);
 					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-					source.volatiles["spamguess"].failCount++;
 				} else if (!target.addVolatile('leechseed', source)) {
 					this.add('-message', `Leech Seed had no effect.`);
 					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-					source.volatiles["spamguess"].failCount++;
 				}
 			} else {
 				this.add('-message', `Leech Seed missed!`);
 				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				source.volatiles["spamguess"].failCount++;
 			}
-			let strgl = this.dex.getActiveMove('Struggle');
+			const strgl = this.dex.getActiveMove('Struggle');
 			strgl.basePower = 150;
 			this.useMove(strgl, source);
 		},
@@ -5801,16 +5791,6 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 				this.field.clearTerrain();
 				return success;
 			},
-		},
-	},
-	// modified for meicoo's move calling struggle with adjusted basePower
-	struggle: {
-		inherit: true,
-		basePowerCallback(pokemon, target, move) {
-			if (pokemon.volatiles["spamguess"] && pokemon.volatiles["spamguess"].failCount) {
-				return move.basePower + (40 * pokemon.volatiles["spamguess"].failCount);
-			}
-			return move.basePower;
 		},
 	},
 	// genderless infatuation for nui's Condition Override

@@ -1,5 +1,3 @@
-import * as Data from '../../../sim/dex-data';
-
 export const Scripts: ModdedBattleScriptsData = {
 	inherit: 'gen8',
 	// 1 mega per pokemon
@@ -548,7 +546,7 @@ export const Scripts: ModdedBattleScriptsData = {
 
 		if (typeof move === 'number') {
 			const basePower = move;
-			move = new Data.Move({
+			move = new Dex.Move({
 				basePower,
 				type: '???',
 				category: 'Physical',

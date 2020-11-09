@@ -2946,95 +2946,25 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		onTryMove() {
 			this.attrLastMove('[still]');
 		},
-		/* onPrepareHit(target, source) {
-			this.add('-anim', source, 'TBD', source);
-		}, */
+		onPrepareHit(target, source) {
+			// No Animation
+		},
 		// fruit this move.
 		onHit(target, source) {
-			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Haze.`);
-			// Haze
-			this.add('-clearallboost');
-			let cleared = false;
-			for (const pokemon of this.getAllActive()) {
-				let stat: BoostName;
-				const stats: BoostName[] = [];
-				for (stat in pokemon.boosts) {
-					if (pokemon.boosts[stat]) {
-						stats.push(stat);
-					}
-				}
-				if (stats.length) {
-					pokemon.clearBoosts();
-					cleared = true;
-				}
-			}
-
-			if (!cleared) {
-				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-			}
-
-			// Worry Seed
-			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Worry Seed.`);
-			// added Set The Stage due to being "Stance Change+" this note is for me to remember to comment on this when making the pr and to remove this comment before opening the pr
-			const bannedAbilities = [
-				'battlebond', 'comatose', 'disguise', 'insomnia', 'multitype', 'powerconstruct', 'rkssystem', 'schooling', 'shieldsdown', 'stancechange', 'setthestage', 'truant', 'zenmode',
-			];
-			if (bannedAbilities.includes(target.ability)) {
-				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-			} else {
-				const oldAbility = target.setAbility('insomnia');
-				if (oldAbility) {
-					this.add('-ability', target, 'Insomnia', '[from] move: Worry Seed');
-					if (target.status === 'slp') {
-						target.cureStatus();
-					}
-				} else {
-					this.add('-message', `Worry Seed had no effect.`);
-					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				}
-			}
-
-			// Poison Powder
-			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Poison Powder.`);
-			if (this.randomChance(3, 4)) { // Powder accuracy
-				if (!target.trySetStatus('psn', source)) {
-					this.add('-message', `Poison Powder had no effect.`);
-					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				}
-			} else {
-				this.add('-message', `Poison Powder missed!`);
-				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-			}
-
-			// Stun Spore
-			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Stun Spore.`);
-			if (this.randomChance(3, 4)) { // Powder accuracy
-				if (!target.trySetStatus('par', source)) {
-					this.add('-message', `Stun spore had no effect.`);
-					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				}
-			} else {
-				this.add('-message', `Stun Spore missed!`);
-				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-			}
-
-			// Leech Seed
-			this.add('-message', `${source.side.name}'s ${source.name} called upon the effects of Leech Seed.`);
-			if (this.randomChance(9, 10)) {
-				if (target.hasType('Grass')) {
-					this.add('-message', `Leech Seed had no effect.`);
-					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				} else if (!target.addVolatile('leechseed', source)) {
-					this.add('-message', `Leech Seed had no effect.`);
-					this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-				}
-			} else {
-				this.add('-message', `Leech Seed missed!`);
-				this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
-			}
+			this.useMove('Haze', source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
+			this.useMove('Worry Seed', source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
+			this.useMove('Poison Powder', source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
+			this.useMove('Stun Spore', source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
+			this.useMove('Leech Seed', source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
 			const strgl = this.dex.getActiveMove('Struggle');
 			strgl.basePower = 150;
 			this.useMove(strgl, source);
+			this.add(`c|${getName('Meicoo')}|That is not the answer - try again!`);
 		},
 		secondary: null,
 		target: "normal",
